@@ -1,0 +1,243 @@
+.search-container {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  color: #2D2D2D;
+  line-height: 1.6;
+  min-height: 100vh;
+  padding: clamp(20px, 5vw, 30px) clamp(15px, 4vw, 20px);
+  box-sizing: border-box;
+}
+
+.search-header {
+  background: linear-gradient(135deg, #00A9E8 0%, #0080b8 100%);
+  color: white;
+  padding: clamp(25px, 5vw, 30px) clamp(15px, 4vw, 20px);
+  border-radius: 20px;
+  margin-bottom: 25px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 169, 232, 0.3);
+}
+
+.search-header h1 {
+  font-size: clamp(22px, 5vw, 28px);
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.search-subtitle {
+  font-size: clamp(14px, 4vw, 16px);
+  opacity: 0.9;
+}
+
+.search-input-wrapper {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.search-input {
+  width: 100%;
+  padding: clamp(15px, 4vw, 18px) clamp(20px, 5vw, 25px);
+  font-size: clamp(16px, 4vw, 18px);
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  border: 2px solid #e1e5e9;
+  border-radius: 15px;
+  background: white;
+  transition: all 0.3s ease;
+  box-sizing: border-box;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #00A9E8;
+  box-shadow: 0 0 0 3px rgba(0, 169, 232, 0.1);
+}
+
+.search-loading {
+  position: absolute;
+  right: 20px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #6c757d;
+  font-size: 14px;
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+
+.search-hint {
+  background: rgba(255, 193, 7, 0.1);
+  color: #FF9800;
+  padding: 12px 15px;
+  border-radius: 10px;
+  font-size: 14px;
+  margin-bottom: 20px;
+  border-left: 4px solid #FF9800;
+}
+
+.search-results {
+  margin-top: 25px;
+}
+
+.search-results-count {
+  font-size: 16px;
+  font-weight: 600;
+  color: #6c757d;
+  margin-bottom: 15px;
+}
+
+.search-results-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.search-result-card {
+  background: white;
+  border-radius: 15px;
+  padding: clamp(18px, 4vw, 22px) clamp(15px, 4vw, 20px);
+  box-shadow: 0 5px 20px rgba(45, 45, 45, 0.1);
+  transition: all 0.3s ease;
+}
+
+.search-result-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(45, 45, 45, 0.15);
+}
+
+.search-result-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 15px;
+  margin-bottom: 12px;
+}
+
+.search-result-name {
+  font-size: clamp(16px, 4vw, 18px);
+  font-weight: 600;
+  color: #2D2D2D;
+  margin: 0;
+  flex: 1;
+}
+
+.search-result-points {
+  background: linear-gradient(135deg, rgba(255, 193, 7, 0.1) 0%, rgba(255, 193, 7, 0.2) 100%);
+  color: #FF9800;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: clamp(13px, 3.5vw, 14px);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.search-result-achievements {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.search-result-achievement {
+  background: linear-gradient(135deg, rgba(0, 169, 232, 0.1) 0%, rgba(0, 169, 232, 0.2) 100%);
+  color: #00A9E8;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: clamp(12px, 3vw, 13px);
+  font-weight: 500;
+  display: inline-block;
+}
+
+.search-result-company {
+  color: #00A9E8;
+  font-size: clamp(14px, 3.5vw, 15px);
+  font-weight: 500;
+  margin-bottom: 10px;
+}
+
+.search-result-description {
+  color: #495057;
+  font-size: clamp(14px, 3.5vw, 15px);
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+
+.search-result-phone {
+  color: #6c757d;
+  font-size: clamp(13px, 3.5vw, 14px);
+}
+
+.search-result-contacts {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+  padding-top: 12px;
+  border-top: 1px solid #e1e5e9;
+}
+
+.search-result-telegram {
+  color: #00A9E8;
+  text-decoration: none;
+  font-size: clamp(13px, 3.5vw, 14px);
+  font-weight: 500;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+.search-result-telegram:hover {
+  color: #0080b8;
+  text-decoration: underline;
+}
+
+.search-result-telegram-logo {
+  opacity: 0.7;
+  transition: all 0.3s ease;
+}
+
+.search-result-telegram:hover .search-result-telegram-logo {
+  opacity: 1;
+}
+
+.search-empty {
+  text-align: center;
+  padding: 40px 20px;
+  color: #6c757d;
+}
+
+.search-empty p {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+.search-empty-hint {
+  font-size: 14px;
+  opacity: 0.8;
+}
+
+@media (max-width: 480px) {
+  .search-container {
+    padding: clamp(15px, 4vw, 20px) clamp(10px, 3vw, 15px);
+  }
+  
+  .search-header {
+    padding: clamp(20px, 4vw, 25px) clamp(12px, 3vw, 15px);
+  }
+  
+  .search-result-header {
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .search-result-points {
+    align-self: flex-start;
+  }
+}

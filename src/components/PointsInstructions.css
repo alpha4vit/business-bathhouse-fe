@@ -1,0 +1,200 @@
+.instructions-container {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  color: #2D2D2D;
+  line-height: 1.6;
+  min-height: 100vh;
+  padding: clamp(15px, 4vw, 20px) clamp(10px, 3vw, 15px);
+  box-sizing: border-box;
+}
+
+.instructions-header {
+  background: linear-gradient(135deg, #00A9E8 0%, #0080b8 100%);
+  color: white;
+  padding: clamp(25px, 5vw, 30px) clamp(15px, 4vw, 20px);
+  border-radius: 20px;
+  margin-bottom: 25px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 169, 232, 0.3);
+  position: relative;
+  overflow: hidden;
+}
+
+.instructions-header::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  right: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+  animation: float 6s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); }
+  50% { transform: translate(-20px, -20px) rotate(180deg); }
+}
+
+.instructions-header h1 {
+  font-size: clamp(20px, 5vw, 24px);
+  font-weight: 700;
+  margin-bottom: 10px;
+  position: relative;
+  z-index: 1;
+}
+
+.instructions-subtitle {
+  font-size: clamp(14px, 4vw, 16px);
+  opacity: 0.9;
+  position: relative;
+  z-index: 1;
+}
+
+.instructions-intro {
+  background: linear-gradient(135deg, rgba(0, 169, 232, 0.05) 0%, rgba(0, 169, 232, 0.1) 100%);
+  padding: 20px;
+  border-radius: 15px;
+  margin-bottom: 25px;
+  border-left: 4px solid #00A9E8;
+  font-size: clamp(14px, 3.5vw, 16px);
+  line-height: 1.7;
+}
+
+.instructions-card {
+  background: white;
+  border-radius: 15px;
+  padding: clamp(20px, 5vw, 25px) clamp(15px, 4vw, 20px);
+  margin-bottom: 20px;
+  box-shadow: 0 5px 20px rgba(45, 45, 45, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  box-sizing: border-box;
+}
+
+.instructions-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(45, 45, 45, 0.15);
+}
+
+.instructions-section-title {
+  color: #00A9E8;
+  font-size: clamp(16px, 4vw, 20px);
+  font-weight: 600;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.instructions-section-number {
+  background: #00A9E8;
+  color: white;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: clamp(12px, 3vw, 14px);
+  font-weight: 700;
+  flex-shrink: 0;
+}
+
+.instructions-section-content {
+  color: #2D2D2D;
+  font-size: clamp(14px, 3.5vw, 16px);
+  line-height: 1.7;
+}
+
+.instructions-highlight {
+  background: linear-gradient(120deg, rgba(0, 169, 232, 0.1) 0%, rgba(0, 169, 232, 0.2) 100%);
+  padding: 15px;
+  border-radius: 10px;
+  margin: 15px 0;
+  border-left: 4px solid #00A9E8;
+}
+
+.instructions-pulse {
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.7; }
+  100% { opacity: 1; }
+}
+
+.instructions-points-badge {
+  display: inline-block;
+  background: #00A9E8;
+  color: white;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: clamp(12px, 3vw, 14px);
+  font-weight: 600;
+  margin: 0 5px;
+}
+
+.instructions-list-item {
+  margin: 10px 0;
+  padding-left: 20px;
+  position: relative;
+}
+
+.instructions-list-item::before {
+  content: '•';
+  color: #00A9E8;
+  font-size: 20px;
+  position: absolute;
+  left: 0;
+  top: -2px;
+}
+
+.instructions-footer {
+  text-align: center;
+  margin-top: 30px;
+  padding: 20px;
+  color: #2D2D2D;
+  opacity: 0.7;
+  font-size: clamp(12px, 3vw, 14px);
+}
+
+.instructions-close-button {
+  width: 100%;
+  padding: clamp(12px, 3vw, 15px);
+  background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+  color: #2D2D2D;
+  border: 2px solid #ced4da;
+  border-radius: 12px;
+  font-size: clamp(14px, 3.5vw, 15px);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 20px;
+}
+
+.instructions-close-button:hover {
+  background: linear-gradient(135deg, #dee2e6 0%, #ced4da 100%);
+  border-color: #adb5bd;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.instructions-close-button:active {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+@media (max-width: 480px) {
+  .instructions-container {
+    padding: clamp(12px, 3vw, 15px) clamp(8px, 2vw, 10px);
+  }
+  
+  .instructions-header {
+    padding: clamp(20px, 4vw, 25px) clamp(12px, 3vw, 15px);
+  }
+  
+  .instructions-card {
+    padding: clamp(15px, 4vw, 20px) clamp(12px, 3vw, 15px);
+  }
+}
