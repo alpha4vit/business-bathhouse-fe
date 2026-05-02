@@ -44,9 +44,9 @@ function Navbar() {
                     <Link to="/offers" className="navbar-item">
                         <span className="navbar-text">Спецпредложения</span>
                     </Link>
-                    {/*<Link to="/residents/search" className="navbar-item">*/}
-                    {/*    <span className="navbar-text">Поиск резидентов</span>*/}
-                    {/*</Link>*/}
+                    <Link to="/residents/search" className="navbar-item">
+                        <span className="navbar-text">Поиск резидентов</span>
+                    </Link>
                 </div>
             </div>
 
@@ -70,9 +70,9 @@ function Navbar() {
                         <Link to="/offers" className="navbar-drawer-link" onClick={() => setIsMenuOpen(false)}>
                             <span>Спецпредложения</span>
                         </Link>
-                        {/*<Link to="/residents/search" className="navbar-drawer-link" onClick={() => setIsMenuOpen(false)}>*/}
-                        {/*    <span>Поиск резидентов</span>*/}
-                        {/*</Link>*/}
+                        <Link to="/residents/search" className="navbar-drawer-link" onClick={() => setIsMenuOpen(false)}>
+                            <span>Поиск резидентов</span>
+                        </Link>
                     </div>
                 </div>
             </div>

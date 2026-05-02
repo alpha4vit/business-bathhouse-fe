@@ -3,9 +3,11 @@
   background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
   color: #2D2D2D;
   line-height: 1.6;
-  min-height: 100vh;
   padding: clamp(20px, 5vw, 30px) clamp(15px, 4vw, 20px);
   box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 
 .search-header {
@@ -78,7 +80,8 @@
 }
 
 .search-results {
-  margin-top: 25px;
+  position: relative;
+  flex-grow: 1;
 }
 
 .search-results-count {
@@ -86,26 +89,70 @@
   font-weight: 600;
   color: #6c757d;
   margin-bottom: 15px;
+  text-align: center;
 }
 
-.search-results-list {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
+.search-card-container {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+  min-height: 500px;
+  touch-action: pan-y;
+  height: auto;
+}
+
+.search-card-container.swiping {
+  touch-action: none;
 }
 
 .search-result-card {
   background: white;
-  border-radius: 15px;
-  padding: clamp(18px, 4vw, 22px) clamp(15px, 4vw, 20px);
-  box-shadow: 0 5px 20px rgba(45, 45, 45, 0.1);
-  transition: all 0.3s ease;
+  border-radius: 20px;
+  padding: 30px;
+  box-shadow: 0 10px 40px rgba(45, 45, 45, 0.15);
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  min-height: 500px;
+  height: auto;
+  transition: transform 0.3s ease, opacity 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  touch-action: pan-y;
+  user-select: none;
 }
 
-.search-result-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 8px 25px rgba(45, 45, 45, 0.15);
+.search-result-card.active {
+  position: relative;
+  z-index: 1;
 }
+
+.search-result-card.dragging {
+  transition: none;
+}
+
+.search-result-card.swiping-left {
+  transform: translateX(-120%) rotate(-15deg);
+  opacity: 0;
+}
+
+.search-result-card.swiping-right {
+  transform: translateX(120%) rotate(15deg);
+  opacity: 0;
+}
+
+.search-result-card.entering {
+  transform: scale(0.9);
+  opacity: 0;
+}
+
+.search-result-card.active {
+  transform: scale(1);
+  opacity: 1;
+}
+
 
 .search-result-header {
   display: flex;
@@ -227,16 +274,29 @@
   .search-container {
     padding: clamp(15px, 4vw, 20px) clamp(10px, 3vw, 15px);
   }
-  
+
   .search-header {
     padding: clamp(20px, 4vw, 25px) clamp(12px, 3vw, 15px);
   }
-  
+
+  .search-card-container {
+    max-width: 100%;
+    min-height: 450px;
+  }
+
+  .search-result-card {
+    min-height: 450px;
+  }
+
+  .search-result-card {
+    padding: 20px;
+  }
+
   .search-result-header {
     flex-direction: column;
     gap: 10px;
   }
-  
+
   .search-result-points {
     align-self: flex-start;
   }

@@ -29,6 +29,15 @@ export interface LeaderboardItem {
   chatId: number
 }
 
+export interface Resident {
+  chatId: number
+  fullName: string
+  businessDescription?: string
+  phoneNumber?: string
+  telegramUsername?: string
+  achievements: string[]
+}
+
 interface TelegramUserResponse {
   chatId: number
   telegramUsername?: string
@@ -122,13 +131,13 @@ export const userService = {
   async getLeaderboard(): Promise<LeaderboardItem[]> {
     try {
       const response = await fetch(`${API_BASE_URL}/api/points/leaderboard`)
-      
+
       if (!response.ok) {
         throw new Error(`Failed to fetch leaderboard: ${response.status}`)
       }
 
       const data = await response.json()
-      
+
       return data.map((item: any) => ({
         fullName: item.fullName || '',
         points: item.company?.points || 0,
@@ -136,6 +145,22 @@ export const userService = {
       }))
     } catch (error) {
       console.error('Error fetching leaderboard:', error)
+      throw error
+    }
+  },
+
+  async searchResidents(keyword: string): Promise<Resident[]> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/user?keyword=${encodeURIComponent(keyword)}`)
+
+      if (!response.ok) {
+        throw new Error(`Failed to search residents: ${response.status}`)
+      }
+
+      const data = await response.json()
+      return data
+    } catch (error) {
+      console.error('Error searching residents:', error)
       throw error
     }
   }

@@ -1,52 +1,31 @@
-import {useState, useEffect, useRef} from 'react'
+import {useState, useEffect} from 'react'
 import './ResidentSearch.css'
-
-interface Resident {
-    chatId: number
-    fullName: string
-    businessDescription?: string
-    phoneNumber?: string
-    telegramUsername?: string
-    achievements: string[]
-}
+import {userService, Resident} from '../services/userService'
 
 function ResidentSearch() {
     const [searchTerm, setSearchTerm] = useState('')
     const [results, setResults] = useState<Resident[]>([])
     const [loading, setLoading] = useState(false)
-    const abortControllerRef = useRef<AbortController | null>(null)
+    const [currentIndex, setCurrentIndex] = useState(0)
+    const [swipeOffset, setSwipeOffset] = useState(0)
+    const [isDragging, setIsDragging] = useState(false)
 
     useEffect(() => {
         if (searchTerm.length < 2) {
             setResults([])
             setLoading(false)
+            setCurrentIndex(0)
             return
         }
-
-        if (abortControllerRef.current) {
-            abortControllerRef.current.abort()
-        }
-
-        const abortController = new AbortController()
-        abortControllerRef.current = abortController
 
         const timer = setTimeout(async () => {
             setLoading(true)
             try {
-                const response = await fetch(`http://localhost:8080/api/user?keyword=${encodeURIComponent(searchTerm)}`, {
-                    signal: abortController.signal
-                })
-                
-                if (!response.ok) {
-                    throw new Error('Failed to search residents')
-                }
-                
-                const data = await response.json()
+                const data = await userService.searchResidents(searchTerm)
                 setResults(data)
+                setCurrentIndex(0)
             } catch (error) {
-                if (error instanceof Error && error.name !== 'AbortError') {
-                    console.error('Search error:', error)
-                }
+                console.error('Search error:', error)
             } finally {
                 setLoading(false)
             }
@@ -54,9 +33,85 @@ function ResidentSearch() {
 
         return () => {
             clearTimeout(timer)
-            abortController.abort()
         }
     }, [searchTerm])
+
+    const handleTouchStart = (e: React.TouchEvent) => {
+        setTouchStart(e.touches[0].clientX)
+        setTouchStartY(e.touches[0].clientY)
+        setIsDragging(true)
+        setSwipeOffset(0)
+        setIsHorizontalSwipeStarted(false)
+        setIsSwiping(false)
+    }
+
+    const handleTouchMove = (e: React.TouchEvent) => {
+        if (!isDragging) return
+        const currentX = e.touches[0].clientX
+        const currentY = e.touches[0].clientY
+        const diffX = currentX - touchStart
+        const diffY = Math.abs(currentY - (touchStartY || 0))
+
+        // Если вертикальное движение больше горизонтального и горизонтальный свайп еще не начался, не обрабатываем свайп
+        if (diffY > Math.abs(diffX) && diffY > 30 && !isHorizontalSwipeStarted) {
+            setIsDragging(false)
+            return
+        }
+
+        // Если горизонтальное движение достаточно большое, блокируем вертикальный скролл
+        if (Math.abs(diffX) > 20) {
+            setIsHorizontalSwipeStarted(true)
+            setIsSwiping(true)
+            e.preventDefault()
+        }
+
+        const threshold = 50
+
+        if (diffX < -threshold && currentIndex < results.length - 1 && !swipeDirection) {
+            setSwipeDirection('left')
+        } else if (diffX > threshold && currentIndex > 0 && !swipeDirection) {
+            setSwipeDirection('right')
+        }
+
+        setSwipeOffset(diffX)
+    }
+
+    const [touchStart, setTouchStart] = useState(0)
+    const [touchStartY, setTouchStartY] = useState(0)
+    const [isAnimating, setIsAnimating] = useState(false)
+    const [swipeDirection, setSwipeDirection] = useState<'left' | 'right' | null>(null)
+    const [isHorizontalSwipeStarted, setIsHorizontalSwipeStarted] = useState(false)
+    const [isSwiping, setIsSwiping] = useState(false)
+
+    const handleTouchEnd = () => {
+        if (!isDragging) return
+        setIsDragging(false)
+        setIsHorizontalSwipeStarted(false)
+        setIsSwiping(false)
+
+        if (swipeDirection === 'left' && currentIndex < results.length - 1) {
+            setIsAnimating(true)
+            setSwipeOffset(-500)
+            setTimeout(() => {
+                setCurrentIndex(currentIndex + 1)
+                setIsAnimating(false)
+                setSwipeOffset(0)
+                setSwipeDirection(null)
+            }, 300)
+        } else if (swipeDirection === 'right' && currentIndex > 0) {
+            setIsAnimating(true)
+            setSwipeOffset(500)
+            setTimeout(() => {
+                setCurrentIndex(currentIndex - 1)
+                setIsAnimating(false)
+                setSwipeOffset(0)
+                setSwipeDirection(null)
+            }, 300)
+        } else {
+            setSwipeOffset(0)
+            setSwipeDirection(null)
+        }
+    }
 
     return (
         <div className="search-container">
@@ -85,15 +140,27 @@ function ResidentSearch() {
             {results.length > 0 && (
                 <div className="search-results">
                     <div className="search-results-count">
-                        Найдено резидентов: {results.length}
+                        {currentIndex + 1} из {results.length}
                     </div>
-                    <div className="search-results-list">
-                        {results.map((resident) => (
-                            <div key={resident.chatId} className="search-result-card">
+                    <div
+                        className={`search-card-container ${isSwiping ? 'swiping' : ''}`}
+                        onTouchStart={handleTouchStart}
+                        onTouchMove={handleTouchMove}
+                        onTouchEnd={handleTouchEnd}
+                    >
+                        {results.map((resident, index) => (
+                            <div
+                                key={resident.chatId}
+                                className={`search-result-card ${index === currentIndex ? 'active' : ''} ${isAnimating ? (index < currentIndex ? 'swiping-left' : 'swiping-right') : ''} ${isDragging && index === currentIndex ? 'dragging' : ''}`}
+                                style={{
+                                    display: index === currentIndex || (isAnimating && (index === currentIndex - 1 || index === currentIndex + 1)) ? 'flex' : 'none',
+                                    transform: index === currentIndex && !isAnimating ? `translateX(${swipeOffset}px) rotate(${swipeOffset * 0.05}deg)` : undefined
+                                }}
+                            >
                                 <div className="search-result-header">
                                     <h3 className="search-result-name">{resident.fullName}</h3>
                                 </div>
-                                
+
                                 {resident.achievements && resident.achievements.length > 0 && (
                                     <div className="search-result-achievements">
                                         {resident.achievements.map((achievement, index) => (
@@ -103,33 +170,28 @@ function ResidentSearch() {
                                         ))}
                                     </div>
                                 )}
-                                
+
                                 {resident.businessDescription && (
                                     <div className="search-result-description">
                                         {resident.businessDescription}
                                     </div>
                                 )}
-                                
+
                                 <div className="search-result-contacts">
                                     {resident.telegramUsername && (
-                                        <button 
-                                            // onClick={() => {
-                                            //     const username = resident.telegramUsername.replace('@', '')
-                                            //     if (window.Telegram?.WebApp?.openTelegramLink) {
-                                            //         window.Telegram.WebApp.openTelegramLink(`https://t.me/${username}`)
-                                            //     } else {
-                                            //         window.open(`https://t.me/${username}`, '_blank')
-                                            //     }
-                                            // }}
+                                        <a
+                                            href={`https://t.me/${resident.telegramUsername.replace('@', '')}`}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
                                             className="search-result-telegram"
                                         >
                                             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" className="search-result-telegram-logo">
                                                 <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
                                             </svg>
                                             @{resident.telegramUsername.replace('@', '')}
-                                        </button>
+                                        </a>
                                     )}
-                                    
+
                                     {resident.phoneNumber && (
                                         <div className="search-result-phone">
                                             📞 {resident.phoneNumber}
