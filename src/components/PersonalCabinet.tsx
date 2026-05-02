@@ -1,7 +1,8 @@
 import {useEffect, useState} from 'react'
 import './PersonalCabinet.css'
-import {userService, UserDataDto, LeaderboardItem} from '../services/userService'
+import {userService, UserDataDto} from '../services/userService'
 import {useUserId} from '../hooks/useUserId'
+import {useCache} from '../utils/cache'
 import PointsInstructions from './PointsInstructions'
 import arrowIcon from '../img/arrow.svg'
 
@@ -11,12 +12,18 @@ function PersonalCabinet() {
     const [userData, setUserData] = useState<UserDataDto | null>(null)
     const [loading, setLoading] = useState<boolean>(true)
     const [error, setError] = useState<string | null>(null)
-    const [leaderboard, setLeaderboard] = useState<LeaderboardItem[]>([])
     const [showLeaderboard, setShowLeaderboard] = useState<boolean>(false)
     const [visibleCount, setVisibleCount] = useState<number>(20)
     const [isClosing, setIsClosing] = useState<boolean>(false)
     const [showInstructions, setShowInstructions] = useState<boolean>(false)
     const [isInstructionsClosing, setIsInstructionsClosing] = useState<boolean>(false)
+
+    // Используем кеш для рейтинга резидентов
+    const { data: leaderboard, loading: leaderboardLoading, error: leaderboardError } = useCache(
+        'leaderboard',
+        () => userService.getLeaderboard(),
+        [] // Пустые зависимости - кеш обновится только при перерендеринге компонента
+    )
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -46,7 +53,7 @@ function PersonalCabinet() {
         }
     }, [chatId])
 
-    const fetchLeaderboard = async () => {
+    const fetchLeaderboard = () => {
         if (showLeaderboard) {
             setIsClosing(true)
             setTimeout(() => {
@@ -57,13 +64,8 @@ function PersonalCabinet() {
             return
         }
 
-        try {
-            const data = await userService.getLeaderboard()
-            setLeaderboard(data)
-            setShowLeaderboard(true)
-        } catch (err) {
-            console.error('Failed to fetch leaderboard:', err)
-        }
+        // Просто показываем/скрываем рейтинг, данные уже в кеше
+        setShowLeaderboard(true)
     }
 
     const getPointsWord = (count: number): string => {
@@ -214,7 +216,15 @@ function PersonalCabinet() {
                     <div className={`cabinet-card leaderboard-card ${isClosing ? 'closing' : ''}`}>
                         <h2>🏆 Рейтинг резидентов</h2>
                         
-                        {leaderboard.length > 0 ? (
+                        {leaderboardLoading ? (
+                            <div className="cabinet-loading">
+                                Загрузка рейтинга...
+                            </div>
+                        ) : leaderboardError ? (
+                            <div className="cabinet-empty-history">
+                                Ошибка загрузки рейтинга: {leaderboardError}
+                            </div>
+                        ) : leaderboard && leaderboard.length > 0 ? (
                             <>
                                 <div className="cabinet-leaderboard-list">
                                     {leaderboard.slice(0, visibleCount).map((item, index) => (
