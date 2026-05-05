@@ -17,7 +17,7 @@ function PersonalCabinet() {
     const [isClosing, setIsClosing] = useState<boolean>(false)
     const [showInstructions, setShowInstructions] = useState<boolean>(false)
     const [isInstructionsClosing, setIsInstructionsClosing] = useState<boolean>(false)
-
+    
     // Используем кеш для рейтинга резидентов
     const { data: leaderboard, loading: leaderboardLoading, error: leaderboardError } = useCache(
         'leaderboard',
@@ -38,6 +38,7 @@ function PersonalCabinet() {
                 }
 
                 const data = await userService.getUserData(chatId)
+                console.log('User data:', data)
                 setUserData(data)
             } catch (err) {
                 console.error('Failed to fetch user data:', err)
@@ -131,6 +132,7 @@ function PersonalCabinet() {
                 <div className="cabinet-card">
                     <h2>Профиль</h2>
                     
+                                        
                     <div className="cabinet-info-group">
                         <div className="cabinet-info-item">
                             <span className="cabinet-info-label">ФИО:</span>
@@ -174,6 +176,18 @@ function PersonalCabinet() {
                             <div className="cabinet-points-emoji">⭐</div>
                             <div className="cabinet-points-label">Всего баллов</div>
                         </div>
+                    </div>
+
+                    <div className="cabinet-deposit-button-container">
+                        <button 
+                            className="cabinet-deposit-button"
+                            onClick={() => {
+                                // Переходим на страницу выставления счета
+                                window.location.href = `/view/invoice/?id=${chatId}`
+                            }}
+                        >
+                            <span className="cabinet-deposit-button-text">Пополнить лицевой счет</span>
+                        </button>
                     </div>
 
                     <div className="cabinet-buttons-row">

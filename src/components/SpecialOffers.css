@@ -44,7 +44,7 @@
 }
 
 .offers-card {
-  background: linear-gradient(120deg, rgba(0, 169, 232, 0.05) 0%, rgba(0, 169, 232, 0.1) 100%);
+  background: white;
   border: 2px solid rgba(0, 169, 232, 0.2);
   border-radius: 15px;
   padding: clamp(20px, 5vw, 25px) clamp(15px, 4vw, 20px);
@@ -96,14 +96,15 @@
 
 .offers-detail-item {
   padding: 15px;
-  background: rgba(255, 255, 255, 0.5);
+  background: linear-gradient(135deg, rgba(0, 169, 232, 0.06) 0%, rgba(0, 169, 232, 0.1) 100%);
   border-radius: 10px;
-  transition: background 0.3s ease;
+  transition: all 0.3s ease;
   border-left: 3px solid #00A9E8;
 }
 
 .offers-detail-item:hover {
-  background: rgba(255, 255, 255, 0.7);
+  background: linear-gradient(135deg, rgba(0, 169, 232, 0.12) 0%, rgba(0, 169, 232, 0.16) 100%);
+  transform: translateX(3px);
 }
 
 .offers-detail-content {
@@ -185,10 +186,10 @@
 }
 
 .offers-bonus-section {
-  background: rgba(255, 255, 255, 0.5);
+  background: linear-gradient(135deg, rgba(0, 169, 232, 0.08) 0%, rgba(0, 169, 232, 0.12) 100%);
   border-radius: 10px;
   padding: 20px;
-  border: 1px solid rgba(0, 169, 232, 0.2);
+  border: 1px solid rgba(0, 169, 232, 0.3);
 }
 
 .offers-bonus-header {
@@ -227,6 +228,22 @@
   text-decoration: underline;
 }
 
+.offers-bonus-value-black {
+  font-size: clamp(14px, 3.5vw, 15px);
+  color: #2D2D2D;
+  font-weight: 500;
+  line-height: 1.4;
+  text-decoration: none;
+  transition: color 0.3s ease;
+  word-break: break-word;
+  cursor: pointer;
+}
+
+.offers-bonus-value-black:hover {
+  color: #00A9E8;
+  text-decoration: underline;
+}
+
 .offers-exclusive-content {
   display: flex;
   flex-direction: column;
@@ -250,6 +267,10 @@
   gap: 15px;
   margin-top: 20px;
   margin-bottom: 20px;
+  background: linear-gradient(135deg, rgba(0, 169, 232, 0.08) 0%, rgba(0, 169, 232, 0.12) 100%);
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid rgba(0, 169, 232, 0.3);
 }
 
 .offers-exclusive-step {

@@ -76,7 +76,7 @@ function SpecialOffers() {
                                         href={offer.telegramLink} 
                                         target="_blank" 
                                         rel="noopener noreferrer"
-                                        className="offers-bonus-value-link"
+                                        className={offer.establishment === 'Кальянная «Полки Lounge»' ? 'offers-bonus-value-black' : 'offers-bonus-value-link'}
                                     >
                                         {offer.bonus}
                                     </a>

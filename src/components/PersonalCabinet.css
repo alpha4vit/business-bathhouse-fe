@@ -151,6 +151,49 @@
   margin-bottom: 20px;
 }
 
+.cabinet-deposit-button-container {
+  margin-bottom: 25px;
+}
+
+.cabinet-deposit-button {
+  width: 100%;
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  padding: 16px 20px;
+  font-size: clamp(15px, 4vw, 17px);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(40, 167, 69, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  position: relative;
+  overflow: hidden;
+}
+
+.cabinet-deposit-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(40, 167, 69, 0.4);
+}
+
+.cabinet-deposit-button:active {
+  transform: translateY(0);
+}
+
+.cabinet-deposit-button-icon {
+  font-size: clamp(18px, 5vw, 20px);
+  flex-shrink: 0;
+}
+
+.cabinet-deposit-button-text {
+  flex: 1;
+  text-align: center;
+}
+
 .cabinet-buttons-row {
   display: flex;
   gap: 10px;
@@ -519,6 +562,26 @@
   color: #6c757d;
 }
 
+.cabinet-photo-container {
+  text-align: center;
+  margin-bottom: 25px;
+}
+
+.cabinet-photo {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #00A9E8;
+  box-shadow: 0 8px 25px rgba(0, 169, 232, 0.3);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.cabinet-photo:hover {
+  transform: scale(1.05);
+  box-shadow: 0 12px 35px rgba(0, 169, 232, 0.4);
+}
+
 /* Responsive adjustments */
 @media (max-width: 480px) {
   .cabinet-container {
@@ -542,5 +605,10 @@
   .cabinet-history-item {
     grid-template-columns: 1fr;
     gap: 6px;
+  }
+  
+  .cabinet-photo {
+    width: 100px;
+    height: 100px;
   }
 }

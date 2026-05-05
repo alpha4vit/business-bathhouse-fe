@@ -21,6 +21,21 @@ export interface UserDataDto {
   balance: BalanceDto
   points: number
   pointsHistory: PointsHistoryItem[]
+  company?: {
+    id: string
+    title?: string
+    points?: number
+    balance?: {
+      amount: number
+      currency: string
+    }
+    photo?: {
+      id: number
+      showUrl: string
+      downloadUrl: string
+    }
+    [key: string]: any // Дополнительные поля которые могут приходить с бэкенда
+  }
 }
 
 export interface LeaderboardItem {
@@ -55,6 +70,11 @@ interface TelegramUserResponse {
     balance?: {
       amount: number
       currency: string
+    }
+    photo?: {
+      id: number
+      showUrl: string
+      downloadUrl: string
     }
   }
 }
@@ -120,10 +140,30 @@ export const userService = {
           currency: user.company?.balance?.currency || 'RUB'
         },
         points: user.company?.points || 0,
-        pointsHistory
+        pointsHistory,
+        company: user.company ? {
+          ...user.company,
+          photo: user.company.photo
+        } : undefined
       }
     } catch (error) {
       console.error('Error fetching user data:', error)
+      throw error
+    }
+  },
+
+  async getPhoto(photoUrl: string): Promise<string> {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/proxy/photo?url=${encodeURIComponent(photoUrl)}`)
+      
+      if (!response.ok) {
+        throw new Error(`Failed to fetch photo: ${response.status}`)
+      }
+      
+      const blob = await response.blob()
+      return URL.createObjectURL(blob)
+    } catch (error) {
+      console.error('Error fetching photo:', error)
       throw error
     }
   },

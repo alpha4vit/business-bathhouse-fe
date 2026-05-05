@@ -167,7 +167,7 @@ function CompanyRequisitesInput({ onCompanyDataChange, companyName }: CompanyReq
     }
 
     return (
-        <div className="invoice-input-group">
+        <div className="legal-invoice-input-group">
             <label>
                 Наименование ЮЛ (ООО / ИП)
             </label>
@@ -179,7 +179,7 @@ function CompanyRequisitesInput({ onCompanyDataChange, companyName }: CompanyReq
                 onFocus={handleInputFocus}
                 onBlur={handleInputBlur}
                 placeholder="Введите ИНН или название организации"
-                className="invoice-input"
+                className="legal-invoice-input"
             />
             {showSuggestions && suggestions.length > 0 && createPortal(
                 <div

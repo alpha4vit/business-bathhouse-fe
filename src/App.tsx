@@ -1,6 +1,6 @@
 import {BrowserRouter as Router, Route, Routes, useSearchParams} from 'react-router-dom'
 import {useEffect} from 'react'
-import Invoice from "./components/Invoice.tsx";
+import InvoicePage from "./components/InvoicePage.tsx";
 import PersonalCabinet from "./components/PersonalCabinet.tsx";
 import SpecialOffers from "./components/SpecialOffers.tsx";
 import PointsInstructions from "./components/PointsInstructions.tsx";
@@ -26,7 +26,7 @@ function AppContent() {
             <Navbar />
             <Routes>
                 <Route path="/" element={<div><h1>Home Page</h1></div>}/>
-                <Route path="/invoice" element={<Invoice/>}/>
+                <Route path="/invoice" element={<InvoicePage/>}/>
                 <Route path="/cabinet" element={<PersonalCabinet/>}/>
                 <Route path="/offers" element={<SpecialOffers/>}/>
                 <Route path="/points/instructions" element={<PointsInstructions/>}/>
