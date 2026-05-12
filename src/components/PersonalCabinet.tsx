@@ -17,6 +17,8 @@ function PersonalCabinet() {
     const [isClosing, setIsClosing] = useState<boolean>(false)
     const [showInstructions, setShowInstructions] = useState<boolean>(false)
     const [isInstructionsClosing, setIsInstructionsClosing] = useState<boolean>(false)
+    const [userPhotoUrl, setUserPhotoUrl] = useState<string | null>(null)
+    const [photoLoading, setPhotoLoading] = useState<boolean>(false)
     
     // Используем кеш для рейтинга резидентов
     const { data: leaderboard, loading: leaderboardLoading, error: leaderboardError } = useCache(
@@ -40,10 +42,32 @@ function PersonalCabinet() {
                 const data = await userService.getUserData(chatId)
                 console.log('User data:', data)
                 setUserData(data)
+
+                // Начинаем загрузку фото асинхронно, не блокируя отображение карточки
+                if (data.company?.photo?.showUrl) {
+                    setPhotoLoading(true)
+                    // Не ждем загрузки фото - запускаем в фоне
+                    userService.getPhoto(data.company.photo.showUrl)
+                        .then(photoUrl => {
+                            setUserPhotoUrl(photoUrl)
+                        })
+                        .catch(photoError => {
+                            console.error('Failed to load user photo:', photoError)
+                            setUserPhotoUrl(null)
+                        })
+                        .finally(() => {
+                            setPhotoLoading(false)
+                        })
+                } else {
+                    setUserPhotoUrl(null)
+                    setPhotoLoading(false)
+                }
             } catch (err) {
                 console.error('Failed to fetch user data:', err)
                 setError('Не удалось загрузить данные пользователя')
                 setUserData(null)
+                setUserPhotoUrl(null)
+                setPhotoLoading(false)
             } finally {
                 setLoading(false)
             }
@@ -53,6 +77,15 @@ function PersonalCabinet() {
             fetchUserData()
         }
     }, [chatId])
+
+    // Очистка URL объекта при размонтировании
+    useEffect(() => {
+        return () => {
+            if (userPhotoUrl && userPhotoUrl.startsWith('blob:')) {
+                URL.revokeObjectURL(userPhotoUrl)
+            }
+        }
+    }, [userPhotoUrl])
 
     const fetchLeaderboard = () => {
         if (showLeaderboard) {
@@ -132,21 +165,47 @@ function PersonalCabinet() {
                 <div className="cabinet-card">
                     <h2>Профиль</h2>
                     
-                                        
-                    <div className="cabinet-info-group">
-                        <div className="cabinet-info-item">
-                            <span className="cabinet-info-label">ФИО:</span>
-                            <span className="cabinet-info-value">{userData.fullName || 'Не указано'}</span>
+                    <div className="cabinet-profile-container">
+                        <div className="cabinet-photo-section">
+                            {photoLoading ? (
+                                <div className="cabinet-photo-loading">
+                                    Загрузка фото...
+                                </div>
+                            ) : userPhotoUrl ? (
+                                <div className="cabinet-photo-wrapper">
+                                    <img 
+                                        src={userPhotoUrl} 
+                                        alt="Фото резидента" 
+                                        className="cabinet-user-photo"
+                                        onError={() => {
+                                            console.error('Failed to load user photo image')
+                                            setUserPhotoUrl(null)
+                                        }}
+                                    />
+                                </div>
+                            ) : (
+                                <div className="cabinet-no-photo">
+                                    <div className="cabinet-no-photo-icon">👤</div>
+                                    <span className="cabinet-no-photo-text">Нет фото</span>
+                                </div>
+                            )}
                         </div>
                         
-                        <div className="cabinet-info-item">
-                            <span className="cabinet-info-label">Телефон:</span>
-                            <span className="cabinet-info-value">{userData.phoneNumber || 'Не указано'}</span>
-                        </div>
-                        
-                        <div className="cabinet-info-item">
-                            <span className="cabinet-info-label">Компания:</span>
-                            <span className="cabinet-info-value">{userData.companyTitle || 'Не указано'}</span>
+                        <div className="cabinet-info-group">
+                            <div className="cabinet-info-item">
+                                <span className="cabinet-info-label">ФИО:</span>
+                                <span className="cabinet-info-value">{userData.fullName || 'Не указано'}</span>
+                            </div>
+                            
+                            <div className="cabinet-info-item">
+                                <span className="cabinet-info-label">Телефон:</span>
+                                <span className="cabinet-info-value">{userData.phoneNumber || 'Не указано'}</span>
+                            </div>
+                            
+                            <div className="cabinet-info-item">
+                                <span className="cabinet-info-label">Компания:</span>
+                                <span className="cabinet-info-value">{userData.companyTitle || 'Не указано'}</span>
+                            </div>
                         </div>
                     </div>
 
