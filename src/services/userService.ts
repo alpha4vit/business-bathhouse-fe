@@ -301,7 +301,7 @@ export const userService = {
     },
 
     // Callback для обновления аватара конкретного резидента
-    updateResidentAvatar(chatId: number, avatarUrl: string) {
+    updateResidentAvatar(chatId: number, avatarUrl: string | undefined) {
         // Этот метод будет вызываться для обновления конкретного резидента
         // В React компоненте мы будем использовать state обновление
         if (typeof window !== 'undefined' && (window as any).updateResidentAvatar) {

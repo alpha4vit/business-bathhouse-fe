@@ -168,9 +168,7 @@ function PersonalCabinet() {
                     <div className="cabinet-profile-container">
                         <div className="cabinet-photo-section">
                             {photoLoading ? (
-                                <div className="cabinet-photo-loading">
-                                    Загрузка фото...
-                                </div>
+                                <div className="cabinet-photo-loading"></div>
                             ) : userPhotoUrl ? (
                                 <div className="cabinet-photo-wrapper">
                                     <img 

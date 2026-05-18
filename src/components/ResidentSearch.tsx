@@ -27,7 +27,7 @@ function ResidentSearch() {
     }
 
     // Callback для обновления аватара конкретного резидента
-    const updateResidentAvatar = (chatId: number, avatarUrl: string) => {
+    const updateResidentAvatar = (chatId: number, avatarUrl: string | undefined) => {
         setResults(prev => prev.map(resident => 
             resident.chatId === chatId 
                 ? { ...resident, avatar: avatarUrl }
@@ -246,7 +246,7 @@ function ResidentSearch() {
                                     }}
                                 >
                                     <div className="search-result-header">
-                                        <div className="search-result-avatar">
+                                        <div className="search-result-avatar large">
                                             {resident.hasPhotoSource && loadingAvatars.has(resident.chatId) ? (
                                                 <div className="search-result-avatar-skeleton"></div>
                                             ) : resident.avatar && !failedAvatars.has(resident.chatId) ? (

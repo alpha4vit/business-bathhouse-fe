@@ -236,6 +236,11 @@
   border: 3px solid #00A9E8;
 }
 
+.search-result-avatar.large {
+  width: 80px;
+  height: 80px;
+}
+
 .search-result-avatar-img {
   width: 100%;
   height: 100%;
@@ -264,6 +269,10 @@
   background-size: 200% 100%;
   border: 3px solid #e1e5e9;
   animation: skeleton-loading 1.5s infinite ease-in-out;
+}
+
+.search-result-avatar.large .search-result-avatar-skeleton {
+  border-width: 3px;
 }
 
 @keyframes skeleton-loading {
@@ -415,6 +424,11 @@
     width: 50px;
     height: 50px;
     align-self: center;
+  }
+
+  .search-result-avatar.large {
+    width: 70px;
+    height: 70px;
   }
 
   .search-result-avatar-placeholder {
