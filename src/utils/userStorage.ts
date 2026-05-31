@@ -1,4 +1,4 @@
-const USER_ID_KEY = 'telegram_user_id';
+const USER_ID_KEY = 'userId';
 
 export const userStorage = {
   /**

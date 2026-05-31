@@ -11,6 +11,17 @@ function ResidentSearch() {
     const [isDragging, setIsDragging] = useState(false)
     const [failedAvatars, setFailedAvatars] = useState<Set<number>>(new Set())
     const [loadingAvatars, setLoadingAvatars] = useState<Set<number>>(new Set())
+    const [loadedAvatars, setLoadedAvatars] = useState<Set<number>>(new Set())
+
+    const handleAvatarLoad = (resident: Resident) => {
+        console.log(`[ResidentSearch] ✅ Аватар успешно загружен для ${resident.fullName} (chatId: ${resident.chatId})`)
+        setLoadingAvatars(prev => {
+            const newSet = new Set(prev)
+            newSet.delete(resident.chatId)
+            return newSet
+        })
+        setLoadedAvatars(prev => new Set(prev).add(resident.chatId))
+    }
 
     const handleAvatarError = (resident: Resident, event: React.SyntheticEvent<HTMLImageElement>) => {
         const imgElement = event.currentTarget
@@ -24,6 +35,29 @@ function ResidentSearch() {
             newSet.delete(resident.chatId)
             return newSet
         })
+    }
+
+    const loadResidentAvatar = async (resident: Resident) => {
+        if (!resident.photoSource || loadedAvatars.has(resident.chatId) || loadingAvatars.has(resident.chatId)) {
+            return
+        }
+
+        console.log(`[ResidentSearch] 📸 Загрузка аватара для ${resident.fullName} (chatId: ${resident.chatId})`)
+        setLoadingAvatars(prev => new Set(prev).add(resident.chatId))
+
+        try {
+            const fullPhotoUrl = resident.photoSource!.startsWith('http') 
+                ? resident.photoSource 
+                : `https://prime-ural.bitrix24.ru/${resident.photoSource}`
+            
+            const avatarUrl = await userService.getPhoto(fullPhotoUrl)
+            
+            updateResidentAvatar(resident.chatId, avatarUrl)
+            console.log(`[ResidentSearch] ✅ Аватар загружен для ${resident.fullName}`)
+        } catch (error) {
+            console.error(`[ResidentSearch] ❌ Ошибка загрузки аватара для ${resident.fullName}:`, error)
+            updateResidentAvatar(resident.chatId, undefined)
+        }
     }
 
     // Callback для обновления аватара конкретного резидента
@@ -48,6 +82,14 @@ function ResidentSearch() {
         }
     }, [])
 
+    // Загружаем аватар только для текущего резидента
+    useEffect(() => {
+        if (results.length > 0 && currentIndex >= 0 && currentIndex < results.length) {
+            const currentResident = results[currentIndex]
+            loadResidentAvatar(currentResident)
+        }
+    }, [currentIndex, results])
+
     useEffect(() => {
         if (searchTerm.length < 2) {
             setResults([])
@@ -55,6 +97,7 @@ function ResidentSearch() {
             setCurrentIndex(0)
             setFailedAvatars(new Set())
             setLoadingAvatars(new Set())
+            setLoadedAvatars(new Set())
             return
         }
 
@@ -62,19 +105,11 @@ function ResidentSearch() {
             setLoading(true)
             setFailedAvatars(new Set())
             setLoadingAvatars(new Set())
+            setLoadedAvatars(new Set())
             try {
                 const data = await userService.searchResidents(searchTerm)
                 setResults(data)
                 setCurrentIndex(0)
-                
-                // Добавляем резидентов в загрузку аватаров только если у них есть источник фото
-                const avatarLoadingSet = new Set<number>()
-                data.forEach(resident => {
-                    if (resident.hasPhotoSource) {
-                        avatarLoadingSet.add(resident.chatId)
-                    }
-                })
-                setLoadingAvatars(avatarLoadingSet)
             } catch (error) {
                 console.error('Search error:', error)
             } finally {
@@ -254,6 +289,7 @@ function ResidentSearch() {
                                                     src={resident.avatar} 
                                                     alt={`Аватар ${resident.fullName}`}
                                                     className="search-result-avatar-img"
+                                                    onLoad={() => handleAvatarLoad(resident)}
                                                     onError={(e) => handleAvatarError(resident, e)}
                                                 />
                                             ) : (

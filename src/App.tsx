@@ -5,6 +5,9 @@ import PersonalCabinet from "./components/PersonalCabinet.tsx";
 import SpecialOffers from "./components/SpecialOffers.tsx";
 import PointsInstructions from "./components/PointsInstructions.tsx";
 import ResidentSearch from "./components/ResidentSearch.tsx";
+import PointsAdjustmentsTable from "./components/PointsAdjustmentsTable.tsx";
+import TransactionHistory from "./components/TransactionHistory.tsx";
+import EventsPage from "./components/EventsPage.tsx";
 import Navbar from "./components/Navbar.tsx";
 import {userStorage} from "./utils/userStorage.ts";
 
@@ -13,7 +16,7 @@ function AppContent() {
 
     useEffect(() => {
         // Получаем ID пользователя из URL параметров
-        const userId = searchParams.get('user_id');
+        const userId = searchParams.get('userId');
         
         if (userId) {
             // Сохраняем ID в localStorage если его нет или он отличается
@@ -31,6 +34,9 @@ function AppContent() {
                 <Route path="/offers" element={<SpecialOffers/>}/>
                 <Route path="/points/instructions" element={<PointsInstructions/>}/>
                 <Route path="/residents/search" element={<ResidentSearch/>}/>
+                <Route path="/points/adjustments" element={<PointsAdjustmentsTable/>}/>
+                <Route path="/transactions" element={<TransactionHistory/>}/>
+                <Route path="/events" element={<EventsPage/>}/>
             </Routes>
         </div>
     );

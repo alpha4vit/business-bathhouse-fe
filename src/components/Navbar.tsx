@@ -45,8 +45,14 @@ function Navbar() {
                     <Link to="/invoice" className="navbar-item">
                         <span className="navbar-text">Пополнение лицевого счета</span>
                     </Link>
+                    <Link to="/transactions" className="navbar-item">
+                        <span className="navbar-text">Журнал операций</span>
+                    </Link>
                     <Link to="/offers" className="navbar-item">
                         <span className="navbar-text">Спецпредложения</span>
+                    </Link>
+                    <Link to="/events" className="navbar-item">
+                        <span className="navbar-text">Календарь мероприятий</span>
                     </Link>
                     <Link to="/residents/search" className="navbar-item">
                         <span className="navbar-text">Поиск резидентов</span>
@@ -83,10 +89,16 @@ function Navbar() {
                                 <Link to="/invoice" className="navbar-drawer-link navbar-drawer-sublink" onClick={() => { setIsMenuOpen(false); setIsCabinetSubmenuOpen(false); }}>
                                     <span>Пополнение лицевого счета</span>
                                 </Link>
+                                <Link to="/transactions" className="navbar-drawer-link navbar-drawer-sublink" onClick={() => { setIsMenuOpen(false); setIsCabinetSubmenuOpen(false); }}>
+                                    <span>Журнал операций</span>
+                                </Link>
                             </div>
                         </div>
                         <Link to="/offers" className="navbar-drawer-link" onClick={() => setIsMenuOpen(false)}>
                             <span>Спецпредложения</span>
+                        </Link>
+                        <Link to="/events" className="navbar-drawer-link" onClick={() => setIsMenuOpen(false)}>
+                            <span>Календарь мероприятий</span>
                         </Link>
                         <Link to="/residents/search" className="navbar-drawer-link" onClick={() => setIsMenuOpen(false)}>
                             <span>Поиск резидентов</span>

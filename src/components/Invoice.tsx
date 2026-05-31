@@ -51,6 +51,7 @@ function Invoice() {
         okved: ''
     })
     const [paymentPurpose, setPaymentPurpose] = useState<PaymentPurpose | ''>('')
+    const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
 
     const handleInvoiceAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value
@@ -61,6 +62,11 @@ function Invoice() {
 
     const handleCompanyDataChange = (data: CompanyData) => {
         setCompanyData(data)
+    }
+
+    const showNotification = (type: 'success' | 'error', message: string) => {
+        setNotification({ type, message })
+        setTimeout(() => setNotification(null), 3000)
     }
 
     useEffect(() => {
@@ -111,7 +117,7 @@ function Invoice() {
 
     const handleCreateInvoice = async () => {
         if (!invoiceAmount || !paymentPurpose) {
-            alert('Пожалуйста, введите сумму счета и выберите назначение платежа')
+            showNotification('error', 'Пожалуйста, введите сумму счета и выберите назначение платежа')
             return
         }
 
@@ -123,7 +129,7 @@ function Invoice() {
             if (manualEntryMode) {
                 // Режим ручного ввода с DaData
                 if (!companyData.title || !companyData.inn) {
-                    alert('Пожалуйста, заполните все обязательные поля компании')
+                    showNotification('error', 'Пожалуйста, заполните все обязательные поля компании')
                     setIsCreatingInvoice(false)
                     return
                 }
@@ -148,11 +154,11 @@ function Invoice() {
                 }
 
                 await invoiceService.createInvoice(newCompanyDto)
-                alert('Счет успешно создан!')
+                showNotification('success', 'Счет успешно создан!')
             } else {
                 // Режим выбора существующей компании
                 if (!selectedEntity) {
-                    alert('Пожалуйста, выберите юридическое лицо')
+                    showNotification('error', 'Пожалуйста, выберите юридическое лицо')
                     setIsCreatingInvoice(false)
                     return
                 }
@@ -166,11 +172,11 @@ function Invoice() {
                 }
 
                 await invoiceService.createInvoice(existedCompanyDto)
-                alert('Счет успешно создан!')
+                showNotification('success', 'Счет успешно создан!')
             }
         } catch (error) {
             console.error('Error creating invoice:', error)
-            alert('Ошибка при создании счета. Пожалуйста, попробуйте позже.')
+            showNotification('error', 'Ошибка при создании счета. Пожалуйста, попробуйте позже.')
         } finally {
             setIsCreatingInvoice(false)
         }
@@ -209,6 +215,11 @@ function Invoice() {
 
     return (
         <div className="invoice-container">
+            {notification && (
+                <div className={`notification notification-${notification.type}`}>
+                    {notification.type === 'success' ? '✅' : '❌'} {notification.message}
+                </div>
+            )}
             <div className="invoice-content">
                 <div className="invoice-header">
                     <h1>Создание счета</h1>

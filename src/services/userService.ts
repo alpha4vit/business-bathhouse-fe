@@ -54,6 +54,18 @@ export interface Resident {
     achievements: string[]
     avatar?: string
     hasPhotoSource?: boolean // Флаг для определения нужно ли показывать скелетон
+    photoSource?: string // Источник фото для загрузки по требованию
+}
+
+export interface UserSearchDto {
+    chatId: number
+    fullName: string
+    businessDescription: string | null
+    phoneNumber: string | null
+    telegramUsername: string | null
+    achievements: string[]
+    avatarUrl: string | null
+    role: string
 }
 
 interface TelegramUserResponse {
@@ -258,27 +270,6 @@ export const userService = {
 
                 // Приоритет: сначала пробуем avatarUrl, потом photo.showUrl
                 const photoSource = user.avatarUrl || user.company?.photo?.showUrl
-                
-                if (photoSource) {
-                    console.log(`[ResidentSearch] 📸 Запускаю асинхронную загрузку аватара для ${user.fullName}`)
-                    
-                    const fullPhotoUrl = photoSource.startsWith('http') ? photoSource : `https://prime-ural.bitrix24.ru/${photoSource}`
-                    
-                    // Запускаем загрузку фото в фоне, не блокируя отображение
-                    this.getPhoto(fullPhotoUrl)
-                        .then(avatarUrl => {
-                            // Обновляем состояние резидента через callback
-                            this.updateResidentAvatar(user.chatId, avatarUrl)
-                            console.log(`[ResidentSearch] ✅ Аватар загружен для ${user.fullName}`)
-                        })
-                        .catch(error => {
-                            console.error(`[ResidentSearch] ❌ Ошибка загрузки аватара для ${user.fullName}:`, error)
-                            // При ошибке тоже вызываем callback чтобы убрать скелетон
-                            this.updateResidentAvatar(user.chatId, undefined)
-                        })
-                } else {
-                    console.log(`[ResidentSearch] ❌ Нет источника аватара для ${user.fullName}`)
-                }
 
                 return {
                     chatId: user.chatId,
@@ -288,7 +279,8 @@ export const userService = {
                     telegramUsername: user.telegramUsername,
                     achievements: [], // TODO: Получить достижения с бэкенда
                     avatar: undefined, // Будет загружено асинхронно
-                    hasPhotoSource: !!photoSource // Флаг для скелетона
+                    hasPhotoSource: !!photoSource, // Флаг для скелетона
+                    photoSource: photoSource // Сохраняем источник для последующей загрузки
                 }
             })
 
@@ -306,6 +298,21 @@ export const userService = {
         // В React компоненте мы будем использовать state обновление
         if (typeof window !== 'undefined' && (window as any).updateResidentAvatar) {
             (window as any).updateResidentAvatar(chatId, avatarUrl)
+        }
+    },
+
+    async getAllUsers(): Promise<UserSearchDto[]> {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/user`)
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch users: ${response.status}`)
+            }
+
+            return await response.json()
+        } catch (error) {
+            console.error('Error fetching users:', error)
+            throw error
         }
     }
 }
