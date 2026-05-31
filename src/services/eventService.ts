@@ -1,0 +1,68 @@
+import {API_BASE_URL} from '../config/api'
+
+export interface EventPhoto {
+    fileId?: number
+    showUrl?: string
+    downloadUrl?: string
+}
+
+export interface Event {
+    id: string
+    title: string
+    carryDate: string
+    type: string
+    price?: number
+    points?: number
+    fullDescription?: EventPhoto
+    previewDescription?: EventPhoto
+    photo?: EventPhoto
+    registrationLink?: string
+    status: string
+    privacy: string
+}
+
+export const eventService = {
+    async getEvents(type?: string): Promise<Event[]> {
+        try {
+            const url = new URL(`${API_BASE_URL}/api/events`)
+            if (type) {
+                url.searchParams.append('type', type)
+            }
+
+            console.log('[eventService] Запрос к API:', url.toString())
+            const response = await fetch(url.toString())
+
+            console.log('[eventService] Статус ответа:', response.status)
+            if (!response.ok) {
+                throw new Error(`Failed to fetch events: ${response.status}`)
+            }
+
+            const data = await response.json()
+            console.log('[eventService] Получены данные:', data)
+            return data
+        } catch (error) {
+            console.error('[eventService] Error fetching events:', error)
+            throw error
+        }
+    },
+
+    async getHtml(htmlUrl: string): Promise<string> {
+        try {
+            const url = new URL(htmlUrl)
+            const path = url.pathname + url.search
+            const encodedPath = encodeURIComponent(path)
+            
+            const response = await fetch(`${API_BASE_URL}/bitrix/image?path=${encodedPath}`)
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch HTML: ${response.status}`)
+            }
+
+            const html = await response.text()
+            return html
+        } catch (error) {
+            console.error('[eventService] Error fetching HTML:', error)
+            throw error
+        }
+    }
+}

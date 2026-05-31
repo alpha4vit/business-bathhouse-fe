@@ -1,0 +1,283 @@
+.transactions-container {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  color: #2D2D2D;
+  line-height: 1.6;
+  min-height: 100vh;
+  padding: clamp(15px, 4vw, 20px) clamp(10px, 3vw, 15px);
+  box-sizing: border-box;
+}
+
+.transactions-content {
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.transactions-header {
+  background: linear-gradient(135deg, #00A9E8 0%, #0080b8 100%);
+  color: white;
+  padding: clamp(20px, 5vw, 30px) clamp(15px, 4vw, 20px);
+  border-radius: 20px;
+  margin-bottom: 25px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 169, 232, 0.3);
+  box-sizing: border-box;
+}
+
+.transactions-header h1 {
+  font-size: clamp(20px, 5vw, 24px);
+  font-weight: 700;
+  margin: 0 0 10px 0;
+}
+
+.transactions-balance {
+  font-size: clamp(16px, 4vw, 18px);
+  font-weight: 500;
+  opacity: 0.95;
+}
+
+.transactions-card {
+  background: white;
+  border-radius: 15px;
+  padding: clamp(20px, 5vw, 25px) clamp(15px, 4vw, 20px);
+  margin-bottom: 20px;
+  box-shadow: 0 5px 20px rgba(45, 45, 45, 0.1);
+  box-sizing: border-box;
+}
+
+.transactions-table-wrapper {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  margin-bottom: 30px;
+  border-radius: 10px;
+  border: 1px solid #e1e5e9;
+}
+
+.transactions-table {
+  width: 100%;
+  min-width: 600px;
+  border-collapse: collapse;
+  background: white;
+}
+
+.transactions-table thead {
+  background: linear-gradient(135deg, #00A9E8 0%, #0080b8 100%);
+  color: white;
+}
+
+.transactions-table th {
+  padding: clamp(12px, 3vw, 15px);
+  text-align: left;
+  font-weight: 600;
+  font-size: clamp(13px, 3.5vw, 14px);
+  white-space: nowrap;
+}
+
+.transactions-table td {
+  padding: clamp(10px, 3vw, 12px);
+  border-bottom: 1px solid #e1e5e9;
+}
+
+.transactions-table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.transactions-table tbody tr:hover {
+  background-color: #f8f9fa;
+}
+
+.transactions-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.transactions-date {
+  font-size: clamp(13px, 3.5vw, 14px);
+  color: #6c757d;
+  white-space: nowrap;
+}
+
+.transactions-title {
+  font-size: clamp(14px, 3.5vw, 15px);
+  font-weight: 500;
+  color: #2D2D2D;
+}
+
+.transactions-amount {
+  font-size: clamp(14px, 3.5vw, 15px);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.transactions-amount.credit {
+  color: #28a745;
+}
+
+.transactions-amount.debit {
+  color: #dc3545;
+}
+
+.transactions-direction {
+  font-size: clamp(13px, 3.5vw, 14px);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.transactions-direction.credit {
+  color: #28a745;
+}
+
+.transactions-direction.debit {
+  color: #dc3545;
+}
+
+.transactions-loading {
+  text-align: center;
+  padding: clamp(15px, 4vw, 20px);
+  color: #6c757d;
+  font-size: clamp(14px, 3.5vw, 15px);
+}
+
+.transactions-error {
+  background: linear-gradient(135deg, rgba(220, 53, 69, 0.1) 0%, rgba(220, 53, 69, 0.2) 100%);
+  color: #dc3545;
+  padding: clamp(12px, 3vw, 15px);
+  border-radius: 10px;
+  margin-bottom: 20px;
+  border-left: 4px solid #dc3545;
+  font-size: clamp(13px, 3.5vw, 14px);
+}
+
+.transactions-empty {
+  text-align: center;
+  padding: clamp(30px, 5vw, 40px);
+  color: #6c757d;
+  font-size: clamp(14px, 3.5vw, 15px);
+}
+
+/* Card layout for mobile devices */
+.transactions-cards {
+  display: none;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.transaction-card {
+  background: white;
+  border-radius: 12px;
+  padding: 16px;
+  border: 1px solid #e1e5e9;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.transaction-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transform: translateY(-2px);
+}
+
+.transaction-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.transaction-card-date {
+  font-size: 13px;
+  color: #6c757d;
+  font-weight: 500;
+}
+
+.transaction-card-direction {
+  font-size: 12px;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 12px;
+}
+
+.transaction-card-direction.credit {
+  background: linear-gradient(135deg, rgba(40, 167, 69, 0.1) 0%, rgba(40, 167, 69, 0.2) 100%);
+  color: #28a745;
+}
+
+.transaction-card-direction.debit {
+  background: linear-gradient(135deg, rgba(220, 53, 69, 0.1) 0%, rgba(220, 53, 69, 0.2) 100%);
+  color: #dc3545;
+}
+
+.transaction-card-title {
+  font-size: 15px;
+  font-weight: 500;
+  color: #2D2D2D;
+  margin-bottom: 8px;
+  line-height: 1.4;
+}
+
+.transaction-card-amount {
+  font-size: 18px;
+  font-weight: 700;
+  text-align: right;
+}
+
+.transaction-card-amount.credit {
+  color: #28a745;
+}
+
+.transaction-card-amount.debit {
+  color: #dc3545;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 768px) {
+  .transactions-container {
+    padding: clamp(12px, 3vw, 15px) clamp(8px, 2vw, 10px);
+  }
+
+  .transactions-card {
+    padding: clamp(15px, 4vw, 20px) clamp(12px, 3vw, 15px);
+  }
+
+  .desktop-only {
+    display: none;
+  }
+
+  .mobile-only {
+    display: flex;
+  }
+
+  .transactions-cards {
+    display: flex;
+  }
+}
+
+@media (min-width: 769px) {
+  .mobile-only {
+    display: none;
+  }
+
+  .desktop-only {
+    display: block;
+  }
+}
+
+/* Scrollbar styling for horizontal scroll */
+.transactions-table-wrapper::-webkit-scrollbar {
+  height: 8px;
+}
+
+.transactions-table-wrapper::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.transactions-table-wrapper::-webkit-scrollbar-thumb {
+  background: #00A9E8;
+  border-radius: 10px;
+}
+
+.transactions-table-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #0080b8;
+}

@@ -1,0 +1,31 @@
+import {API_BASE_URL} from '../config/api'
+
+export enum TransactionDirection {
+    DEBIT = 'DEBIT',
+    CREDIT = 'CREDIT'
+}
+
+export interface TransactionDto {
+    title: string
+    amount: number
+    currency: string
+    direction: TransactionDirection
+    date: string
+}
+
+export const paymentService = {
+    async getTransactionHistory(userId: string): Promise<TransactionDto[]> {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/transactions/${userId}`)
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch transaction history: ${response.status}`)
+            }
+
+            return await response.json()
+        } catch (error) {
+            console.error('Error fetching transaction history:', error)
+            throw error
+        }
+    }
+}
