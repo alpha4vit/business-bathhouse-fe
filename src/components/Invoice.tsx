@@ -7,7 +7,8 @@ import {
     InvoiceExistedCompanyDto,
     InvoiceNewCompanyDto,
     invoiceService,
-    LegalCompanyType
+    LegalCompanyType,
+    PaymentType
 } from '../services/invoiceService'
 
 enum PaymentPurpose {
@@ -138,12 +139,14 @@ function Invoice() {
                 const companyType = companyData.type === 'INDIVIDUAL' ? LegalCompanyType.INDIVIDUAL : LegalCompanyType.LEGAL
 
                 const newCompanyDto: InvoiceNewCompanyDto = {
-                    dtoType: 'NEW_COMPANY',
+                    invoiceType: 'NEW_COMPANY',
                     userId: userId || '',
                     amount: parseFloat(invoiceAmount),
+                    currency: 'RUB',
+                    purpose: backendPaymentPurpose as any,
+                    type: PaymentType.INVOICE,
+                    companyType: companyType,
                     edo: edoType,
-                    paymentPurpose: backendPaymentPurpose as any,
-                    type: companyType,
                     title: companyData.title,
                     inn: companyData.inn,
                     okpo: companyData.okpo,
@@ -154,7 +157,7 @@ function Invoice() {
                 }
 
                 await invoiceService.createInvoice(newCompanyDto)
-                showNotification('success', 'Счет успешно создан!')
+                showNotification('success', 'Готовим ваш счет. Это займет около 2 минут')
             } else {
                 // Режим выбора существующей компании
                 if (!selectedEntity) {
@@ -164,10 +167,12 @@ function Invoice() {
                 }
 
                 const existedCompanyDto: InvoiceExistedCompanyDto = {
-                    dtoType: 'EXISTED_COMPANY',
+                    invoiceType: 'EXISTED_COMPANY',
                     userId: userId || '',
                     amount: parseFloat(invoiceAmount),
-                    paymentPurpose: backendPaymentPurpose as any,
+                    currency: 'RUB',
+                    purpose: backendPaymentPurpose as any,
+                    type: PaymentType.INVOICE,
                     companyId: selectedEntity
                 }
 
@@ -176,7 +181,8 @@ function Invoice() {
             }
         } catch (error) {
             console.error('Error creating invoice:', error)
-            showNotification('error', 'Ошибка при создании счета. Пожалуйста, попробуйте позже.')
+            const errorMessage = error instanceof Error ? error.message : 'Ошибка при создании счета. Пожалуйста, попробуйте позже.'
+            showNotification('error', errorMessage)
         } finally {
             setIsCreatingInvoice(false)
         }

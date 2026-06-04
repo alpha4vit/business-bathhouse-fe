@@ -1,9 +1,10 @@
 import { API_BASE_URL } from '../config/api'
 
 export enum PaymentPurpose {
-    RESIDENT_TOP_UP = 'RESIDENT_TOP_UP',
+    DEPOSIT = 'DEPOSIT',
     CHARITY = 'CHARITY',
-    MEMBERSHIP_FEE = 'MEMBERSHIP_FEE'
+    SUBSCRIPTION_RENEWAL = 'SUBSCRIPTION_RENEWAL',
+    BATHHOUSE_EVENT = 'BATHHOUSE_EVENT'
 }
 
 export enum LegalCompanyType {
@@ -11,28 +12,37 @@ export enum LegalCompanyType {
     INDIVIDUAL = 'INDIVIDUAL'
 }
 
+export enum PaymentType {
+    INVOICE = 'INVOICE',
+    FAST_PAYMENT = 'FAST_PAYMENT',
+    PERSONAL_ACCOUNT = 'PERSONAL_ACCOUNT'
+}
+
 export interface InvoiceExistedCompanyDto {
-    dtoType: 'EXISTED_COMPANY'
+    invoiceType: 'EXISTED_COMPANY'
     userId: string
     amount: number
-    paymentPurpose: PaymentPurpose
+    currency: string
+    purpose: PaymentPurpose
+    type: PaymentType
     companyId: string
 }
 
 export interface InvoiceNewCompanyDto {
-    dtoType: 'NEW_COMPANY'
+    invoiceType: 'NEW_COMPANY'
     userId: string
     amount: number
+    currency: string
+    purpose: PaymentPurpose
+    type: PaymentType
+    companyType: LegalCompanyType
     edo: string
-    paymentPurpose: PaymentPurpose
-    type: LegalCompanyType
     title: string
     inn: string
     okpo: string
     address: string
+    ogrn: string
     kpp?: string
-    ogrn?: string
-    ogrnip?: string
     okved?: string
 }
 
@@ -47,7 +57,8 @@ export const invoiceService = {
         })
 
         if (!response.ok) {
-            throw new Error('Failed to create invoice')
+            const errorData = await response.json()
+            throw new Error(errorData.message || 'Failed to create invoice')
         }
     }
 }

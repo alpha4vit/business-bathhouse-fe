@@ -8,6 +8,7 @@ import ResidentSearch from "./components/ResidentSearch.tsx";
 import PointsAdjustmentsTable from "./components/PointsAdjustmentsTable.tsx";
 import TransactionHistory from "./components/TransactionHistory.tsx";
 import EventsPage from "./components/EventsPage.tsx";
+import NewsletterSender from "./components/NewsletterSender.tsx";
 import Navbar from "./components/Navbar.tsx";
 import {userStorage} from "./utils/userStorage.ts";
 
@@ -37,6 +38,7 @@ function AppContent() {
                 <Route path="/points/adjustments" element={<PointsAdjustmentsTable/>}/>
                 <Route path="/transactions" element={<TransactionHistory/>}/>
                 <Route path="/events" element={<EventsPage/>}/>
+                <Route path="/newsletter" element={<NewsletterSender/>}/>
             </Routes>
         </div>
     );

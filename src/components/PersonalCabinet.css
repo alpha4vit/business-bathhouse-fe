@@ -53,35 +53,6 @@
   box-sizing: border-box;
 }
 
-.cabinet-card.leaderboard-card {
-  animation: slideDown 0.4s ease forwards;
-}
-
-.cabinet-card.leaderboard-card.closing {
-  animation: slideUp 0.3s ease forwards;
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-@keyframes slideUp {
-  from {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: translateY(-20px);
-  }
-}
 
 .cabinet-card:hover {
   transform: translateY(-2px);
@@ -443,38 +414,6 @@
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
-.instructions-card {
-  position: relative;
-  padding: 0;
-  overflow: hidden;
-  animation: slideDown 0.4s ease forwards;
-}
-
-.instructions-card.closing {
-  animation: slideUp 0.3s ease forwards;
-}
-
-.instructions-card .instructions-container {
-  padding: 0;
-  background: transparent;
-}
-
-.instructions-card .instructions-header {
-  border-radius: 15px 15px 0 0;
-  margin-bottom: 0;
-}
-
-.instructions-card .instructions-card {
-  background: transparent;
-  box-shadow: none;
-  margin-bottom: 0;
-  padding: 0;
-}
-
-.instructions-card .instructions-card:hover {
-  transform: none;
-  box-shadow: none;
-}
 
 .cabinet-close-instructions-button {
   position: absolute;

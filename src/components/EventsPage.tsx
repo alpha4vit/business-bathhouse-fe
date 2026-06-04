@@ -3,6 +3,7 @@ import './EventsPage.css'
 import {eventService, Event} from '../services/eventService'
 import {userService} from '../services/userService'
 import {userStorage} from '../utils/userStorage'
+import {API_BASE_URL} from "../config/api.ts";
 
 const eventTypeLabels: Record<string, string> = {
     'ENTERTAINMENT': 'Развлекательные мероприятия',
@@ -30,6 +31,8 @@ function EventsPage() {
     const [loadingBalance, setLoadingBalance] = useState(false)
     const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
     const [isProcessingPayment, setIsProcessingPayment] = useState(false)
+    const [createdPayment, setCreatedPayment] = useState<any>(null)
+    const [copiedUrl, setCopiedUrl] = useState<boolean>(false)
 
     const handleImageLoad = (eventId: string) => {
         console.log(`[EventsPage] ✅ Изображение успешно загружено для мероприятия ${eventId}`)
@@ -320,8 +323,6 @@ function EventsPage() {
         setIsProcessingPayment(true)
 
         try {
-            const API_BASE_URL = 'http://localhost:8080'
-
             const purpose = selectedEvent.type === 'BATH' ? 'BATHHOUSE_EVENT' : 'EVENT'
 
             const paymentData = {
@@ -353,8 +354,8 @@ function EventsPage() {
             console.log('Payment result:', paymentResult)
 
             if (paymentType === 'FAST_PAYMENT') {
+                setCreatedPayment(paymentResult)
                 showNotification('success', 'СБП успешно создан!')
-                setRegistrationModalOpen(false)
             } else {
                 showNotification('success', 'Оплата с лицевого счета выполнена!')
                 setRegistrationModalOpen(false)
@@ -373,6 +374,21 @@ function EventsPage() {
         if (userId) {
             window.location.href = `/view/invoice`
         }
+    }
+
+    const handleCopyUrl = async (url: string) => {
+        try {
+            await navigator.clipboard.writeText(url)
+            setCopiedUrl(true)
+            setTimeout(() => setCopiedUrl(false), 2000)
+        } catch (error) {
+            console.error('Failed to copy URL:', error)
+        }
+    }
+
+    const handleResetPayment = () => {
+        setCreatedPayment(null)
+        setCopiedUrl(false)
     }
 
     return (
@@ -538,69 +554,147 @@ function EventsPage() {
                 <div className="registration-modal-overlay" onClick={() => setRegistrationModalOpen(false)}>
                     <div className="registration-modal" onClick={(e) => e.stopPropagation()}>
                         <div className="registration-modal-header">
-                            <h2>Оплата</h2>
+                            <h2>{createdPayment ? 'Оплата через СБП' : 'Оплата'}</h2>
                             <button
                                 className="registration-modal-close"
-                                onClick={() => setRegistrationModalOpen(false)}
+                                onClick={() => {
+                                    setRegistrationModalOpen(false)
+                                    handleResetPayment()
+                                }}
                             >
                                 ✕
                             </button>
                         </div>
 
                         <div className="registration-modal-body">
-                            <div className="registration-modal-event-info">
-                                <h3>{selectedEvent.title}</h3>
-                                <p className="registration-modal-event-date">
-                                    🕐 {formatDate(selectedEvent.carryDate)}
-                                </p>
-                                {selectedEvent.price !== undefined && selectedEvent.price > 0 && (
-                                    <p className="registration-modal-event-price">
-                                        💰 Стоимость: {selectedEvent.price} ₽
-                                    </p>
-                                )}
-                            </div>
+                            {createdPayment ? (
+                                <>
+                                    <div className="registration-modal-event-info">
+                                        <h3>{selectedEvent.title}</h3>
+                                        <p className="registration-modal-event-date">
+                                            🕐 {formatDate(selectedEvent.carryDate)}
+                                        </p>
+                                    </div>
 
-                            <div className="registration-modal-balance">
-                                <h4>Ваш баланс лицевого счета</h4>
-                                <div className="registration-modal-balance-amount">
-                                    {loadingBalance ? (
-                                        <span className="registration-modal-balance-loading">Загрузка...</span>
-                                    ) : (
-                                        `${userBalance.toLocaleString('ru-RU')} ₽`
-                                    )}
-                                </div>
-                            </div>
+                                    <div className="payment-success-card">
+                                        <div className="payment-success-header">
+                                            <h2>СБП успешно создан!</h2>
+                                        </div>
 
-                            <div className="registration-modal-payment-methods">
-                                {userBalance >= (selectedEvent.price || 0) ? (
-                                    <button
-                                        className="registration-modal-payment-btn registration-modal-payment-account"
-                                        onClick={() => handlePayment('PERSONAL_ACCOUNT')}
-                                        disabled={isProcessingPayment}
-                                    >
-                                        <span className="registration-modal-payment-icon">💳</span>
-                                        <span>Списать с лицевого счета</span>
-                                    </button>
-                                ) : (
-                                    <button
-                                        className="registration-modal-payment-btn registration-modal-payment-account"
-                                        onClick={handleTopUpBalance}
-                                        disabled={isProcessingPayment}
-                                    >
-                                        <span className="registration-modal-payment-icon">💳</span>
-                                        <span>Пополнить лицевой счет</span>
-                                    </button>
-                                )}
+                                        <div className="payment-details">
+                                            <div className="qr-code-container">
+                                                <img
+                                                    src={`data:image/png;base64,${createdPayment.content?.base64Image}`}
+                                                    alt="QR-код для оплаты"
+                                                    className="qr-code-image"
+                                                />
+                                            </div>
+                                            <div className="payment-detail-item">
+                                                <span className="detail-label">Сумма платежа:</span>
+                                                <span className="detail-value">{(createdPayment.amount / 100).toFixed(2)} ₽</span>
+                                            </div>
+                                            <div className="payment-detail-item">
+                                                <span className="detail-label">Дата выставления:</span>
+                                                <span className="detail-value">{new Date(createdPayment.createdAt || createdPayment.issuedAt).toLocaleDateString('ru-RU', {
+                                                    day: 'numeric',
+                                                    month: 'long',
+                                                    year: 'numeric',
+                                                    hour: '2-digit',
+                                                    minute: '2-digit'
+                                                })}</span>
+                                            </div>
+                                        </div>
 
-                                <button
-                                    className="registration-modal-payment-btn registration-modal-payment-sbp"
-                                    onClick={() => handlePayment('FAST_PAYMENT')}
-                                    disabled={isProcessingPayment}
-                                >
-                                    <span className="registration-modal-payment-icon">📱</span>
-                                    <span>Оплата СБП</span>
-                                </button>
-                            </div>
+                                        {createdPayment.content?.link && (
+                                            <div className="payment-url-container">
+                                                <p className="payment-url-label">Ссылка для оплаты:</p>
+                                                <div className="payment-url-wrapper">
+                                                    <a
+                                                        href={createdPayment.content.link}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="payment-url-link"
+                                                    >
+                                                        {createdPayment.content.link}
+                                                    </a>
+                                                    <button
+                                                        onClick={() => handleCopyUrl(createdPayment.content.link)}
+                                                        className="copy-button"
+                                                        title={copiedUrl ? "Скопировано!" : "Копировать ссылку"}
+                                                    >
+                                                        {copiedUrl ? "✅" : "📋"}
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        )}
+
+                                        <div className="payment-actions">
+                                            <button
+                                                onClick={handleResetPayment}
+                                                className="reset-button"
+                                            >
+                                                Выбрать другой способ оплаты
+                                            </button>
+                                        </div>
+                                    </div>
+                                </>
+                            ) : (
+                                <>
+                                    <div className="registration-modal-event-info">
+                                        <h3>{selectedEvent.title}</h3>
+                                        <p className="registration-modal-event-date">
+                                            🕐 {formatDate(selectedEvent.carryDate)}
+                                        </p>
+                                        {selectedEvent.price !== undefined && selectedEvent.price > 0 && (
+                                            <p className="registration-modal-event-price">
+                                                💰 Стоимость: {selectedEvent.price} ₽
+                                            </p>
+                                        )}
+                                    </div>
+
+                                    <div className="registration-modal-balance">
+                                        <h4>Ваш баланс лицевого счета</h4>
+                                        <div className="registration-modal-balance-amount">
+                                            {loadingBalance ? (
+                                                <span className="registration-modal-balance-loading">Загрузка...</span>
+                                            ) : (
+                                                `${userBalance.toLocaleString('ru-RU')} ₽`
+                                            )}
+                                        </div>
+                                    </div>
+
+                                    <div className="registration-modal-payment-methods">
+                                        {userBalance >= (selectedEvent.price || 0) ? (
+                                            <button
+                                                className="registration-modal-payment-btn registration-modal-payment-account"
+                                                onClick={() => handlePayment('PERSONAL_ACCOUNT')}
+                                                disabled={isProcessingPayment}
+                                            >
+                                                <span className="registration-modal-payment-icon">💳</span>
+                                                <span>Списать с лицевого счета</span>
+                                            </button>
+                                        ) : (
+                                            <button
+                                                className="registration-modal-payment-btn registration-modal-payment-account"
+                                                onClick={handleTopUpBalance}
+                                                disabled={isProcessingPayment}
+                                            >
+                                                <span className="registration-modal-payment-icon">💳</span>
+                                                <span>Пополнить лицевой счет</span>
+                                            </button>
+                                        )}
+
+                                        <button
+                                            className="registration-modal-payment-btn registration-modal-payment-sbp"
+                                            onClick={() => handlePayment('FAST_PAYMENT')}
+                                            disabled={isProcessingPayment}
+                                        >
+                                            <span className="registration-modal-payment-icon">📱</span>
+                                            <span>Оплата СБП</span>
+                                        </button>
+                                    </div>
+                                </>
+                            )}
                         </div>
                     </div>
                 </div>

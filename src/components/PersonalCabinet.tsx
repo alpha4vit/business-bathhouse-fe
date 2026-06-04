@@ -3,7 +3,6 @@ import './PersonalCabinet.css'
 import {userService, UserDataDto} from '../services/userService'
 import {useUserId} from '../hooks/useUserId'
 import {useCache} from '../utils/cache'
-import PointsInstructions from './PointsInstructions'
 import arrowIcon from '../img/arrow.svg'
 
 function PersonalCabinet() {
@@ -14,9 +13,7 @@ function PersonalCabinet() {
     const [error, setError] = useState<string | null>(null)
     const [showLeaderboard, setShowLeaderboard] = useState<boolean>(false)
     const [visibleCount, setVisibleCount] = useState<number>(20)
-    const [isClosing, setIsClosing] = useState<boolean>(false)
     const [showInstructions, setShowInstructions] = useState<boolean>(false)
-    const [isInstructionsClosing, setIsInstructionsClosing] = useState<boolean>(false)
     const [userPhotoUrl, setUserPhotoUrl] = useState<string | null>(null)
     const [photoLoading, setPhotoLoading] = useState<boolean>(false)
     
@@ -88,18 +85,7 @@ function PersonalCabinet() {
     }, [userPhotoUrl])
 
     const fetchLeaderboard = () => {
-        if (showLeaderboard) {
-            setIsClosing(true)
-            setTimeout(() => {
-                setShowLeaderboard(false)
-                setIsClosing(false)
-                setVisibleCount(20)
-            }, 300)
-            return
-        }
-
-        // Просто показываем/скрываем рейтинг, данные уже в кеше
-        setShowLeaderboard(true)
+        setShowLeaderboard(!showLeaderboard)
     }
 
     const getPointsWord = (count: number): string => {
@@ -259,19 +245,9 @@ function PersonalCabinet() {
                                 className={`cabinet-button-icon ${showLeaderboard ? 'rotated' : ''}`}
                             />
                         </button>
-                        <button 
+                        <button
                             className="cabinet-instructions-button"
-                            onClick={() => {
-                                if (showInstructions) {
-                                    setIsInstructionsClosing(true)
-                                    setTimeout(() => {
-                                        setShowInstructions(false)
-                                        setIsInstructionsClosing(false)
-                                    }, 300)
-                                } else {
-                                    setShowInstructions(true)
-                                }
-                            }}
+                            onClick={() => setShowInstructions(!showInstructions)}
                         >
                             <span>Как заработать баллы</span>
                             <img 
@@ -284,7 +260,7 @@ function PersonalCabinet() {
                 </div>
 
                 {showLeaderboard && (
-                    <div className={`cabinet-card leaderboard-card ${isClosing ? 'closing' : ''}`}>
+                    <div className="cabinet-card leaderboard-card">
                         <h2>🏆 Рейтинг резидентов</h2>
                         
                         {leaderboardLoading ? (
@@ -342,14 +318,81 @@ function PersonalCabinet() {
                 )}
 
                 {showInstructions && (
-                    <div className={`cabinet-card instructions-card ${isInstructionsClosing ? 'closing' : ''}`}>
-                        <PointsInstructions onClose={() => {
-                            setIsInstructionsClosing(true)
-                            setTimeout(() => {
-                                setShowInstructions(false)
-                                setIsInstructionsClosing(false)
-                            }, 300)
-                        }} />
+                    <div className="cabinet-card instructions-card">
+                        <h2>Как заработать баллы</h2>
+
+                        <div className="cabinet-instructions-intro">
+                            В целях формирования объективного рейтинга участников бизнес-сообщества «Бизнес Баня» баллы начисляются за следующие активности.
+                        </div>
+
+                        <div className="cabinet-instructions-item">
+                            <div className="cabinet-instructions-title">
+                                <span className="cabinet-instructions-number">1</span>
+                                <span>🏢 Посещение внутренних мероприятий</span>
+                            </div>
+                            <div className="cabinet-instructions-content">
+                                <p>За участие в мероприятиях сообщества резидентам начисляются баллы.</p>
+                                <div className="cabinet-instructions-highlight">
+                                    <p>Перечень ближайших мероприятий, за которые предусмотрено начисление баллов, публикуется один раз в две недели совместно с обновлённой версией рейтинга.</p>
+                                </div>
+                                <p>Также баллы могут начисляться за участие в партнёрских мероприятиях. Факт начисления баллов в таких случаях всегда указывается в анонсе мероприятия.</p>
+                            </div>
+                        </div>
+
+                        <div className="cabinet-instructions-item">
+                            <div className="cabinet-instructions-title">
+                                <span className="cabinet-instructions-number">2</span>
+                                <span>⚽ Участие в мероприятиях клубов по интересам</span>
+                            </div>
+                            <div className="cabinet-instructions-content">
+                                <p>Баллы начисляются за посещение активностей спортивных клубов сообщества.</p>
+                                <div className="cabinet-instructions-highlight cabinet-instructions-pulse">
+                                    <p><strong>Важно:</strong> Следите за анонсами спортивных мероприятий и активно участвуйте в жизни клубов!</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="cabinet-instructions-item">
+                            <div className="cabinet-instructions-title">
+                                <span className="cabinet-instructions-number">3</span>
+                                <span>🤝 Участие в проекте «Персональный нетворкинг»</span>
+                            </div>
+                            <div className="cabinet-instructions-content">
+                                <p>В рамках данного проекта начисление баллов осуществляется следующим образом:</p>
+                                <div className="cabinet-instructions-list-item">
+                                    <strong>Инициатор встречи</strong> — <span className="cabinet-instructions-badge">5 баллов</span> за каждую состоявшуюся встречу
+                                </div>
+                                <div className="cabinet-instructions-highlight">
+                                    <p><strong>Совет:</strong> Будьте proactive! Иницируйте встречи с другими резидентами для расширения нетворка и заработка дополнительных баллов.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="cabinet-instructions-item">
+                            <div className="cabinet-instructions-title">
+                                <span className="cabinet-instructions-number">📊</span>
+                                <span>Актуальная информация</span>
+                            </div>
+                            <div className="cabinet-instructions-content">
+                                <div className="cabinet-instructions-highlight">
+                                    <p>Актуальный рейтинг и перечень мероприятий с начислением баллов публикуются с периодичностью один раз в две недели.</p>
+                                </div>
+                                <p>Следите за обновлениями в сообществе, чтобы не упустить возможности для заработка баллов!</p>
+                            </div>
+                        </div>
+
+                        <button
+                            className="cabinet-hide-instructions-button"
+                            onClick={() => {
+
+                                setTimeout(() => {
+                                    setShowInstructions(false)
+
+                                }, 300)
+                            }}
+                        >
+                            Скрыть
+                        </button>
                     </div>
                 )}
 
