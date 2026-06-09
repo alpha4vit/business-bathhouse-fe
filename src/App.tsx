@@ -11,6 +11,7 @@ import EventsPage from "./components/EventsPage.tsx";
 import NewsletterSender from "./components/NewsletterSender.tsx";
 import Navbar from "./components/Navbar.tsx";
 import {userStorage} from "./utils/userStorage.ts";
+import EventRegistrationsPage from "./components/EventRegistrationsPage.tsx";
 
 function AppContent() {
     const [searchParams] = useSearchParams();
@@ -18,7 +19,7 @@ function AppContent() {
     useEffect(() => {
         // Получаем ID пользователя из URL параметров
         const userId = searchParams.get('userId');
-        
+
         if (userId) {
             // Сохраняем ID в localStorage если его нет или он отличается
             userStorage.setUserId(userId);
@@ -27,7 +28,7 @@ function AppContent() {
 
     return (
         <div>
-            <Navbar />
+            <Navbar/>
             <Routes>
                 <Route path="/" element={<div><h1>Home Page</h1></div>}/>
                 <Route path="/invoice" element={<InvoicePage/>}/>
@@ -39,6 +40,7 @@ function AppContent() {
                 <Route path="/transactions" element={<TransactionHistory/>}/>
                 <Route path="/events" element={<EventsPage/>}/>
                 <Route path="/newsletter" element={<NewsletterSender/>}/>
+                <Route path="/events/registration" element={<EventRegistrationsPage/>}/>
             </Routes>
         </div>
     );
@@ -47,7 +49,7 @@ function AppContent() {
 function App() {
     return (
         <Router basename="/view">
-            <AppContent />
+            <AppContent/>
         </Router>
     )
 }
