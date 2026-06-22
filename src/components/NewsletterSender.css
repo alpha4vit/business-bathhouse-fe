@@ -234,21 +234,19 @@
   border-radius: 12px;
   font-weight: 500;
   text-transform: uppercase;
+  color: white !important;
 }
 
 .selected-user-role.resident {
   background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
-  color: white;
 }
 
 .selected-user-role.admin {
   background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
-  color: white;
 }
 
 .selected-user-role.non-resident {
   background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
-  color: white;
 }
 
 .newsletter-remove-button {

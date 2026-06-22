@@ -253,7 +253,7 @@
 }
 
 /* Стили для отображения успешного создания платежа */
-.payment-success-card {
+.transaction-success-card {
   background: white;
   border-radius: 15px;
   padding: clamp(25px, 6vw, 30px);
@@ -262,31 +262,24 @@
   animation: slideIn 0.5s ease-out;
 }
 
-.payment-success-header {
+.transaction-success-header {
   margin-bottom: 25px;
 }
 
-.payment-success-header h2 {
+.transaction-success-header h2 {
   color: #28a745;
   font-size: clamp(20px, 5vw, 24px);
   font-weight: 600;
   margin-bottom: 8px;
 }
 
-.payment-success-header p {
+.transaction-success-header p {
   color: #6c757d;
   font-size: clamp(13px, 3.5vw, 14px);
   margin: 0;
   font-family: 'Monaco', 'Menlo', monospace;
 }
 
-.payment-notice {
-  color: #00A9E8 !important;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif !important;
-  font-size: clamp(12px, 3vw, 13px) !important;
-  margin-top: 8px !important;
-  font-weight: 500;
-}
 
 .qr-code-container {
   margin: 30px 0;
@@ -303,7 +296,7 @@
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-.payment-details {
+.transaction-details {
   background: #f8f9fa;
   border: 1px solid #dee2e6;
   border-radius: 12px;
@@ -311,7 +304,7 @@
   margin: 25px 0;
 }
 
-.payment-detail-item {
+.transaction-detail-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -319,7 +312,7 @@
   border-bottom: 1px solid #e9ecef;
 }
 
-.payment-detail-item:last-child {
+.transaction-detail-item:last-child {
   border-bottom: none;
 }
 
@@ -335,19 +328,19 @@
   color: #2D2D2D;
 }
 
-.payment-url-container {
+.transaction-url-container {
   margin: 25px 0;
   text-align: left;
 }
 
-.payment-url-label {
+.transaction-url-label {
   font-size: clamp(13px, 3.5vw, 14px);
   font-weight: 600;
   color: #495057;
   margin-bottom: 10px;
 }
 
-.payment-url-wrapper {
+.transaction-url-wrapper {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -358,12 +351,12 @@
   transition: all 0.3s ease;
 }
 
-.payment-url-wrapper:hover {
+.transaction-url-wrapper:hover {
   border-color: #00A9E8;
   box-shadow: 0 2px 8px rgba(0, 169, 232, 0.1);
 }
 
-.payment-url-link {
+.transaction-url-link {
   flex: 1;
   color: #00A9E8;
   text-decoration: none;
@@ -372,7 +365,7 @@
   font-family: 'Monaco', 'Menlo', monospace;
 }
 
-.payment-url-link:hover {
+.transaction-url-link:hover {
   text-decoration: underline;
 }
 
@@ -395,7 +388,7 @@
   transform: scale(0.95);
 }
 
-.payment-actions {
+.transaction-actions {
   margin-top: 30px;
 }
 
@@ -433,17 +426,14 @@
 }
 
 @media (max-width: 768px) {
-  .payment-success-card {
+  .transaction-success-card {
     padding: 20px 15px;
   }
-  
+
   .qr-code-image {
     max-width: 160px;
   }
-  
-  .payment-message {
-    padding: 12px 16px;
-  }
+
 }
 
 @media (max-width: 480px) {
@@ -461,7 +451,7 @@
     right: 14px;
   }
   
-  .payment-success-card {
+  .transaction-success-card {
     padding: 15px 12px;
   }
   

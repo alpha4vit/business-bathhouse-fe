@@ -1,6 +1,6 @@
 import {useEffect, useState} from 'react'
 import {userService, UserSearchDto} from '../services/userService'
-// import './NewsletxterSender.css'
+import './NewsletterSender.css'
 import {API_BASE_URL} from "../config/api.ts";
 
 export default function NewsletterSender() {

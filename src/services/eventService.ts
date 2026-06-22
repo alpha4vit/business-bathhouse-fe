@@ -46,6 +46,21 @@ export const eventService = {
         }
     },
 
+    async getAllEvents(): Promise<Event[]> {
+        try {
+            const response = await fetch(`${API_BASE_URL}/api/events/all`)
+
+            if (!response.ok) {
+                throw new Error(`Failed to fetch all events: ${response.status}`)
+            }
+
+            return await response.json()
+        } catch (error) {
+            console.error('[eventService] Error fetching all events:', error)
+            throw error
+        }
+    },
+
     async getHtml(htmlUrl: string): Promise<string> {
         try {
             const url = new URL(htmlUrl)

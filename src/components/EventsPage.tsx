@@ -30,8 +30,8 @@ function EventsPage() {
     const [userBalance, setUserBalance] = useState<number>(0)
     const [loadingBalance, setLoadingBalance] = useState(false)
     const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
-    const [isProcessingPayment, setIsProcessingPayment] = useState(false)
-    const [createdPayment, setCreatedPayment] = useState<any>(null)
+    const [isProcessingTransaction, setIsProcessingTransaction] = useState(false)
+    const [createdTransaction, setCreatedTransaction] = useState<any>(null)
     const [copiedUrl, setCopiedUrl] = useState<boolean>(false)
 
     const handleImageLoad = (eventId: string) => {
@@ -311,7 +311,7 @@ function EventsPage() {
         setTimeout(() => setNotification(null), 3000)
     }
 
-    const handlePayment = async (paymentType: 'FAST_PAYMENT' | 'PERSONAL_ACCOUNT') => {
+    const handleTransaction = async (paymentType: 'FAST_PAYMENT' | 'PERSONAL_ACCOUNT') => {
         if (!selectedEvent) return
 
         const userId = userStorage.getUserId()
@@ -320,12 +320,12 @@ function EventsPage() {
             return
         }
 
-        setIsProcessingPayment(true)
+        setIsProcessingTransaction(true)
 
         try {
             const purpose = selectedEvent.type === 'BATH' ? 'BATHHOUSE_EVENT' : 'EVENT'
 
-            const paymentData = {
+            const transactionData = {
                 userId: userId,
                 amount: Math.ceil((selectedEvent.price || 0) * 100),
                 currency: 'RUB',
@@ -334,14 +334,14 @@ function EventsPage() {
                 eventId: selectedEvent.id
             }
 
-            console.log('Creating payment:', paymentData)
+            console.log('Creating transaction:', transactionData)
 
-            const response = await fetch(`${API_BASE_URL}/api/payments`, {
+            const response = await fetch(`${API_BASE_URL}/api/transactions`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(paymentData),
+                body: JSON.stringify(transactionData),
             })
 
             if (!response.ok) {
@@ -350,22 +350,22 @@ function EventsPage() {
                 throw new Error(errorMessage)
             }
 
-            const paymentResult = await response.json()
-            console.log('Payment result:', paymentResult)
+            const transactionResult = await response.json()
+            console.log('Transaction result:', transactionResult)
 
             if (paymentType === 'FAST_PAYMENT') {
-                setCreatedPayment(paymentResult)
+                setCreatedTransaction(transactionResult)
                 showNotification('success', 'СБП успешно создан!')
             } else {
                 showNotification('success', 'Оплата с лицевого счета выполнена!')
                 setRegistrationModalOpen(false)
             }
         } catch (error) {
-            console.error('Error creating payment:', error)
-            const errorMessage = error instanceof Error ? error.message : 'Ошибка при создании платежа. Пожалуйста, попробуйте позже.'
+            console.error('Error creating transaction:', error)
+            const errorMessage = error instanceof Error ? error.message : 'Ошибка при создании транзакции. Пожалуйста, попробуйте позже.'
             showNotification('error', errorMessage)
         } finally {
-            setIsProcessingPayment(false)
+            setIsProcessingTransaction(false)
         }
     }
 
@@ -386,8 +386,8 @@ function EventsPage() {
         }
     }
 
-    const handleResetPayment = () => {
-        setCreatedPayment(null)
+    const handleResetTransaction = () => {
+        setCreatedTransaction(null)
         setCopiedUrl(false)
     }
 
@@ -554,12 +554,12 @@ function EventsPage() {
                 <div className="registration-modal-overlay" onClick={() => setRegistrationModalOpen(false)}>
                     <div className="registration-modal" onClick={(e) => e.stopPropagation()}>
                         <div className="registration-modal-header">
-                            <h2>{createdPayment ? 'Оплата через СБП' : 'Оплата'}</h2>
+                            <h2>{createdTransaction ? 'Оплата через СБП' : 'Оплата'}</h2>
                             <button
                                 className="registration-modal-close"
                                 onClick={() => {
                                     setRegistrationModalOpen(false)
-                                    handleResetPayment()
+                                    handleResetTransaction()
                                 }}
                             >
                                 ✕
@@ -567,7 +567,7 @@ function EventsPage() {
                         </div>
 
                         <div className="registration-modal-body">
-                            {createdPayment ? (
+                            {createdTransaction ? (
                                 <>
                                     <div className="registration-modal-event-info">
                                         <h3>{selectedEvent.title}</h3>
@@ -576,26 +576,26 @@ function EventsPage() {
                                         </p>
                                     </div>
 
-                                    <div className="payment-success-card">
-                                        <div className="payment-success-header">
+                                    <div className="transaction-success-card">
+                                        <div className="transaction-success-header">
                                             <h2>СБП успешно создан!</h2>
                                         </div>
 
-                                        <div className="payment-details">
+                                        <div className="transaction-details">
                                             <div className="qr-code-container">
                                                 <img
-                                                    src={`data:image/png;base64,${createdPayment.content?.base64Image}`}
+                                                    src={`data:image/png;base64,${createdTransaction.content?.base64Image}`}
                                                     alt="QR-код для оплаты"
                                                     className="qr-code-image"
                                                 />
                                             </div>
-                                            <div className="payment-detail-item">
+                                            <div className="transaction-detail-item">
                                                 <span className="detail-label">Сумма платежа:</span>
-                                                <span className="detail-value">{(createdPayment.amount / 100).toFixed(2)} ₽</span>
+                                                <span className="detail-value">{(createdTransaction.amount / 100).toFixed(2)} ₽</span>
                                             </div>
-                                            <div className="payment-detail-item">
+                                            <div className="transaction-detail-item">
                                                 <span className="detail-label">Дата выставления:</span>
-                                                <span className="detail-value">{new Date(createdPayment.createdAt || createdPayment.issuedAt).toLocaleDateString('ru-RU', {
+                                                <span className="detail-value">{new Date(createdTransaction.createdAt || createdTransaction.issuedAt).toLocaleDateString('ru-RU', {
                                                     day: 'numeric',
                                                     month: 'long',
                                                     year: 'numeric',
@@ -605,20 +605,20 @@ function EventsPage() {
                                             </div>
                                         </div>
 
-                                        {createdPayment.content?.link && (
-                                            <div className="payment-url-container">
-                                                <p className="payment-url-label">Ссылка для оплаты:</p>
-                                                <div className="payment-url-wrapper">
+                                        {createdTransaction.content?.link && (
+                                            <div className="transaction-url-container">
+                                                <p className="transaction-url-label">Ссылка для оплаты:</p>
+                                                <div className="transaction-url-wrapper">
                                                     <a
-                                                        href={createdPayment.content.link}
+                                                        href={createdTransaction.content.link}
                                                         target="_blank"
                                                         rel="noopener noreferrer"
-                                                        className="payment-url-link"
+                                                        className="transaction-url-link"
                                                     >
-                                                        {createdPayment.content.link}
+                                                        {createdTransaction.content.link}
                                                     </a>
                                                     <button
-                                                        onClick={() => handleCopyUrl(createdPayment.content.link)}
+                                                        onClick={() => handleCopyUrl(createdTransaction.content.link)}
                                                         className="copy-button"
                                                         title={copiedUrl ? "Скопировано!" : "Копировать ссылку"}
                                                     >
@@ -628,9 +628,9 @@ function EventsPage() {
                                             </div>
                                         )}
 
-                                        <div className="payment-actions">
+                                        <div className="transaction-actions">
                                             <button
-                                                onClick={handleResetPayment}
+                                                onClick={handleResetTransaction}
                                                 className="reset-button"
                                             >
                                                 Выбрать другой способ оплаты
@@ -663,33 +663,33 @@ function EventsPage() {
                                         </div>
                                     </div>
 
-                                    <div className="registration-modal-payment-methods">
+                                    <div className="registration-modal-transaction-methods">
                                         {userBalance >= (selectedEvent.price || 0) ? (
                                             <button
-                                                className="registration-modal-payment-btn registration-modal-payment-account"
-                                                onClick={() => handlePayment('PERSONAL_ACCOUNT')}
-                                                disabled={isProcessingPayment}
+                                                className="registration-modal-transaction-btn registration-modal-transaction-account"
+                                                onClick={() => handleTransaction('PERSONAL_ACCOUNT')}
+                                                disabled={isProcessingTransaction}
                                             >
-                                                <span className="registration-modal-payment-icon">💳</span>
+                                                <span className="registration-modal-transaction-icon">💳</span>
                                                 <span>Списать с лицевого счета</span>
                                             </button>
                                         ) : (
                                             <button
-                                                className="registration-modal-payment-btn registration-modal-payment-account"
+                                                className="registration-modal-transaction-btn registration-modal-transaction-account"
                                                 onClick={handleTopUpBalance}
-                                                disabled={isProcessingPayment}
+                                                disabled={isProcessingTransaction}
                                             >
-                                                <span className="registration-modal-payment-icon">💳</span>
+                                                <span className="registration-modal-transaction-icon">💳</span>
                                                 <span>Пополнить лицевой счет</span>
                                             </button>
                                         )}
 
                                         <button
-                                            className="registration-modal-payment-btn registration-modal-payment-sbp"
-                                            onClick={() => handlePayment('FAST_PAYMENT')}
-                                            disabled={isProcessingPayment}
+                                            className="registration-modal-transaction-btn registration-modal-transaction-sbp"
+                                            onClick={() => handleTransaction('FAST_PAYMENT')}
+                                            disabled={isProcessingTransaction}
                                         >
-                                            <span className="registration-modal-payment-icon">📱</span>
+                                            <span className="registration-modal-transaction-icon">📱</span>
                                             <span>Оплата СБП</span>
                                         </button>
                                     </div>

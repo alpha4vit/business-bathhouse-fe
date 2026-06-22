@@ -1,22 +1,14 @@
 import React, {useEffect, useState} from 'react'
 import './Invoice.css'
-import {Company, companyService} from '../services/companyService'
+import {Company, companyService, CreateCompanyDto} from '../services/companyService'
 import {useUserId} from '../hooks/useUserId'
 import CompanyRequisitesInput from './CompanyRequisitesInput'
 import {
-    InvoiceExistedCompanyDto,
-    InvoiceNewCompanyDto,
     invoiceService,
-    LegalCompanyType,
+    PaymentPurpose,
+    PaymentRequestDto,
     PaymentType
 } from '../services/invoiceService'
-
-enum PaymentPurpose {
-    DEPOSIT = 'DEPOSIT',
-    CHARITY = 'CHARITY',
-    SUBSCRIPTION_RENEWAL = 'SUBSCRIPTION_RENEWAL',
-    BATHHOUSE_EVENT = 'BATHHOUSE_EVENT'
-}
 
 interface CompanyData {
     title: string
@@ -66,7 +58,7 @@ function Invoice() {
     }
 
     const showNotification = (type: 'success' | 'error', message: string) => {
-        setNotification({ type, message })
+        setNotification({type, message})
         setTimeout(() => setNotification(null), 3000)
     }
 
@@ -107,12 +99,12 @@ function Invoice() {
 
     const calculatedAmount = (() => {
         if (!invoiceAmount) return '0'
-        
+
         if (paymentPurpose === PaymentPurpose.BATHHOUSE_EVENT) {
             if (invoiceAmount === '14000') return '13000'
             if (invoiceAmount === '28000') return '26000'
         }
-        
+
         return Math.ceil(parseFloat(invoiceAmount) * 0.92).toFixed(0)
     })()
 
@@ -126,6 +118,7 @@ function Invoice() {
 
         try {
             const backendPaymentPurpose = paymentPurpose
+            let companyId: string | undefined
 
             if (manualEntryMode) {
                 // Режим ручного ввода с DaData
@@ -135,17 +128,10 @@ function Invoice() {
                     return
                 }
 
-                // Определяем тип компании на основе данных из DaData
-                const companyType = companyData.type === 'INDIVIDUAL' ? LegalCompanyType.INDIVIDUAL : LegalCompanyType.LEGAL
-
-                const newCompanyDto: InvoiceNewCompanyDto = {
-                    invoiceType: 'NEW_COMPANY',
+                // Создаем компанию через CompanyController
+                const createCompanyDto: CreateCompanyDto = {
                     userId: userId || '',
-                    amount: parseFloat(invoiceAmount),
-                    currency: 'RUB',
-                    purpose: backendPaymentPurpose as any,
-                    type: PaymentType.INVOICE,
-                    companyType: companyType,
+                    type: companyData.type === 'INDIVIDUAL' ? 'INDIVIDUAL' : 'LEGAL',
                     edo: edoType,
                     title: companyData.title,
                     inn: companyData.inn,
@@ -156,7 +142,7 @@ function Invoice() {
                     okved: companyData.okved
                 }
 
-                await invoiceService.createInvoice(newCompanyDto)
+                companyId = await companyService.createCompany(createCompanyDto)
                 showNotification('success', 'Готовим ваш счет. Это займет около 2 минут')
             } else {
                 // Режим выбора существующей компании
@@ -166,19 +152,21 @@ function Invoice() {
                     return
                 }
 
-                const existedCompanyDto: InvoiceExistedCompanyDto = {
-                    invoiceType: 'EXISTED_COMPANY',
-                    userId: userId || '',
-                    amount: parseFloat(invoiceAmount),
-                    currency: 'RUB',
-                    purpose: backendPaymentPurpose as any,
-                    type: PaymentType.INVOICE,
-                    companyId: selectedEntity
-                }
-
-                await invoiceService.createInvoice(existedCompanyDto)
+                companyId = selectedEntity
                 showNotification('success', 'Счет успешно создан!')
             }
+
+            // Создаем платеж через TransactionController
+            const paymentDto: PaymentRequestDto = {
+                userId: userId || '',
+                amount: parseFloat(invoiceAmount) * 100, // Конвертируем в копейки
+                currency: 'RUB',
+                purpose: backendPaymentPurpose as any,
+                type: PaymentType.INVOICE,
+                companyId: companyId
+            }
+
+            await invoiceService.createInvoice(paymentDto)
         } catch (error) {
             console.error('Error creating invoice:', error)
             const errorMessage = error instanceof Error ? error.message : 'Ошибка при создании счета. Пожалуйста, попробуйте позже.'

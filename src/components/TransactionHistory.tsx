@@ -1,5 +1,5 @@
 import {useEffect, useState} from 'react'
-import {paymentService, TransactionDto, TransactionDirection} from '../services/paymentService'
+import {transactionService, TransactionDto, TransactionDirection} from '../services/transactionService'
 import {userService, UserDataDto} from '../services/userService'
 import {useUserId} from '../hooks/useUserId'
 import './TransactionHistory.css'
@@ -38,7 +38,7 @@ export default function TransactionHistory() {
         setLoading(true)
         setError(null)
         try {
-            const data = await paymentService.getTransactionHistory(userId)
+            const data = await transactionService.getTransactionHistory(userId)
             setTransactions(data)
         } catch (err) {
             setError('Не удалось загрузить журнал операций')

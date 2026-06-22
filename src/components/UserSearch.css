@@ -1,0 +1,139 @@
+.user-search-container {
+    max-width: 100%;
+}
+
+.user-search-wrapper {
+    position: relative;
+    max-width: 100%;
+}
+
+.user-search-input {
+    width: 100%;
+    max-width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.2s;
+    box-sizing: border-box;
+}
+
+.user-search-input:focus {
+    outline: none;
+    border-color: #4a90e2;
+}
+
+.user-search-input:disabled {
+    background-color: #f5f5f5;
+    cursor: not-allowed;
+}
+
+.user-search-autocomplete {
+    position: fixed;
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    max-height: 300px;
+    overflow-y: auto;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    z-index: 100;
+}
+
+.user-search-autocomplete-item {
+    padding: 12px 16px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.user-search-autocomplete-item:last-child {
+    border-bottom: none;
+}
+
+.user-search-autocomplete-item:hover {
+    background-color: #f8f9fa;
+}
+
+.autocomplete-item-name {
+    font-weight: 500;
+    color: #333;
+}
+
+.autocomplete-item-role {
+    font-size: 12px;
+    color: #666;
+    margin-top: 4px;
+}
+
+.user-search-selected-users {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.user-search-selected-user {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    border: 1px solid #e0e0e0;
+}
+
+.selected-user-name {
+    font-weight: 500;
+    color: #333;
+}
+
+.selected-user-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.selected-user-role {
+    font-size: 12px;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-weight: 500;
+}
+
+.selected-user-role.resident {
+    background-color: #e3f2fd;
+    color: #1976d2;
+}
+
+.selected-user-role.admin {
+    background-color: #fff3e0;
+    color: #f57c00;
+}
+
+.selected-user-role.non-resident {
+    background-color: #f5f5f5;
+    color: #666;
+}
+
+.user-search-remove-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    transition: color 0.2s;
+    border-radius: 4px;
+}
+
+.user-search-remove-button:hover:not(:disabled) {
+    color: #dc3545;
+    background-color: #f8d7da;
+}
+
+.user-search-remove-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}

@@ -17,7 +17,7 @@ function IndividualInvoice() {
     const [paymentPurpose] = useState<PaymentPurpose>(PaymentPurpose.DEPOSIT)
     const [isCreatingInvoice, setIsCreatingInvoice] = useState<boolean>(false)
     const [isPressed, setIsPressed] = useState<boolean>(false)
-    const [createdPayment, setCreatedPayment] = useState<any>(null)
+    const [createdTransaction, setCreatedTransaction] = useState<any>(null)
     const [copiedUrl, setCopiedUrl] = useState<boolean>(false)
     const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
 
@@ -42,7 +42,7 @@ function IndividualInvoice() {
         setIsCreatingInvoice(true)
 
         try {
-            const paymentData = {
+            const transactionData = {
                 userId: userId || '',
                 amount: Math.ceil(parseFloat(invoiceAmount) * 100), // Конвертируем в копейки
                 currency: 'RUB',
@@ -50,14 +50,14 @@ function IndividualInvoice() {
                 type: 'FAST_PAYMENT'
             }
 
-            console.log('Creating fast payment:', paymentData)
+            console.log('Creating fast transaction:', transactionData)
 
-            const response = await fetch(`${API_BASE_URL}/api/payments`, {
+            const response = await fetch(`${API_BASE_URL}/api/transactions`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(paymentData),
+                body: JSON.stringify(transactionData),
             })
 
             if (!response.ok) {
@@ -75,14 +75,14 @@ function IndividualInvoice() {
                 throw new Error('Server returned non-JSON response')
             }
 
-            const paymentResult = await response.json()
-            console.log('Payment result:', paymentResult)
-            setCreatedPayment(paymentResult)
+            const transactionResult = await response.json()
+            console.log('Transaction result:', transactionResult)
+            setCreatedTransaction(transactionResult)
 
             // Очистка формы
             setInvoiceAmount('')
         } catch (error) {
-            console.error('Error creating fast payment:', error)
+            console.error('Error creating fast transaction:', error)
 
             let errorMessage = 'Ошибка при создании СБП. Пожалуйста, попробуйте позже.'
 
@@ -123,7 +123,7 @@ function IndividualInvoice() {
     }
 
     const handleReset = () => {
-        setCreatedPayment(null)
+        setCreatedTransaction(null)
         setInvoiceAmount('')
         setCopiedUrl(false)
     }
@@ -137,24 +137,24 @@ function IndividualInvoice() {
         )
     }
 
-    // Показываем результат создания платежа
-    if (createdPayment) {
-        const paymentUrl = createdPayment.content?.link
-        const base64Image = createdPayment.content?.base64Image
-        const issuedAt = createdPayment.createdAt || createdPayment.issuedAt
+    // Показываем результат создания транзакции
+    if (createdTransaction) {
+        const transactionUrl = createdTransaction.content?.link
+        const base64Image = createdTransaction.content?.base64Image
+        const issuedAt = createdTransaction.createdAt || createdTransaction.issuedAt
 
         return (
             <div className="individual-invoice-container">
                 <div className="individual-invoice-content">
-                    <div className="payment-success-card">
-                        <div className="payment-success-header">
+                    <div className="transaction-success-card">
+                        <div className="transaction-success-header">
                             <h2>СБП успешно создан!</h2>
-                            {/*<p className="payment-notice"> Данные платежа отправлены в личные сообщения с Ботом Бизнес Бани</p>*/}
+                            {/*<p className="transaction-notice"> Данные платежа отправлены в личные сообщения с Ботом Бизнес Бани</p>*/}
                         </div>
                         
 
                         
-                        <div className="payment-details">
+                        <div className="transaction-details">
                             <div className="qr-code-container">
                                 <img
                                     src={`data:image/png;base64,${base64Image}`}
@@ -162,11 +162,11 @@ function IndividualInvoice() {
                                     className="qr-code-image"
                                 />
                             </div>
-                            <div className="payment-detail-item">
+                            <div className="transaction-detail-item">
                                 <span className="detail-label">Сумма платежа:</span>
-                                <span className="detail-value">{(createdPayment.amount / 100).toFixed(2)} ₽</span>
+                                <span className="detail-value">{(createdTransaction.amount / 100).toFixed(2)} ₽</span>
                             </div>
-                            <div className="payment-detail-item">
+                            <div className="transaction-detail-item">
                                 <span className="detail-label">Дата выставления:</span>
                                 <span className="detail-value">{new Date(issuedAt).toLocaleDateString('ru-RU', {
                                     day: 'numeric',
@@ -178,20 +178,20 @@ function IndividualInvoice() {
                             </div>
                         </div>
                         
-                        {paymentUrl && (
-                            <div className="payment-url-container">
-                                <p className="payment-url-label">Ссылка для оплаты:</p>
-                                <div className="payment-url-wrapper">
+                        {transactionUrl && (
+                            <div className="transaction-url-container">
+                                <p className="transaction-url-label">Ссылка для оплаты:</p>
+                                <div className="transaction-url-wrapper">
                                     <a 
-                                        href={paymentUrl} 
+                                        href={transactionUrl} 
                                         target="_blank" 
                                         rel="noopener noreferrer" 
-                                        className="payment-url-link"
+                                        className="transaction-url-link"
                                     >
-                                        {paymentUrl}
+                                        {transactionUrl}
                                     </a>
                                     <button
-                                        onClick={() => handleCopyUrl(paymentUrl)}
+                                        onClick={() => handleCopyUrl(transactionUrl)}
                                         className="copy-button"
                                         title={copiedUrl ? "Скопировано!" : "Копировать ссылку"}
                                     >
@@ -201,7 +201,7 @@ function IndividualInvoice() {
                             </div>
                         )}
                         
-                        <div className="payment-actions">
+                        <div className="transaction-actions">
                             <button
                                 onClick={handleReset}
                                 className="reset-button"

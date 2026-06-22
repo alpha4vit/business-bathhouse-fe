@@ -59,6 +59,7 @@ export interface Resident {
 
 export interface UserSearchDto {
     chatId: number
+    companyId: string | null
     fullName: string
     businessDescription: string | null
     phoneNumber: string | null

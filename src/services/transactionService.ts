@@ -13,7 +13,7 @@ export interface TransactionDto {
     date: string
 }
 
-export const paymentService = {
+export const transactionService = {
     async getTransactionHistory(userId: string): Promise<TransactionDto[]> {
         try {
             const response = await fetch(`${API_BASE_URL}/api/transactions/${userId}`)

@@ -606,13 +606,13 @@
   font-weight: 500;
 }
 
-.registration-modal-payment-methods {
+.registration-modal-transaction-methods {
   display: flex;
   flex-direction: column;
   gap: 12px;
 }
 
-.registration-modal-payment-btn {
+.registration-modal-transaction-btn {
   display: flex;
   align-items: center;
   gap: 12px;
@@ -627,36 +627,36 @@
   color: #2D2D2D;
 }
 
-.registration-modal-payment-btn:hover {
+.registration-modal-transaction-btn:hover {
   border-color: #00A9E8;
   background: linear-gradient(135deg, rgba(0, 169, 232, 0.05) 0%, rgba(0, 169, 232, 0.1) 100%);
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0, 169, 232, 0.2);
 }
 
-.registration-modal-payment-btn:active {
+.registration-modal-transaction-btn:active {
   transform: translateY(0);
 }
 
-.registration-modal-payment-icon {
+.registration-modal-transaction-icon {
   font-size: 24px;
 }
 
-.registration-modal-payment-account {
+.registration-modal-transaction-account {
   border-color: #4CAF50;
 }
 
-.registration-modal-payment-account:hover {
+.registration-modal-transaction-account:hover {
   border-color: #4CAF50;
   background: linear-gradient(135deg, rgba(76, 175, 80, 0.05) 0%, rgba(76, 175, 80, 0.1) 100%);
   box-shadow: 0 4px 12px rgba(76, 175, 80, 0.2);
 }
 
-.registration-modal-payment-sbp {
+.registration-modal-transaction-sbp {
   border-color: #FF9800;
 }
 
-.registration-modal-payment-sbp:hover {
+.registration-modal-transaction-sbp:hover {
   border-color: #FF9800;
   background: linear-gradient(135deg, rgba(255, 152, 0, 0.05) 0%, rgba(255, 152, 0, 0.1) 100%);
   box-shadow: 0 4px 12px rgba(255, 152, 0, 0.2);
@@ -679,7 +679,7 @@
 }
 
 /* Стили для отображения СБП в модальном окне */
-.payment-success-card {
+.transaction-success-card {
   background: white;
   border-radius: 15px;
   padding: clamp(25px, 6vw, 30px);
@@ -688,11 +688,11 @@
   animation: slideIn 0.5s ease-out;
 }
 
-.payment-success-header {
+.transaction-success-header {
   margin-bottom: 25px;
 }
 
-.payment-success-header h2 {
+.transaction-success-header h2 {
   color: #28a745;
   font-size: clamp(20px, 5vw, 24px);
   font-weight: 600;
@@ -714,7 +714,7 @@
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-.payment-details {
+.transaction-details {
   background: #f8f9fa;
   border: 1px solid #dee2e6;
   border-radius: 12px;
@@ -722,7 +722,7 @@
   margin: 25px 0;
 }
 
-.payment-detail-item {
+.transaction-detail-item {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -730,7 +730,7 @@
   border-bottom: 1px solid #e9ecef;
 }
 
-.payment-detail-item:last-child {
+.transaction-detail-item:last-child {
   border-bottom: none;
 }
 
@@ -746,19 +746,19 @@
   color: #2D2D2D;
 }
 
-.payment-url-container {
+.transaction-url-container {
   margin: 25px 0;
   text-align: left;
 }
 
-.payment-url-label {
+.transaction-url-label {
   font-size: clamp(13px, 3.5vw, 14px);
   font-weight: 600;
   color: #495057;
   margin-bottom: 10px;
 }
 
-.payment-url-wrapper {
+.transaction-url-wrapper {
   display: flex;
   align-items: center;
   gap: 10px;
@@ -769,12 +769,12 @@
   transition: all 0.3s ease;
 }
 
-.payment-url-wrapper:hover {
+.transaction-url-wrapper:hover {
   border-color: #00A9E8;
   box-shadow: 0 2px 8px rgba(0, 169, 232, 0.1);
 }
 
-.payment-url-link {
+.transaction-url-link {
   flex: 1;
   color: #00A9E8;
   text-decoration: none;
@@ -783,7 +783,7 @@
   font-family: 'Monaco', 'Menlo', monospace;
 }
 
-.payment-url-link:hover {
+.transaction-url-link:hover {
   text-decoration: underline;
 }
 
@@ -806,7 +806,7 @@
   transform: scale(0.95);
 }
 
-.payment-actions {
+.transaction-actions {
   margin-top: 30px;
 }
 
@@ -844,7 +844,7 @@
 }
 
 @media (max-width: 768px) {
-  .payment-success-card {
+  .transaction-success-card {
     padding: 20px 15px;
   }
 
@@ -854,7 +854,7 @@
 }
 
 @media (max-width: 480px) {
-  .payment-success-card {
+  .transaction-success-card {
     padding: 15px 12px;
   }
 
