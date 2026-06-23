@@ -10,23 +10,6 @@ import {
 import UserSearch from './UserSearch'
 import EventSearch from './EventSearch'
 
-const getPluralForm = (count: number, forms: [string, string, string]): string => {
-    const n = Math.abs(count)
-    const n10 = n % 10
-    const n100 = n % 100
-
-    if (n100 >= 11 && n100 <= 19) {
-        return forms[2]
-    }
-    if (n10 === 1) {
-        return forms[0]
-    }
-    if (n10 >= 2 && n10 <= 4) {
-        return forms[1]
-    }
-    return forms[2]
-}
-
 const PURPOSES_BY_DIRECTION: Record<TransactionDirection, TransactionPurpose[]> = {
     [TransactionDirection.CREDIT]: [TransactionPurpose.DEPOSIT],
     [TransactionDirection.DEBIT]: [
@@ -42,7 +25,8 @@ const PURPOSE_LABELS: Record<TransactionPurpose, string> = {
     [TransactionPurpose.DOWN_PAYMENT]: 'Первоначальный взнос',
     [TransactionPurpose.EVENT]: 'Оплата мероприятия',
     [TransactionPurpose.SUBSCRIPTION_RENEWAL]: 'Годовой членский взнос',
-    [TransactionPurpose.CHARITY]: 'Благотворительность'
+    [TransactionPurpose.CHARITY]: 'Благотворительность',
+    [TransactionPurpose.BATHHOUSE_EVENT]: 'Мероприятие в бане'
 }
 
 function BalanceAdjustmentPage() {
@@ -127,8 +111,6 @@ function BalanceAdjustmentPage() {
             }
 
             if (successCount > 0) {
-                const userWord = getPluralForm(successCount, ['пользователя', 'пользователей', 'пользователей'])
-                const errorMessage = errorCount > 0 ? ` (${errorCount} ${getPluralForm(errorCount, ['пользователя', 'пользователей', 'пользователей'])} с ошибкой)` : ''
                 showNotification('success', `Баланс успешно скорректирован!`)
 
                 setSelectedUsers([])

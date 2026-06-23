@@ -1,6 +1,6 @@
-import {useState, useEffect} from 'react'
+import {useEffect, useState} from 'react'
 import './EventsPage.css'
-import {eventService, Event} from '../services/eventService'
+import {Event, eventService} from '../services/eventService'
 import {userService} from '../services/userService'
 import {userStorage} from '../utils/userStorage'
 import {API_BASE_URL} from "../config/api.ts";
@@ -143,14 +143,6 @@ function EventsPage() {
             setLoadingImages(new Set())
             setLoadedImages(new Set())
             try {
-                const userId = userStorage.getUserId()
-                console.log('[EventsPage] User ID из localStorage:', userId)
-                if (!userId) {
-                    console.error('[EventsPage] User ID not found в localStorage')
-                    console.log('[EventsPage] Проверьте, передается ли user_id в URL параметрах')
-                    return
-                }
-                console.log('[EventsPage] Запрашиваю мероприятия для userId:', userId)
                 const data = await eventService.getEvents()
                 console.log('[EventsPage] Получено мероприятий:', data.length)
                 setEvents(data)

@@ -19,7 +19,7 @@ function AppContent() {
 
     useEffect(() => {
         // Получаем ID пользователя из URL параметров
-        const userId = searchParams.get('userId');
+        const userId = searchParams.get('id');
 
         if (userId) {
             // Сохраняем ID в localStorage если его нет или он отличается
