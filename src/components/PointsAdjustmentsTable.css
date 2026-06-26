@@ -32,6 +32,13 @@
   margin: 0;
 }
 
+.adjustments-header h2 {
+  font-size: clamp(16px, 4vw, 18px);
+  font-weight: 500;
+  margin: clamp(8px, 2vw, 10px) 0 0 0;
+  opacity: 0.9;
+}
+
 .adjustments-card {
   background: white;
   border-radius: 15px;
@@ -39,6 +46,51 @@
   margin-bottom: 20px;
   box-shadow: 0 5px 20px rgba(45, 45, 45, 0.1);
   box-sizing: border-box;
+  transition: opacity 0.3s ease, transform 0.3s ease;
+}
+
+.adjustments-event-selector {
+  margin-bottom: 25px;
+  padding-bottom: 25px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.adjustments-event-selector label {
+  display: block;
+  font-size: clamp(14px, 3.5vw, 15px);
+  font-weight: 600;
+  color: #2D2D2D;
+  margin-bottom: 10px;
+}
+
+.adjustments-select.adjustments-event-select {
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: 14px 16px !important;
+  padding-right: 40px !important;
+  border: 2px solid #e1e5e9 !important;
+  border-radius: 12px !important;
+  font-size: 16px !important;
+  background-color: #f8f9fa !important;
+  outline: none !important;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  box-shadow: none !important;
+  transform: translateY(0) !important;
+  cursor: pointer !important;
+  appearance: none !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%236c757d' d='M6 9L1 4h10z'/%3E%3C/svg%3E") !important;
+  background-repeat: no-repeat !important;
+  background-position: right 16px center !important;
+  box-sizing: border-box !important;
+  min-height: 52px !important;
+}
+
+.adjustments-select.adjustments-event-select:focus {
+  border-color: #00A9E8 !important;
+  background-color: #ffffff !important;
+  box-shadow: 0 0 0 4px rgba(0, 169, 232, 0.1) !important;
+  transform: translateY(-1px) !important;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2300A9E8' d='M6 9L1 4h10z'/%3E%3C/svg%3E") !important;
 }
 
 .adjustments-table-wrapper {
@@ -47,6 +99,7 @@
   margin-bottom: 30px;
   border-radius: 10px;
   border: 1px solid #e1e5e9;
+  transition: opacity 0.3s ease, transform 0.3s ease;
 }
 
 .adjustments-table {

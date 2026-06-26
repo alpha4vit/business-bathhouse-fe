@@ -10,30 +10,10 @@ import {
 import UserSearch from './UserSearch'
 import EventSearch from './EventSearch'
 
-const PURPOSES_BY_DIRECTION: Record<TransactionDirection, TransactionPurpose[]> = {
-    [TransactionDirection.CREDIT]: [TransactionPurpose.DEPOSIT],
-    [TransactionDirection.DEBIT]: [
-        TransactionPurpose.EVENT,
-        TransactionPurpose.DOWN_PAYMENT,
-        TransactionPurpose.SUBSCRIPTION_RENEWAL,
-        TransactionPurpose.CHARITY
-    ]
-}
-
-const PURPOSE_LABELS: Record<TransactionPurpose, string> = {
-    [TransactionPurpose.DEPOSIT]: 'Пополнение лицевого счета',
-    [TransactionPurpose.DOWN_PAYMENT]: 'Первоначальный взнос',
-    [TransactionPurpose.EVENT]: 'Оплата мероприятия',
-    [TransactionPurpose.SUBSCRIPTION_RENEWAL]: 'Годовой членский взнос',
-    [TransactionPurpose.CHARITY]: 'Благотворительность',
-    [TransactionPurpose.BATHHOUSE_EVENT]: 'Мероприятие в бане'
-}
-
 function BalanceAdjustmentPage() {
     const [selectedUsers, setSelectedUsers] = useState<UserSearchDto[]>([])
     const [amount, setAmount] = useState<string>('')
     const [direction, setDirection] = useState<TransactionDirection>(TransactionDirection.CREDIT)
-    const [purpose, setPurpose] = useState<TransactionPurpose>(TransactionPurpose.DEPOSIT)
     const [title, setTitle] = useState<string>('')
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
@@ -51,18 +31,6 @@ function BalanceAdjustmentPage() {
         }
     }
 
-    const handleDirectionChange = (newDirection: TransactionDirection) => {
-        setDirection(newDirection)
-        // Сбрасываем purpose, если он не соответствует новому направлению
-        const validPurposes = PURPOSES_BY_DIRECTION[newDirection]
-        if (!validPurposes.includes(purpose)) {
-            setPurpose(validPurposes[0])
-        }
-    }
-
-    const getAvailablePurposes = (): TransactionPurpose[] => {
-        return PURPOSES_BY_DIRECTION[direction] || []
-    }
 
     const handleSubmit = async () => {
         if (selectedUsers.length === 0) {
@@ -75,8 +43,8 @@ function BalanceAdjustmentPage() {
             return
         }
 
-        if (!title.trim() && !selectedEvent) {
-            showNotification('error', 'Пожалуйста, введите описание операции или выберите мероприятие')
+        if (!title.trim()) {
+            showNotification('error', 'Пожалуйста, введите заголовок операции')
             return
         }
 
@@ -99,7 +67,7 @@ function BalanceAdjustmentPage() {
                             currency: 'RUB'
                         },
                         direction: direction,
-                        purpose: purpose,
+                        purpose: TransactionPurpose.MANUAL_ADJUSTMENT,
                         title: selectedEvent ? selectedEvent.title : title.trim(),
                         eventId: selectedEvent ? selectedEvent.id : undefined
                     })
@@ -179,7 +147,7 @@ function BalanceAdjustmentPage() {
                         </label>
                         <select
                             value={direction}
-                            onChange={(e) => handleDirectionChange(e.target.value as TransactionDirection)}
+                            onChange={(e) => setDirection(e.target.value as TransactionDirection)}
                             className="balance-adjustment-select"
                             disabled={isSubmitting}
                         >
@@ -190,23 +158,7 @@ function BalanceAdjustmentPage() {
 
                     <div className="balance-adjustment-input-group">
                         <label>
-                            Назначение
-                        </label>
-                        <select
-                            value={purpose}
-                            onChange={(e) => setPurpose(e.target.value as TransactionPurpose)}
-                            className="balance-adjustment-select"
-                            disabled={isSubmitting}
-                        >
-                            {getAvailablePurposes().map(p => (
-                                <option key={p} value={p}>{PURPOSE_LABELS[p]}</option>
-                            ))}
-                        </select>
-                    </div>
-
-                    <div className="balance-adjustment-input-group">
-                        <label>
-                            Мероприятие (опционально)
+                            Заголовок операции
                         </label>
                         <EventSearch
                             selectedEvent={selectedEvent}
@@ -222,7 +174,7 @@ function BalanceAdjustmentPage() {
                 <div className="balance-adjustment-button-container">
                     <button
                         onClick={handleSubmit}
-                        disabled={selectedUsers.length === 0 || !amount || (!title.trim() && !selectedEvent) || isSubmitting}
+                        disabled={selectedUsers.length === 0 || !amount || !title.trim() || isSubmitting}
                         className="balance-adjustment-button"
                     >
                         {isSubmitting ? (

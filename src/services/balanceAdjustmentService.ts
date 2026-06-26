@@ -6,7 +6,8 @@ export enum TransactionPurpose {
     EVENT = 'EVENT',
     SUBSCRIPTION_RENEWAL = 'SUBSCRIPTION_RENEWAL',
     CHARITY = 'CHARITY',
-    BATHHOUSE_EVENT = 'BATHHOUSE_EVENT'
+    BATHHOUSE_EVENT = 'BATHHOUSE_EVENT',
+    MANUAL_ADJUSTMENT = 'MANUAL_ADJUSTMENT'
 }
 
 export enum TransactionDirection {
