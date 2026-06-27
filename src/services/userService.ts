@@ -315,5 +315,19 @@ export const userService = {
             console.error('Error fetching users:', error)
             throw error
         }
+    },
+
+    async deactivate(companyIds: string[]): Promise<string[]> {
+        const response = await fetch(`${API_BASE_URL}/api/user/deactivate`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(companyIds)
+        })
+
+        if (!response.ok) {
+            throw new Error(`Failed to deactivate users: ${response.status}`)
+        }
+
+        return await response.json()
     }
 }
