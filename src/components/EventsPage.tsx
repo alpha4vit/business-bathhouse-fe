@@ -3,7 +3,8 @@ import './EventsPage.css'
 import {Event, eventService} from '../services/eventService'
 import {userService} from '../services/userService'
 import {userStorage} from '../utils/userStorage'
-import {API_BASE_URL} from "../config/api.ts";
+import {API_BASE_URL} from "../config/api.ts"
+import SwipeCard from './SwipeCard'
 
 const eventTypeLabels: Record<string, string> = {
     'ENTERTAINMENT': 'Развлекательные мероприятия',
@@ -17,8 +18,6 @@ function EventsPage() {
     const [events, setEvents] = useState<Event[]>([])
     const [loading, setLoading] = useState(true)
     const [currentIndex, setCurrentIndex] = useState(0)
-    const [swipeOffset, setSwipeOffset] = useState(0)
-    const [isDragging, setIsDragging] = useState(false)
     const [failedImages, setFailedImages] = useState<Set<string>>(new Set())
     const [loadingImages, setLoadingImages] = useState<Set<string>>(new Set())
     const [loadedImages, setLoadedImages] = useState<Set<string>>(new Set())
@@ -157,109 +156,6 @@ function EventsPage() {
         loadEvents()
     }, [])
 
-    const handleTouchStart = (e: React.TouchEvent) => {
-        setTouchStart(e.touches[0].clientX)
-        setTouchStartY(e.touches[0].clientY)
-        setIsDragging(true)
-        setSwipeOffset(0)
-        setIsHorizontalSwipeStarted(false)
-        setIsSwiping(false)
-    }
-
-    const handleTouchMove = (e: React.TouchEvent) => {
-        if (!isDragging) return
-        const currentX = e.touches[0].clientX
-        const currentY = e.touches[0].clientY
-        const diffX = currentX - touchStart
-        const diffY = Math.abs(currentY - (touchStartY || 0))
-
-        if (diffY > Math.abs(diffX) && diffY > 30 && !isHorizontalSwipeStarted) {
-            setIsDragging(false)
-            return
-        }
-
-        if (Math.abs(diffX) > 20) {
-            setIsHorizontalSwipeStarted(true)
-            setIsSwiping(true)
-            e.preventDefault()
-        }
-
-        const threshold = 50
-
-        if (diffX < -threshold && currentIndex < events.length - 1 && !swipeDirection) {
-            setSwipeDirection('left')
-        } else if (diffX > threshold && currentIndex > 0 && !swipeDirection) {
-            setSwipeDirection('right')
-        }
-
-        setSwipeOffset(diffX)
-    }
-
-    const [touchStart, setTouchStart] = useState(0)
-    const [touchStartY, setTouchStartY] = useState(0)
-    const [isAnimating, setIsAnimating] = useState(false)
-    const [swipeDirection, setSwipeDirection] = useState<'left' | 'right' | null>(null)
-    const [isHorizontalSwipeStarted, setIsHorizontalSwipeStarted] = useState(false)
-    const [isSwiping, setIsSwiping] = useState(false)
-    const [animationDir, setAnimationDir] = useState<'left' | 'right' | null>(null)
-
-    const handleTouchEnd = () => {
-        if (!isDragging) return
-        setIsDragging(false)
-        setIsHorizontalSwipeStarted(false)
-        setIsSwiping(false)
-
-        if (swipeDirection === 'left' && currentIndex < events.length - 1) {
-            setIsAnimating(true)
-            setAnimationDir('left')
-            setTimeout(() => {
-                setCurrentIndex(currentIndex + 1)
-                setIsAnimating(false)
-                setSwipeOffset(0)
-                setSwipeDirection(null)
-                setAnimationDir(null)
-            }, 300)
-        } else if (swipeDirection === 'right' && currentIndex > 0) {
-            setIsAnimating(true)
-            setAnimationDir('right')
-            setTimeout(() => {
-                setCurrentIndex(currentIndex - 1)
-                setIsAnimating(false)
-                setSwipeOffset(0)
-                setSwipeDirection(null)
-                setAnimationDir(null)
-            }, 300)
-        } else {
-            setSwipeOffset(0)
-            setSwipeDirection(null)
-        }
-    }
-
-    const handlePrevious = () => {
-        if (currentIndex > 0 && !isAnimating) {
-            setIsAnimating(true)
-            setAnimationDir('right')
-            setTimeout(() => {
-                setCurrentIndex(currentIndex - 1)
-                setIsAnimating(false)
-                setSwipeOffset(0)
-                setAnimationDir(null)
-            }, 300)
-        }
-    }
-
-    const handleNext = () => {
-        if (currentIndex < events.length - 1 && !isAnimating) {
-            setIsAnimating(true)
-            setAnimationDir('left')
-            setTimeout(() => {
-                setCurrentIndex(currentIndex + 1)
-                setIsAnimating(false)
-                setSwipeOffset(0)
-                setAnimationDir(null)
-            }, 300)
-        }
-    }
 
     const formatDate = (dateString: string) => {
         const date = new Date(dateString)
@@ -418,147 +314,100 @@ function EventsPage() {
                         {currentIndex + 1} из {events.length}
                     </div>
                     
-                    <div className="events-navigation-wrapper">
-                        <button
-                            className="events-nav-button events-nav-prev"
-                            onClick={handlePrevious}
-                            disabled={currentIndex === 0 || isAnimating}
-                            aria-label="Предыдущее мероприятие"
-                        >
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <polyline points="15 18 9 12 15 6"></polyline>
-                            </svg>
-                        </button>
-                        
-                        <div
-                            className={`events-card-container ${isSwiping ? 'swiping' : ''}`}
-                            onTouchStart={handleTouchStart}
-                            onTouchMove={handleTouchMove}
-                            onTouchEnd={handleTouchEnd}
-                        >
-                            {events.map((evt, index) => {
-                                const isCurrent = index === currentIndex
-                                const isIncoming = isAnimating && (
-                                    (animationDir === 'left' && index === currentIndex + 1) ||
-                                    (animationDir === 'right' && index === currentIndex - 1)
-                                )
-
-                                let animClass = ''
-                                if (isAnimating && isCurrent) {
-                                    animClass = animationDir === 'left' ? 'swiping-left' : 'swiping-right'
-                                } else if (isIncoming) {
-                                    animClass = animationDir === 'left' ? 'sliding-in-from-right' : 'sliding-in-from-left'
-                                }
-
-                                return (
-                                <div
-                                    key={evt.id}
-                                    className={`events-result-card ${isCurrent ? 'active' : ''} ${animClass} ${isDragging && isCurrent ? 'dragging' : ''}`}
-                                    style={{
-                                        display: isCurrent || isIncoming ? 'flex' : 'none',
-                                        transform: isCurrent && !isAnimating ? `translateX(${swipeOffset}px) rotate(${swipeOffset * 0.05}deg)` : undefined
-                                    }}
-                                >
-                                    <div className="events-result-image">
-                                        {evt.photo?.showUrl && loadingImages.has(evt.id) ? (
-                                            <div className="events-result-image-skeleton"></div>
-                                        ) : evt.photo?.showUrl && !failedImages.has(evt.id) ? (
-                                            <img 
-                                                src={evt.photo.showUrl} 
-                                                alt={`Изображение ${evt.title}`}
-                                                className="events-result-image-img"
-                                                onLoad={() => handleImageLoad(evt.id)}
-                                                onError={(e) => handleImageError(evt.id, e)}
-                                            />
-                                        ) : (
-                                            <div className="events-result-image-placeholder">
-                                                📅
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    <div className="events-result-header">
-                                        <h3 className="events-result-name">{evt.title}</h3>
-                                        <div className="events-result-date">
-                                            🕐 {formatDate(evt.carryDate)}
-                                        </div>
-                                    </div>
-
-                                    {evt.type && (
-                                        <div className="events-result-type">
-                                            {eventTypeLabels[evt.type] || evt.type}
+                    <SwipeCard
+                        items={events}
+                        currentIndex={currentIndex}
+                        onIndexChange={setCurrentIndex}
+                        cardClassName="events-result-card"
+                        renderCard={(evt) => (
+                            <>
+                                <div className="events-result-image">
+                                    {evt.photo?.showUrl && loadingImages.has(evt.id) ? (
+                                        <div className="events-result-image-skeleton"></div>
+                                    ) : evt.photo?.showUrl && !failedImages.has(evt.id) ? (
+                                        <img 
+                                            src={evt.photo.showUrl} 
+                                            alt={`Изображение ${evt.title}`}
+                                            className="events-result-image-img"
+                                            onLoad={() => handleImageLoad(evt.id)}
+                                            onError={(e) => handleImageError(evt.id, e)}
+                                        />
+                                    ) : (
+                                        <div className="events-result-image-placeholder">
+                                            📅
                                         </div>
                                     )}
-
-                                    <div className="events-result-info">
-                                        {evt.price !== undefined && evt.price > 0 && (
-                                            <div className="events-result-price">
-                                                💰 {evt.price} ₽
-                                            </div>
-                                        )}
-                                        {evt.points !== undefined && evt.points > 0 && (
-                                            <div className="events-result-points">
-                                                ⭐ {evt.points} баллов
-                                            </div>
-                                        )}
-                                    </div>
-
-                                    {evt.previewDescription?.showUrl && (
-                                        <>
-                                            <button
-                                                className="events-result-description-toggle"
-                                                onClick={() => toggleDescription(evt.id)}
-                                            >
-                                                {expandedDescriptions.has(evt.id) ? (
-                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                                        <polyline points="6 9 12 15 18 9"></polyline>
-                                                    </svg>
-                                                ) : (
-                                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                                        <polyline points="18 15 12 9 6 15"></polyline>
-                                                    </svg>
-                                                )}
-                                            </button>
-
-                                            {expandedDescriptions.has(evt.id) && (
-                                                <div className="events-result-description">
-                                                    {loadingHtml.has(evt.id) ? (
-                                                        <div className="events-result-description-loading">Загрузка описания...</div>
-                                                    ) : htmlDescriptions.has(evt.id) ? (
-                                                        <div 
-                                                            className="events-result-description-content"
-                                                            dangerouslySetInnerHTML={{ __html: htmlDescriptions.get(evt.id) || '' }}
-                                                        />
-                                                    ) : (
-                                                        <div className="events-result-description-loading">Загрузка описания...</div>
-                                                    )}
-                                                </div>
-                                            )}
-                                        </>
-                                    )}
-
-                                    <button
-                                        className="events-result-registration"
-                                        onClick={() => handleRegistration(evt)}
-                                    >
-                                        Зарегистрироваться
-                                    </button>
                                 </div>
-                                )
-                            })}
-                        </div>
-                        
-                        <button
-                            className="events-nav-button events-nav-next"
-                            onClick={handleNext}
-                            disabled={currentIndex === events.length - 1 || isAnimating}
-                            aria-label="Следующее мероприятие"
-                        >
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                                <polyline points="9 18 15 12 9 6"></polyline>
-                            </svg>
-                        </button>
-                    </div>
+
+                                <div className="events-result-header">
+                                    <h3 className="events-result-name">{evt.title}</h3>
+                                    <div className="events-result-date">
+                                        🕐 {formatDate(evt.carryDate)}
+                                    </div>
+                                </div>
+
+                                {evt.type && (
+                                    <div className="events-result-type">
+                                        {eventTypeLabels[evt.type] || evt.type}
+                                    </div>
+                                )}
+
+                                <div className="events-result-info">
+                                    {evt.price !== undefined && evt.price > 0 && (
+                                        <div className="events-result-price">
+                                            💰 {evt.price} ₽
+                                        </div>
+                                    )}
+                                    {evt.points !== undefined && evt.points > 0 && (
+                                        <div className="events-result-points">
+                                            ⭐ {evt.points} баллов
+                                        </div>
+                                    )}
+                                </div>
+
+                                {evt.previewDescription?.showUrl && (
+                                    <>
+                                        <button
+                                            className="events-result-description-toggle"
+                                            onClick={() => toggleDescription(evt.id)}
+                                        >
+                                            {expandedDescriptions.has(evt.id) ? (
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                    <polyline points="6 9 12 15 18 9"></polyline>
+                                                </svg>
+                                            ) : (
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                    <polyline points="18 15 12 9 6 15"></polyline>
+                                                </svg>
+                                            )}
+                                        </button>
+
+                                        {expandedDescriptions.has(evt.id) && (
+                                            <div className="events-result-description">
+                                                {loadingHtml.has(evt.id) ? (
+                                                    <div className="events-result-description-loading">Загрузка описания...</div>
+                                                ) : htmlDescriptions.has(evt.id) ? (
+                                                    <div 
+                                                        className="events-result-description-content"
+                                                        dangerouslySetInnerHTML={{ __html: htmlDescriptions.get(evt.id) || '' }}
+                                                    />
+                                                ) : (
+                                                    <div className="events-result-description-loading">Загрузка описания...</div>
+                                                )}
+                                            </div>
+                                        )}
+                                    </>
+                                )}
+
+                                <button
+                                    className="events-result-registration"
+                                    onClick={() => handleRegistration(evt)}
+                                >
+                                    Зарегистрироваться
+                                </button>
+                            </>
+                        )}
+                    />
                 </div>
             )}
 
