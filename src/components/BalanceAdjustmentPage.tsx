@@ -1,13 +1,13 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import './BalanceAdjustmentPage.css'
-import { UserSearchDto } from '../services/userService'
+import { UserSearchDto, userService } from '../services/userService'
 import { Event } from '../services/eventService'
 import {
     balanceAdjustmentService,
     TransactionDirection,
     TransactionPurpose
 } from '../services/balanceAdjustmentService'
-import UserSearch from './UserSearch'
+import UserSearch, { UserBalanceInfo } from './UserSearch'
 import EventSearch from './EventSearch'
 
 function BalanceAdjustmentPage() {
@@ -18,6 +18,39 @@ function BalanceAdjustmentPage() {
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false)
     const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
+    const [userBalances, setUserBalances] = useState<Record<number, UserBalanceInfo>>({})
+    const fetchedUserIds = useRef<Set<number>>(new Set())
+
+    useEffect(() => {
+        const currentChatIds = new Set(selectedUsers.map(u => u.chatId))
+
+        // Remove balances for deselected users
+        fetchedUserIds.current.forEach(id => {
+            if (!currentChatIds.has(id)) fetchedUserIds.current.delete(id)
+        })
+        setUserBalances(prev => {
+            const cleaned: Record<number, UserBalanceInfo> = {}
+            currentChatIds.forEach(id => { if (prev[id] !== undefined) cleaned[id] = prev[id] })
+            return cleaned
+        })
+
+        // Fetch balance for newly added users
+        selectedUsers.forEach(user => {
+            if (fetchedUserIds.current.has(user.chatId)) return
+            fetchedUserIds.current.add(user.chatId)
+
+            const userId = user.companyId || user.chatId.toString()
+            setUserBalances(prev => ({ ...prev, [user.chatId]: { amount: null, loading: true } }))
+
+            userService.getUserData(userId)
+                .then(data => {
+                    setUserBalances(prev => ({ ...prev, [user.chatId]: { amount: data.balance.amount, loading: false } }))
+                })
+                .catch(() => {
+                    setUserBalances(prev => ({ ...prev, [user.chatId]: { amount: null, loading: false } }))
+                })
+        })
+    }, [selectedUsers]) // eslint-disable-line react-hooks/exhaustive-deps
 
     const showNotification = (type: 'success' | 'error', message: string) => {
         setNotification({ type, message })
@@ -85,6 +118,8 @@ function BalanceAdjustmentPage() {
                 setAmount('')
                 setTitle('')
                 setSelectedEvent(null)
+                setUserBalances({})
+                fetchedUserIds.current.clear()
             } else {
                 showNotification('error', 'Не удалось скорректировать баланс')
             }
@@ -117,6 +152,7 @@ function BalanceAdjustmentPage() {
                             onUsersChange={setSelectedUsers}
                             placeholder="Поиск по фамилии..."
                             disabled={isSubmitting}
+                            userBalances={userBalances}
                         />
                     </div>
                 </div>
@@ -151,8 +187,8 @@ function BalanceAdjustmentPage() {
                             className="balance-adjustment-select"
                             disabled={isSubmitting}
                         >
-                            <option value={TransactionDirection.CREDIT}>Начисление</option>
-                            <option value={TransactionDirection.DEBIT}>Списание</option>
+                            <option value={TransactionDirection.DEBIT}>Начисление</option>
+                            <option value={TransactionDirection.CREDIT}>Списание</option>
                         </select>
                     </div>
 

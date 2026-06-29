@@ -1,26 +1,37 @@
-import React, { useEffect, useState } from 'react'
-import { userService, UserSearchDto } from '../services/userService'
+import React, {useEffect, useState} from 'react'
+import {UserSearchDto, userService} from '../services/userService'
 import './UserSearch.css'
+
+export interface UserBalanceInfo {
+    amount: number | null
+    loading: boolean
+}
 
 interface UserSearchProps {
     selectedUsers: UserSearchDto[]
     onUsersChange: (users: UserSearchDto[]) => void
     placeholder?: string
     disabled?: boolean
+    userBalances?: Record<number, UserBalanceInfo>
 }
 
-function UserSearch({ 
-    selectedUsers, 
-    onUsersChange, 
-    placeholder = 'Поиск по фамилии...',
-    disabled = false
-}: UserSearchProps) {
+function UserSearch({
+                        selectedUsers,
+                        onUsersChange,
+                        placeholder = 'Поиск по фамилии...',
+                        disabled = false,
+                        userBalances
+                    }: UserSearchProps) {
     const [users, setUsers] = useState<UserSearchDto[]>([])
     const [loading, setLoading] = useState(false)
     const [searchQuery, setSearchQuery] = useState('')
     const [filteredUsers, setFilteredUsers] = useState<UserSearchDto[]>([])
     const [autocompleteOpen, setAutocompleteOpen] = useState(false)
-    const [autocompletePosition, setAutocompletePosition] = useState<{ top: number; left: number; width: number } | null>(null)
+    const [autocompletePosition, setAutocompletePosition] = useState<{
+        top: number;
+        left: number;
+        width: number
+    } | null>(null)
 
     useEffect(() => {
         loadUsers()
@@ -119,16 +130,30 @@ function UserSearch({
                     </div>
                 )}
             </div>
-            
+
             {selectedUsers.length > 0 && (
                 <div className="user-search-selected-users">
                     {selectedUsers.map(user => (
                         <div key={user.chatId} className="user-search-selected-user">
                             <span className="selected-user-name">{user.fullName}</span>
                             <div className="selected-user-right">
-                                <span className={`selected-user-role ${getRoleClass(user.role)}`}>
-                                    {getRoleDisplay(user.role)}
-                                </span>
+                                {userBalances && (
+                                    <span className="selected-user-balance">
+                                        {userBalances[user.chatId]?.loading
+                                            ? <span className="selected-user-balance-loading">...</span>
+                                            : userBalances[user.chatId]?.amount != null
+                                                ? `${(userBalances[user.chatId]!.amount!).toLocaleString('ru-RU', {
+                                                    minimumFractionDigits: 2,
+                                                    maximumFractionDigits: 2
+                                                })} ₽`
+                                                : ''}
+                                    </span>
+                                )}
+                                {(!userBalances || userBalances[user.chatId]?.loading || userBalances[user.chatId]?.amount == null) && (
+                                    <span className={`selected-user-role ${getRoleClass(user.role)}`}>
+                                        {getRoleDisplay(user.role)}
+                                    </span>
+                                )}
                                 <button
                                     onClick={() => handleRemoveUser(user.chatId)}
                                     className="user-search-remove-button"
@@ -136,7 +161,8 @@ function UserSearch({
                                     disabled={disabled}
                                 >
                                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                        <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                                        <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" strokeWidth="2"
+                                              strokeLinecap="round"/>
                                     </svg>
                                 </button>
                             </div>

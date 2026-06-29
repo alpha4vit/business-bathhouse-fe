@@ -60,7 +60,7 @@ export default function TransactionHistory() {
     }
 
     const formatAmount = (amount: number, currency: string, direction: TransactionDirection) => {
-        const sign = direction === TransactionDirection.CREDIT ? '+' : '-'
+        const sign = direction === TransactionDirection.CREDIT ? '-' : '+'
         const formattedAmount = (amount / 100).toLocaleString('ru-RU', {
             style: 'currency',
             currency: currency
@@ -69,7 +69,7 @@ export default function TransactionHistory() {
     }
 
     const getDirectionLabel = (direction: TransactionDirection) => {
-        return direction === TransactionDirection.CREDIT ? 'Приход' : 'Расход'
+        return direction === TransactionDirection.CREDIT ? 'Расход' : 'Приход'
     }
 
     const getDirectionClass = (direction: TransactionDirection) => {

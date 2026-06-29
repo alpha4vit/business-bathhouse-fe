@@ -1,7 +1,7 @@
-import {useEffect, useState, memo} from 'react'
+import {memo, useEffect, useState} from 'react'
 import {useSearchParams} from 'react-router-dom'
-import {PointsAdjustmentDto, pointsService, CompanyDto} from '../services/pointsService'
-import {eventService, Event} from '../services/eventService'
+import {CompanyDto, PointsAdjustmentDto, pointsService} from '../services/pointsService'
+import {Event, eventService} from '../services/eventService'
 import './PointsAdjustmentsTable.css'
 
 interface TableProps {
@@ -12,6 +12,7 @@ interface TableProps {
     autocompleteRowId: string | null
     filteredCompanies: CompanyDto[]
     autocompletePosition: { top: number; left: number; width: number } | null
+    originalStatuses: Map<string, string>
     onUpdateRow: (id: string, field: keyof PointsAdjustmentDto, value: any) => void
     onFullNameChange: (id: string, value: string, event?: React.ChangeEvent<HTMLInputElement>) => void
     onCompanySelect: (id: string, company: CompanyDto) => void
@@ -25,24 +26,25 @@ interface TableProps {
 }
 
 const AdjustmentsTable = memo(({
-    adjustments,
-    newRowIds,
-    deletingRowId,
-    focusedInput,
-    autocompleteRowId,
-    filteredCompanies,
-    autocompletePosition,
-    onUpdateRow,
-    onFullNameChange,
-    onCompanySelect,
-    onAddRow,
-    onDeleteRow,
-    onSave,
-    onInputFocus,
-    onInputChange,
-    onInputBlur,
-    saving
-}: TableProps) => {
+                                   adjustments,
+                                   newRowIds,
+                                   deletingRowId,
+                                   focusedInput,
+                                   autocompleteRowId,
+                                   filteredCompanies,
+                                   autocompletePosition,
+                                   originalStatuses,
+                                   onUpdateRow,
+                                   onFullNameChange,
+                                   onCompanySelect,
+                                   onAddRow,
+                                   onDeleteRow,
+                                   onSave,
+                                   onInputFocus,
+                                   onInputChange,
+                                   onInputBlur,
+                                   saving
+                               }: TableProps) => {
     return (
         <>
             {adjustments.length === 0 ? (
@@ -63,105 +65,140 @@ const AdjustmentsTable = memo(({
                         </tr>
                         </thead>
                         <tbody>
-                        {adjustments.map((adj) => (
-                            <tr key={adj.id}
-                                className={`${adj.status === 'REJECTED' ? 'rejected' : ''} ${deletingRowId === adj.id ? 'deleting' : ''}`}>
-                                <td>
-                                    <input
-                                        type="text"
-                                        value={adj.userId}
-                                        onChange={(e) => {
-                                            onUpdateRow(adj.id, 'userId', e.target.value)
-                                            onInputChange(e)
-                                        }}
-                                        onFocus={onInputFocus}
-                                        onBlur={onInputBlur}
-                                        readOnly={!newRowIds.has(adj.id)}
-                                        className="adjustments-input"
-                                        placeholder="ID компании"
-                                    />
-                                </td>
-                                <td className="autocomplete-cell">
-                                    <input
-                                        type="text"
-                                        value={adj.fullName || ''}
-                                        onChange={(e) => {
-                                            if (newRowIds.has(adj.id)) {
-                                                onFullNameChange(adj.id, e.target.value, e)
-                                            }
-                                        }}
-                                        readOnly={!newRowIds.has(adj.id)}
-                                        className="adjustments-input"
-                                        placeholder="Полное имя"
-                                    />
-                                </td>
-                                <td>
-                                    <input
-                                        type="text"
-                                        value={adj.title || ''}
-                                        onChange={(e) => {
-                                            onUpdateRow(adj.id, 'title', e.target.value)
-                                            onInputChange(e)
-                                        }}
-                                        onFocus={onInputFocus}
-                                        onBlur={onInputBlur}
-                                        className="adjustments-input"
-                                        placeholder="Название"
-                                    />
-                                </td>
-                                <td>
-                                    <input
-                                        type="number"
-                                        value={adj.amount === 0 ? '' : adj.amount}
-                                        onChange={(e) => {
-                                            const value = e.target.value
-                                            if (value === '') {
-                                                onUpdateRow(adj.id, 'amount', 0)
-                                            } else {
-                                                onUpdateRow(adj.id, 'amount', parseInt(value) || 0)
-                                            }
-                                        }}
-                                        onBlur={(e) => {
-                                            if (e.target.value === '') {
-                                                onUpdateRow(adj.id, 'amount', 0)
-                                            }
-                                        }}
-                                        className="adjustments-input"
-                                    />
-                                </td>
-                                <td>
-                                    <select
-                                        value={adj.status}
-                                        onChange={(e) => onUpdateRow(adj.id, 'status', e.target.value)}
-                                        disabled={adj.status === 'APPLIED'}
-                                        className="adjustments-select"
-                                    >
-                                        <option value="PENDING">Ожидает</option>
-                                        <option value="CONFIRMED">Подтверждено</option>
-                                        <option value="APPLIED" disabled>Применено</option>
-                                        <option value="REJECTED">Отклонено</option>
-                                    </select>
-                                </td>
-                                <td>
-                                    {adj.status === 'REJECTED' ? (
-                                        <button
-                                            onClick={() => onUpdateRow(adj.id, 'status', 'PENDING')}
-                                            className="adjustments-button adjustments-button-restore"
+                        {adjustments.map((adj) => {
+                            const originalStatus = originalStatuses.get(adj.id)
+                            const isPreFinalStatus = originalStatus === 'PENDING_CANCEL' || originalStatus === 'CONFIRMED'
+                            const isReadOnly = !newRowIds.has(adj.id) || isPreFinalStatus
+
+                            return (
+                                <tr key={adj.id}
+                                    className={`${adj.status === 'CANCELED' || adj.status === 'PENDING_CANCEL' ? 'rejected' : ''} ${deletingRowId === adj.id ? 'deleting' : ''} ${isPreFinalStatus ? 'readonly' : ''}`}>
+                                    <td>
+                                        <input
+                                            type="text"
+                                            value={adj.userId}
+                                            onChange={(e) => {
+                                                onUpdateRow(adj.id, 'userId', e.target.value)
+                                                onInputChange(e)
+                                            }}
+                                            onFocus={onInputFocus}
+                                            onBlur={onInputBlur}
+                                            readOnly={isReadOnly}
+                                            className="adjustments-input"
+                                            placeholder="ID компании"
+                                        />
+                                    </td>
+                                    <td className="autocomplete-cell">
+                                        <input
+                                            type="text"
+                                            value={adj.fullName || ''}
+                                            onChange={(e) => {
+                                                if (!isReadOnly) {
+                                                    onFullNameChange(adj.id, e.target.value, e)
+                                                }
+                                            }}
+                                            readOnly={isReadOnly}
+                                            className="adjustments-input"
+                                            placeholder="Полное имя"
+                                        />
+                                    </td>
+                                    <td>
+                                        <input
+                                            type="text"
+                                            value={adj.title || ''}
+                                            onChange={(e) => {
+                                                onUpdateRow(adj.id, 'title', e.target.value)
+                                                onInputChange(e)
+                                            }}
+                                            onFocus={onInputFocus}
+                                            onBlur={onInputBlur}
+                                            readOnly={isReadOnly}
+                                            className="adjustments-input"
+                                            placeholder="Название"
+                                        />
+                                    </td>
+                                    <td>
+                                        <input
+                                            type="number"
+                                            value={adj.amount === 0 ? '' : adj.amount}
+                                            onChange={(e) => {
+                                                const value = e.target.value
+                                                if (value === '') {
+                                                    onUpdateRow(adj.id, 'amount', 0)
+                                                } else {
+                                                    onUpdateRow(adj.id, 'amount', parseInt(value) || 0)
+                                                }
+                                            }}
+                                            onBlur={(e) => {
+                                                if (e.target.value === '') {
+                                                    onUpdateRow(adj.id, 'amount', 0)
+                                                }
+                                            }}
+                                            readOnly={isReadOnly}
+                                            className="adjustments-input"
+                                        />
+                                    </td>
+                                    <td>
+                                        <select
+                                            value={adj.status}
+                                            onChange={(e) => onUpdateRow(adj.id, 'status', e.target.value)}
+                                            disabled={isPreFinalStatus}
+                                            className="adjustments-select"
                                         >
-                                            Восстановить
-                                        </button>
-                                    ) : (
-                                        <button
-                                            onClick={() => onDeleteRow(adj.id)}
-                                            disabled={adj.status === 'APPLIED'}
-                                            className="adjustments-button adjustments-button-delete"
-                                        >
-                                            Удалить
-                                        </button>
-                                    )}
-                                </td>
-                            </tr>
-                        ))}
+                                            {adj.status === 'APPLIED' && (
+                                                <>
+                                                    <option value="APPLIED" disabled>Применено</option>
+                                                    <option value="PENDING_CANCEL">Отменено</option>
+                                                </>
+                                            )}
+                                            {adj.status === 'PENDING_CANCEL' && (
+                                                <>
+                                                    <option value="APPLIED">Применено</option>
+                                                    <option value="PENDING_CANCEL" disabled>Отменено</option>
+                                                </>
+                                            )}
+                                            {adj.status === 'CANCELED' && (
+                                                <>
+                                                    <option value="CANCELED" disabled>Отклонено</option>
+                                                    <option value="CONFIRMED">Подтверждено</option>
+                                                </>
+                                            )}
+                                            {adj.status === 'CONFIRMED' && (
+                                                <>
+                                                    <option value="CONFIRMED" disabled>Подтверждено</option>
+                                                    <option value="PENDING_CANCEL">Отменено</option>
+                                                </>
+                                            )}
+                                            {(newRowIds.has(adj.id) || adj.status === 'PENDING') && (
+                                                <>
+                                                    <option value="PENDING" disabled>Ожидает</option>
+                                                    <option value="CONFIRMED">Подтверждено</option>
+                                                </>
+                                            )}
+                                        </select>
+                                    </td>
+                                    <td>
+                                        {!isPreFinalStatus && (
+                                            adj.status === 'CANCELED' || adj.status === 'PENDING_CANCEL' ? (
+                                                <button
+                                                    onClick={() => onUpdateRow(adj.id, 'status', 'PENDING')}
+                                                    className="adjustments-button adjustments-button-restore"
+                                                >
+                                                    Восстановить
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    onClick={() => onDeleteRow(adj.id)}
+                                                    className="adjustments-button adjustments-button-delete"
+                                                >
+                                                    Отклонить
+                                                </button>
+                                            )
+                                        )}
+                                    </td>
+                                </tr>
+                            )
+                        })}
                         </tbody>
                     </table>
                 </div>
@@ -230,12 +267,17 @@ export default function PointsAdjustmentsTable() {
     const [error, setError] = useState<string | null>(null)
     const [deletingRowId, setDeletingRowId] = useState<string | null>(null)
     const [newRowIds, setNewRowIds] = useState<Set<string>>(new Set())
+    const [originalStatuses, setOriginalStatuses] = useState<Map<string, string>>(new Map())
 
     const [focusedInput, setFocusedInput] = useState<{ value: string; rect: DOMRect } | null>(null)
     const [companies, setCompanies] = useState<CompanyDto[]>([])
     const [autocompleteRowId, setAutocompleteRowId] = useState<string | null>(null)
     const [filteredCompanies, setFilteredCompanies] = useState<CompanyDto[]>([])
-    const [autocompletePosition, setAutocompletePosition] = useState<{ top: number; left: number; width: number } | null>(null)
+    const [autocompletePosition, setAutocompletePosition] = useState<{
+        top: number;
+        left: number;
+        width: number
+    } | null>(null)
     const [events, setEvents] = useState<Event[]>([])
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
 
@@ -256,6 +298,8 @@ export default function PointsAdjustmentsTable() {
             const data = await pointsService.getEventAdjustments(eventId)
             setAdjustments(data)
             setNewRowIds(new Set())
+            // Сохраняем исходные статусы с бэкенда
+            setOriginalStatuses(new Map(data.map(adj => [adj.id, adj.status])))
         } catch (err) {
             setError('Не удалось загрузить начисления')
             console.error(err)
@@ -276,7 +320,7 @@ export default function PointsAdjustmentsTable() {
     const loadEvents = async () => {
         try {
             const data = await eventService.getAllEvents()
-            const sortedData = [...data].sort((a, b) => 
+            const sortedData = [...data].sort((a, b) =>
                 new Date(b.carryDate).getTime() - new Date(a.carryDate).getTime()
             )
             setEvents(sortedData)
@@ -315,8 +359,17 @@ export default function PointsAdjustmentsTable() {
                 setDeletingRowId(null)
             }, 300)
         } else {
-            // Для существующих строк - меняем статус на REJECTED
-            handleUpdateRow(id, 'status', 'REJECTED')
+            // Для существующих строк - меняем статус в зависимости от текущего
+            const adjustment = adjustments.find(adj => adj.id === id)
+            if (adjustment) {
+                if (adjustment.status === 'APPLIED') {
+                    handleUpdateRow(id, 'status', 'PENDING_CANCEL')
+                } else if (adjustment.status === 'PENDING') {
+                    handleUpdateRow(id, 'status', 'CANCELED')
+                } else {
+                    handleUpdateRow(id, 'status', 'CANCELED')
+                }
+            }
         }
     }
 
@@ -337,6 +390,8 @@ export default function PointsAdjustmentsTable() {
                 const data = await pointsService.getEventAdjustments(event.id)
                 setAdjustments(data)
                 setNewRowIds(new Set())
+                // Сохраняем исходные статусы с бэкенда
+                setOriginalStatuses(new Map(data.map(adj => [adj.id, adj.status])))
             } catch (err) {
                 setError('Не удалось загрузить начисления')
                 console.error(err)
@@ -347,6 +402,7 @@ export default function PointsAdjustmentsTable() {
             // Если мероприятие не выбрано, очищаем таблицу
             setAdjustments([])
             setNewRowIds(new Set())
+            setOriginalStatuses(new Map())
         }
     }
 
@@ -382,10 +438,10 @@ export default function PointsAdjustmentsTable() {
 
     const handleSave = async () => {
         // Валидация: количество баллов должно быть строго больше 0 для всех строк, кроме отклоненных
-        const invalidRows = adjustments.filter(adj => 
-            adj.status !== 'REJECTED' && (!adj.amount || adj.amount <= 0)
+        const invalidRows = adjustments.filter(adj =>
+            adj.status !== 'CANCELED' && adj.status !== 'PENDING_CANCEL' && (!adj.amount || adj.amount <= 0)
         )
-        
+
         if (invalidRows.length > 0) {
             setError('Количество баллов должно быть строго больше 0 для всех строк')
             return
@@ -517,6 +573,7 @@ export default function PointsAdjustmentsTable() {
                         autocompleteRowId={autocompleteRowId}
                         filteredCompanies={filteredCompanies}
                         autocompletePosition={autocompletePosition}
+                        originalStatuses={originalStatuses}
                         onUpdateRow={handleUpdateRow}
                         onFullNameChange={handleFullNameChange}
                         onCompanySelect={handleCompanySelect}

@@ -110,11 +110,11 @@
   white-space: nowrap;
 }
 
-.transactions-amount.credit {
+.transactions-amount.debit {
   color: #28a745;
 }
 
-.transactions-amount.debit {
+.transactions-amount.credit {
   color: #dc3545;
 }
 
@@ -124,11 +124,11 @@
   white-space: nowrap;
 }
 
-.transactions-direction.credit {
+.transactions-direction.debit {
   color: #28a745;
 }
 
-.transactions-direction.debit {
+.transactions-direction.credit {
   color: #dc3545;
 }
 
@@ -198,12 +198,12 @@
   border-radius: 12px;
 }
 
-.transaction-card-direction.credit {
+.transaction-card-direction.debit {
   background: linear-gradient(135deg, rgba(40, 167, 69, 0.1) 0%, rgba(40, 167, 69, 0.2) 100%);
   color: #28a745;
 }
 
-.transaction-card-direction.debit {
+.transaction-card-direction.credit {
   background: linear-gradient(135deg, rgba(220, 53, 69, 0.1) 0%, rgba(220, 53, 69, 0.2) 100%);
   color: #dc3545;
 }
@@ -222,11 +222,11 @@
   text-align: right;
 }
 
-.transaction-card-amount.credit {
+.transaction-card-amount.debit {
   color: #28a745;
 }
 
-.transaction-card-amount.debit {
+.transaction-card-amount.credit {
   color: #dc3545;
 }
 

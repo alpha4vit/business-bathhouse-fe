@@ -115,6 +115,21 @@
     color: #666;
 }
 
+.selected-user-balance {
+    font-size: 13px;
+    font-weight: 600;
+    color: #1a7f3c;
+    background-color: #e6f4ea;
+    padding: 3px 8px;
+    border-radius: 4px;
+    white-space: nowrap;
+}
+
+.selected-user-balance-loading {
+    color: #999;
+    font-weight: 400;
+}
+
 .user-search-remove-button {
     background: none;
     border: none;

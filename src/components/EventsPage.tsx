@@ -201,6 +201,7 @@ function EventsPage() {
     const [swipeDirection, setSwipeDirection] = useState<'left' | 'right' | null>(null)
     const [isHorizontalSwipeStarted, setIsHorizontalSwipeStarted] = useState(false)
     const [isSwiping, setIsSwiping] = useState(false)
+    const [animationDir, setAnimationDir] = useState<'left' | 'right' | null>(null)
 
     const handleTouchEnd = () => {
         if (!isDragging) return
@@ -210,21 +211,23 @@ function EventsPage() {
 
         if (swipeDirection === 'left' && currentIndex < events.length - 1) {
             setIsAnimating(true)
-            setSwipeOffset(-500)
+            setAnimationDir('left')
             setTimeout(() => {
                 setCurrentIndex(currentIndex + 1)
                 setIsAnimating(false)
                 setSwipeOffset(0)
                 setSwipeDirection(null)
+                setAnimationDir(null)
             }, 300)
         } else if (swipeDirection === 'right' && currentIndex > 0) {
             setIsAnimating(true)
-            setSwipeOffset(500)
+            setAnimationDir('right')
             setTimeout(() => {
                 setCurrentIndex(currentIndex - 1)
                 setIsAnimating(false)
                 setSwipeOffset(0)
                 setSwipeDirection(null)
+                setAnimationDir(null)
             }, 300)
         } else {
             setSwipeOffset(0)
@@ -235,11 +238,12 @@ function EventsPage() {
     const handlePrevious = () => {
         if (currentIndex > 0 && !isAnimating) {
             setIsAnimating(true)
-            setSwipeOffset(500)
+            setAnimationDir('right')
             setTimeout(() => {
                 setCurrentIndex(currentIndex - 1)
                 setIsAnimating(false)
                 setSwipeOffset(0)
+                setAnimationDir(null)
             }, 300)
         }
     }
@@ -247,11 +251,12 @@ function EventsPage() {
     const handleNext = () => {
         if (currentIndex < events.length - 1 && !isAnimating) {
             setIsAnimating(true)
-            setSwipeOffset(-500)
+            setAnimationDir('left')
             setTimeout(() => {
                 setCurrentIndex(currentIndex + 1)
                 setIsAnimating(false)
                 setSwipeOffset(0)
+                setAnimationDir(null)
             }, 300)
         }
     }
@@ -431,13 +436,27 @@ function EventsPage() {
                             onTouchMove={handleTouchMove}
                             onTouchEnd={handleTouchEnd}
                         >
-                            {events.map((evt, index) => (
+                            {events.map((evt, index) => {
+                                const isCurrent = index === currentIndex
+                                const isIncoming = isAnimating && (
+                                    (animationDir === 'left' && index === currentIndex + 1) ||
+                                    (animationDir === 'right' && index === currentIndex - 1)
+                                )
+
+                                let animClass = ''
+                                if (isAnimating && isCurrent) {
+                                    animClass = animationDir === 'left' ? 'swiping-left' : 'swiping-right'
+                                } else if (isIncoming) {
+                                    animClass = animationDir === 'left' ? 'sliding-in-from-right' : 'sliding-in-from-left'
+                                }
+
+                                return (
                                 <div
                                     key={evt.id}
-                                    className={`events-result-card ${index === currentIndex ? 'active' : ''} ${isAnimating ? (index < currentIndex ? 'swiping-left' : 'swiping-right') : ''} ${isDragging && index === currentIndex ? 'dragging' : ''}`}
+                                    className={`events-result-card ${isCurrent ? 'active' : ''} ${animClass} ${isDragging && isCurrent ? 'dragging' : ''}`}
                                     style={{
-                                        display: index === currentIndex || (isAnimating && (index === currentIndex - 1 || index === currentIndex + 1)) ? 'flex' : 'none',
-                                        transform: index === currentIndex && !isAnimating ? `translateX(${swipeOffset}px) rotate(${swipeOffset * 0.05}deg)` : undefined
+                                        display: isCurrent || isIncoming ? 'flex' : 'none',
+                                        transform: isCurrent && !isAnimating ? `translateX(${swipeOffset}px) rotate(${swipeOffset * 0.05}deg)` : undefined
                                     }}
                                 >
                                     <div className="events-result-image">
@@ -525,7 +544,8 @@ function EventsPage() {
                                         Зарегистрироваться
                                     </button>
                                 </div>
-                            ))}
+                                )
+                            })}
                         </div>
                         
                         <button
