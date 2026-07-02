@@ -226,7 +226,7 @@ function PersonalCabinet() {
                             className="cabinet-deposit-button"
                             onClick={() => {
                                 // Переходим на страницу выставления счета
-                                window.location.href = `/view/invoice/?id=${chatId}`
+                                window.location.href = `/invoice/?id=${chatId}`
                             }}
                         >
                             <span className="cabinet-deposit-button-text">Пополнить лицевой счет</span>

@@ -4,12 +4,9 @@ import App from './App.tsx'
 import eruda from 'eruda'
 import WebApp from '@twa-dev/sdk'
 
+WebApp.ready()
 
 eruda.init()
-
-
-// Инициализация Telegram Web App SDK
-WebApp.ready()
 
 // Логирование данных пользователя для отладки
 console.log('=== Telegram Web App Data ===')
@@ -22,7 +19,7 @@ console.log('==============================')
 
 // Настройка Telegram Web App
 WebApp.expand()
-WebApp.enableClosingConfirmation()
+WebApp.disableClosingConfirmation();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

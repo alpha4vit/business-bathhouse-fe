@@ -53,7 +53,7 @@ export const pointsService = {
 
     async getAllCompanies(): Promise<CompanyDto[]> {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/company`)
+            const response = await fetch(`${API_BASE_URL}/api/companies`)
 
             if (!response.ok) {
                 throw new Error(`Failed to fetch companies: ${response.status}`)

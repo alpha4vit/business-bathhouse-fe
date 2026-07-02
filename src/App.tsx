@@ -14,6 +14,7 @@ import {userStorage} from "./utils/userStorage.ts";
 import EventRegistrationsPage from "./components/EventRegistrationsPage.tsx";
 import BalanceAdjustmentPage from "./components/BalanceAdjustmentPage.tsx"
 import UserDeactivationPage from "./components/UserDeactivationPage.tsx";
+import ChatsPage from "./components/ChatsPage.tsx";
 
 function AppContent() {
     const [searchParams] = useSearchParams();
@@ -45,6 +46,7 @@ function AppContent() {
                 <Route path="/events/registration" element={<EventRegistrationsPage/>}/>
                 <Route path="/admin/balance/adjustment" element={<BalanceAdjustmentPage/>}/>
                 <Route path="/admin/users/deactivate" element={<UserDeactivationPage/>}/>
+                <Route path="/chats" element={<ChatsPage/>}/>
             </Routes>
         </div>
     );
@@ -52,7 +54,7 @@ function AppContent() {
 
 function App() {
     return (
-        <Router basename="/view">
+        <Router>
             <AppContent/>
         </Router>
     )

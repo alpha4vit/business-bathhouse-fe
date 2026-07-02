@@ -16,8 +16,7 @@
 
 .swipe-card-nav-button {
   position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 200px;
   background: linear-gradient(135deg, #00A9E8 0%, #0080b8 100%);
   border: none;
   border-radius: 50%;
@@ -37,11 +36,11 @@
 .swipe-card-nav-button:hover:not(:disabled) {
   background: linear-gradient(135deg, #0080b8 0%, #006699 100%);
   box-shadow: 0 6px 20px rgba(0, 169, 232, 0.4);
-  transform: translateY(-50%) scale(1.1);
+  transform: scale(1.1);
 }
 
 .swipe-card-nav-button:active:not(:disabled) {
-  transform: translateY(-50%) scale(0.95);
+  transform: scale(0.95);
 }
 
 .swipe-card-nav-button:disabled {

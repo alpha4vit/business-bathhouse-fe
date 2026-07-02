@@ -113,7 +113,7 @@ export const userService = {
     async getUserData(externalId: string): Promise<UserDataDto> {
         try {
             const [userResponse, adjustmentsResponse] = await Promise.all([
-                fetch(`${API_BASE_URL}/api/user/${externalId}`),
+                fetch(`${API_BASE_URL}/api/users/${externalId}`),
                 fetch(`${API_BASE_URL}/api/points/adjustment/${externalId}`)
             ])
 
@@ -247,9 +247,9 @@ export const userService = {
     async searchResidents(keyword: string): Promise<Resident[]> {
         try {
             console.log(`[ResidentSearch] Начинаю поиск резидентов по ключевому слову: "${keyword}"`)
-            console.log(`[ResidentSearch] Запрос к API: ${API_BASE_URL}/api/user?keyword=${encodeURIComponent(keyword)}`)
+            console.log(`[ResidentSearch] Запрос к API: ${API_BASE_URL}/api/users?keyword=${encodeURIComponent(keyword)}`)
 
-            const response = await fetch(`${API_BASE_URL}/api/user?keyword=${encodeURIComponent(keyword)}`)
+            const response = await fetch(`${API_BASE_URL}/api/users?keyword=${encodeURIComponent(keyword)}`)
 
             if (!response.ok) {
                 console.error(`[ResidentSearch] Ошибка API запроса: ${response.status} ${response.statusText}`)
@@ -304,7 +304,7 @@ export const userService = {
 
     async getAllUsers(): Promise<UserSearchDto[]> {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/user`)
+            const response = await fetch(`${API_BASE_URL}/api/users`)
 
             if (!response.ok) {
                 throw new Error(`Failed to fetch users: ${response.status}`)
@@ -318,7 +318,7 @@ export const userService = {
     },
 
     async deactivate(companyIds: string[]): Promise<string[]> {
-        const response = await fetch(`${API_BASE_URL}/api/user/deactivate`, {
+        const response = await fetch(`${API_BASE_URL}/api/users/deactivate`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(companyIds)

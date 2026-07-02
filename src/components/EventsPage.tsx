@@ -265,7 +265,7 @@ function EventsPage() {
     const handleTopUpBalance = () => {
         const userId = userStorage.getUserId()
         if (userId) {
-            window.location.href = `/view/invoice`
+            window.location.href = `/invoice`
         }
     }
 
