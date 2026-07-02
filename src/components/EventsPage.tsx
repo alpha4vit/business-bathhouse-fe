@@ -84,16 +84,24 @@ function EventsPage() {
         }
 
         console.log(`[EventsPage] 📄 Загрузка HTML описания для мероприятия ${event.id}`)
+        console.log(`[EventsPage] 🔗 Исходный URL из Битрикса:`, event.previewDescription.showUrl)
+        
+        const fullHtmlUrl = event.previewDescription.showUrl.startsWith('http') 
+            ? event.previewDescription.showUrl 
+            : `https://prime-ural.bitrix24.ru/${event.previewDescription.showUrl}`
+        
+        console.log(`[EventsPage] 🔗 Полный URL для запроса:`, fullHtmlUrl)
         setLoadingHtml(prev => new Set(prev).add(event.id))
 
         try {
-            const fullHtmlUrl = event.previewDescription.showUrl.startsWith('http') 
-                ? event.previewDescription.showUrl 
-                : `https://prime-ural.bitrix24.ru/${event.previewDescription.showUrl}`
-            
             const html = await eventService.getHtml(fullHtmlUrl)
             
-            setHtmlDescriptions(prev => new Map(prev).set(event.id, html))
+            console.log(`[EventsPage] 📄 HTML содержимое для мероприятия ${event.id}:`, html)
+            setHtmlDescriptions(prev => {
+                const newMap = new Map(prev).set(event.id, html)
+                console.log(`[EventsPage] 🗺️ Map после сохранения:`, newMap)
+                return newMap
+            })
             console.log(`[EventsPage] ✅ HTML описание загружено для мероприятия ${event.title}`)
         } catch (error) {
             console.error(`[EventsPage] ❌ Ошибка загрузки HTML описания для мероприятия ${event.title}:`, error)
@@ -387,10 +395,16 @@ function EventsPage() {
                                                 {loadingHtml.has(evt.id) ? (
                                                     <div className="events-result-description-loading">Загрузка описания...</div>
                                                 ) : htmlDescriptions.has(evt.id) ? (
-                                                    <div 
-                                                        className="events-result-description-content"
-                                                        dangerouslySetInnerHTML={{ __html: htmlDescriptions.get(evt.id) || '' }}
-                                                    />
+                                                    (() => {
+                                                        const htmlContent = htmlDescriptions.get(evt.id) || ''
+                                                        console.log(`[EventsPage] 🖼️ Рендеринг HTML для ${evt.id}:`, htmlContent)
+                                                        return (
+                                                            <div 
+                                                                className="events-result-description-content"
+                                                                dangerouslySetInnerHTML={{ __html: htmlContent }}
+                                                            />
+                                                        )
+                                                    })()
                                                 ) : (
                                                     <div className="events-result-description-loading">Загрузка описания...</div>
                                                 )}

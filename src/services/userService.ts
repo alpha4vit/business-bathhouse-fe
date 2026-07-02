@@ -195,7 +195,7 @@ export const userService = {
                 // Кодируем path для безопасной передачи
                 const encodedPath = encodeURIComponent(path)
                 
-                const response = await fetch(`${API_BASE_URL}/bitrix/image?path=${encodedPath}`)
+                const response = await fetch(`${API_BASE_URL}/api/bitrix/image?path=${encodedPath}`)
 
                 if (!response.ok) {
                     throw new Error(`Failed to fetch photo: ${response.status}`)

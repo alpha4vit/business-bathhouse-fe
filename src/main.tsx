@@ -1,12 +1,12 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App.tsx'
-import eruda from 'eruda'
+// import eruda from 'eruda'
 import WebApp from '@twa-dev/sdk'
 
 WebApp.ready()
 
-eruda.init()
+// eruda.init()
 
 // Логирование данных пользователя для отладки
 console.log('=== Telegram Web App Data ===')

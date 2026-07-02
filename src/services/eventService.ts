@@ -67,7 +67,7 @@ export const eventService = {
             const path = url.pathname + url.search
             const encodedPath = encodeURIComponent(path)
             
-            const response = await fetch(`${API_BASE_URL}/bitrix/image?path=${encodedPath}`)
+            const response = await fetch(`${API_BASE_URL}/api/bitrix/image?path=${encodedPath}`)
 
             if (!response.ok) {
                 throw new Error(`Failed to fetch HTML: ${response.status}`)
