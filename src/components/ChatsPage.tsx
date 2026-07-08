@@ -10,6 +10,7 @@ function ChatsPage() {
     const [currentIndex, setCurrentIndex] = useState(0)
     const [chatImages, setChatImages] = useState<Map<number, string>>(new Map())
     const [loadingImages, setLoadingImages] = useState<Set<number>>(new Set())
+    const [inviteLinks, setInviteLinks] = useState<Map<number, string>>(new Map())
 
     useEffect(() => {
         loadChats()
@@ -19,6 +20,9 @@ function ChatsPage() {
         chats.forEach(chat => {
             if (!chatImages.has(chat.id) && !loadingImages.has(chat.id)) {
                 loadChatImage(chat.id)
+            }
+            if (!inviteLinks.has(chat.id)) {
+                loadInviteLink(chat.id)
             }
         })
     }, [chats])
@@ -51,6 +55,17 @@ function ChatsPage() {
                 newSet.delete(chatId)
                 return newSet
             })
+        }
+    }
+
+    const loadInviteLink = async (chatId: number) => {
+        try {
+            const inviteLink = await chatService.getInviteLink(chatId)
+            if (inviteLink) {
+                setInviteLinks(prev => new Map(prev).set(chatId, inviteLink))
+            }
+        } catch (err) {
+            console.error(`Failed to load invite link for chat ${chatId}:`, err)
         }
     }
 
@@ -158,9 +173,9 @@ function ChatsPage() {
                                     </a>
                                 )}
 
-                                {chat.joinLink ? (
+                                {inviteLinks.get(chat.id) ? (
                                     <a
-                                        href={chat.joinLink}
+                                        href={inviteLinks.get(chat.id)}
                                         target="_blank"
                                         rel="noopener noreferrer"
                                         className="chats-join-button"

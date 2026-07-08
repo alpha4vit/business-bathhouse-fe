@@ -1,4 +1,5 @@
 import {API_BASE_URL} from '../config/api'
+import { authenticatedFetch } from '../utils/apiClient'
 
 export interface BalanceDto {
     amount: number
@@ -69,7 +70,7 @@ export interface UserSearchDto {
     role: string
 }
 
-interface TelegramUserResponse {
+export interface TelegramUserResponse {
     chatId: number
     telegramUsername?: string
     telegramFirstName?: string
@@ -110,11 +111,30 @@ const photoCache = new Map<string, string>()
 const pendingPhotoRequests = new Map<string, Promise<string>>()
 
 export const userService = {
+    async login(initData: string): Promise<TelegramUserResponse> {
+        try {
+            const response = await authenticatedFetch(`${API_BASE_URL}/api/auth/telegram`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: initData
+            });
+
+            if (!response.ok) {
+                throw new Error(`Failed to login: ${response.status}`);
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('Error during login:', error);
+            throw error;
+        }
+    },
+
     async getUserData(externalId: string): Promise<UserDataDto> {
         try {
             const [userResponse, adjustmentsResponse] = await Promise.all([
-                fetch(`${API_BASE_URL}/api/users/${externalId}`),
-                fetch(`${API_BASE_URL}/api/points/adjustment/${externalId}`)
+                authenticatedFetch(`${API_BASE_URL}/api/users/${externalId}`),
+                authenticatedFetch(`${API_BASE_URL}/api/points/adjustment/${externalId}`)
             ])
 
             if (!userResponse.ok) {
@@ -195,7 +215,7 @@ export const userService = {
                 // Кодируем path для безопасной передачи
                 const encodedPath = encodeURIComponent(path)
                 
-                const response = await fetch(`${API_BASE_URL}/api/bitrix/image?path=${encodedPath}`)
+                const response = await authenticatedFetch(`${API_BASE_URL}/api/bitrix/image?path=${encodedPath}`)
 
                 if (!response.ok) {
                     throw new Error(`Failed to fetch photo: ${response.status}`)
@@ -225,7 +245,7 @@ export const userService = {
 
     async getLeaderboard(): Promise<LeaderboardItem[]> {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/points/leaderboard`)
+            const response = await authenticatedFetch(`${API_BASE_URL}/api/points/leaderboard`)
 
             if (!response.ok) {
                 throw new Error(`Failed to fetch leaderboard: ${response.status}`)
@@ -249,7 +269,7 @@ export const userService = {
             console.log(`[ResidentSearch] Начинаю поиск резидентов по ключевому слову: "${keyword}"`)
             console.log(`[ResidentSearch] Запрос к API: ${API_BASE_URL}/api/users?keyword=${encodeURIComponent(keyword)}`)
 
-            const response = await fetch(`${API_BASE_URL}/api/users?keyword=${encodeURIComponent(keyword)}`)
+            const response = await authenticatedFetch(`${API_BASE_URL}/api/users?keyword=${encodeURIComponent(keyword)}`)
 
             if (!response.ok) {
                 console.error(`[ResidentSearch] Ошибка API запроса: ${response.status} ${response.statusText}`)
@@ -304,7 +324,7 @@ export const userService = {
 
     async getAllUsers(): Promise<UserSearchDto[]> {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/users`)
+            const response = await authenticatedFetch(`${API_BASE_URL}/api/users`)
 
             if (!response.ok) {
                 throw new Error(`Failed to fetch users: ${response.status}`)
@@ -318,7 +338,7 @@ export const userService = {
     },
 
     async deactivate(companyIds: string[]): Promise<string[]> {
-        const response = await fetch(`${API_BASE_URL}/api/users/deactivate`, {
+        const response = await authenticatedFetch(`${API_BASE_URL}/api/users/deactivate`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(companyIds)

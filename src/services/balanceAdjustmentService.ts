@@ -1,4 +1,5 @@
 import { API_BASE_URL } from '../config/api'
+import { authenticatedFetch } from '../utils/apiClient'
 
 export enum TransactionPurpose {
     DOWN_PAYMENT = 'DOWN_PAYMENT',
@@ -30,7 +31,7 @@ export interface BalanceAdjustmentDto {
 
 export const balanceAdjustmentService = {
     async adjustBalance(dto: BalanceAdjustmentDto): Promise<void> {
-        const response = await fetch(`${API_BASE_URL}/api/balance/adjust`, {
+        const response = await authenticatedFetch(`${API_BASE_URL}/api/balance/adjust`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

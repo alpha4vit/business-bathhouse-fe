@@ -202,6 +202,18 @@
   box-shadow: 0 6px 20px rgba(0, 169, 232, 0.4);
 }
 
+.chats-join-button:disabled {
+  background: #6c757d;
+  cursor: not-allowed;
+  opacity: 0.6;
+  box-shadow: none;
+}
+
+.chats-join-button:disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
 .chats-loading,
 .chats-error,
 .chats-empty {

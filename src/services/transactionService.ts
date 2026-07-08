@@ -1,4 +1,5 @@
 import {API_BASE_URL} from '../config/api'
+import { authenticatedFetch } from '../utils/apiClient'
 
 export enum TransactionDirection {
     DEBIT = 'DEBIT',
@@ -16,7 +17,7 @@ export interface TransactionDto {
 export const transactionService = {
     async getTransactionHistory(userId: string): Promise<TransactionDto[]> {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/transactions/${userId}`)
+            const response = await authenticatedFetch(`${API_BASE_URL}/api/transactions/${userId}`)
 
             if (!response.ok) {
                 throw new Error(`Failed to fetch transaction history: ${response.status}`)

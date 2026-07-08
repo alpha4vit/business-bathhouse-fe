@@ -1,4 +1,5 @@
 import {API_BASE_URL} from '../config/api'
+import { authenticatedFetch } from '../utils/apiClient'
 
 export interface PointsAdjustmentDto {
     id: string
@@ -18,7 +19,7 @@ export interface CompanyDto {
 export const pointsService = {
     async getEventAdjustments(eventId: string): Promise<PointsAdjustmentDto[]> {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/points/adjustments/${eventId}`)
+            const response = await authenticatedFetch(`${API_BASE_URL}/api/points/adjustments/${eventId}`)
 
             if (!response.ok) {
                 throw new Error(`Failed to fetch event adjustments: ${response.status}`)
@@ -33,7 +34,7 @@ export const pointsService = {
 
     async adjustEventPoints(adjustments: PointsAdjustmentDto[]): Promise<void> {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/points/adjust`, {
+            const response = await authenticatedFetch(`${API_BASE_URL}/api/points/adjust`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -53,7 +54,7 @@ export const pointsService = {
 
     async getAllCompanies(): Promise<CompanyDto[]> {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/companies`)
+            const response = await authenticatedFetch(`${API_BASE_URL}/api/companies`)
 
             if (!response.ok) {
                 throw new Error(`Failed to fetch companies: ${response.status}`)

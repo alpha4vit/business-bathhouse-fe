@@ -18,10 +18,11 @@ export interface CreateCompanyDto {
 }
 
 import {API_BASE_URL} from '../config/api'
+import { authenticatedFetch } from '../utils/apiClient'
 
 export const companyService = {
   async createCompany(dto: CreateCompanyDto): Promise<string> {
-    const response = await fetch(`${API_BASE_URL}/api/companies`, {
+    const response = await authenticatedFetch(`${API_BASE_URL}/api/companies`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -39,7 +40,7 @@ export const companyService = {
 
   async getCompaniesByUserId(userId: string): Promise<Company[]> {
     try {
-      const response = await fetch(`${API_BASE_URL}/api/companies/${userId}/legal`)
+      const response = await authenticatedFetch(`${API_BASE_URL}/api/companies/${userId}/legal`)
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)

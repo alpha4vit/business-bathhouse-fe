@@ -2,10 +2,14 @@ import {useState, useEffect} from 'react'
 import {Link} from 'react-router-dom'
 import './Navbar.css'
 import logo from '../img/бб2.png'
+import {useUser} from '../contexts/UserContext'
 
 function Navbar() {
     const [isMenuOpen, setIsMenuOpen] = useState(false)
     const [isCabinetSubmenuOpen, setIsCabinetSubmenuOpen] = useState(false)
+    const [isAdminSubmenuOpen, setIsAdminSubmenuOpen] = useState(false)
+    const {role} = useUser()
+    const isAdmin = role === 'ADMIN'
 
     useEffect(() => {
         if (isMenuOpen) {
@@ -57,6 +61,28 @@ function Navbar() {
                     <Link to="/residents/search" className="navbar-item">
                         <span className="navbar-text">Поиск резидентов</span>
                     </Link>
+                    <Link to="/chats" className="navbar-item">
+                        <span className="navbar-text">Чаты сообщества</span>
+                    </Link>
+                    {isAdmin && (
+                        <div className="navbar-item navbar-dropdown">
+                            <span className="navbar-text">Админ-панель</span>
+                            <div className="navbar-dropdown-menu">
+                                <Link to="/admin/balance/adjustment" className="navbar-dropdown-item">
+                                    <span>Корректировка баланса</span>
+                                </Link>
+                                <Link to="/admin/points/adjustments" className="navbar-dropdown-item">
+                                    <span>Начисление баллов</span>
+                                </Link>
+                                <Link to="/admin/newsletter" className="navbar-dropdown-item">
+                                    <span>Рассылка</span>
+                                </Link>
+                                <Link to="/admin/users/deactivate" className="navbar-dropdown-item">
+                                    <span>Деактивация пользователей</span>
+                                </Link>
+                            </div>
+                        </div>
+                    )}
                 </div>
             </div>
 
@@ -103,6 +129,34 @@ function Navbar() {
                         <Link to="/residents/search" className="navbar-drawer-link" onClick={() => setIsMenuOpen(false)}>
                             <span>Поиск резидентов</span>
                         </Link>
+                        <Link to="/chats" className="navbar-drawer-link" onClick={() => setIsMenuOpen(false)}>
+                            <span>Чаты сообщества</span>
+                        </Link>
+                        {isAdmin && (
+                            <div className="navbar-drawer-submenu">
+                                <button
+                                    className="navbar-drawer-link navbar-drawer-toggle"
+                                    onClick={() => setIsAdminSubmenuOpen(!isAdminSubmenuOpen)}
+                                >
+                                    <span>Админ-панель</span>
+                                    <span className={`navbar-drawer-arrow ${isAdminSubmenuOpen ? 'open' : ''}`}>▼</span>
+                                </button>
+                                <div className={`navbar-drawer-submenu-links ${isAdminSubmenuOpen ? 'open' : ''}`}>
+                                    <Link to="/admin/balance/adjustment" className="navbar-drawer-link navbar-drawer-sublink" onClick={() => { setIsMenuOpen(false); setIsAdminSubmenuOpen(false); }}>
+                                        <span>Корректировка баланса</span>
+                                    </Link>
+                                    <Link to="/admin/points/adjustments" className="navbar-drawer-link navbar-drawer-sublink" onClick={() => { setIsMenuOpen(false); setIsAdminSubmenuOpen(false); }}>
+                                        <span>Корректировка баллов</span>
+                                    </Link>
+                                    <Link to="/admin/newsletter" className="navbar-drawer-link navbar-drawer-sublink" onClick={() => { setIsMenuOpen(false); setIsAdminSubmenuOpen(false); }}>
+                                        <span>Рассылка</span>
+                                    </Link>
+                                    <Link to="/admin/users/deactivate" className="navbar-drawer-link navbar-drawer-sublink" onClick={() => { setIsMenuOpen(false); setIsAdminSubmenuOpen(false); }}>
+                                        <span>Деактивация пользователей</span>
+                                    </Link>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>

@@ -1,4 +1,5 @@
 import {API_BASE_URL} from '../config/api'
+import { authenticatedFetch } from '../utils/apiClient'
 
 export interface EventPhoto {
     fileId?: number
@@ -30,7 +31,7 @@ export const eventService = {
             }
 
             console.log('[eventService] Запрос к API:', url.toString())
-            const response = await fetch(url.toString())
+            const response = await authenticatedFetch(url.toString())
 
             console.log('[eventService] Статус ответа:', response.status)
             if (!response.ok) {
@@ -48,7 +49,7 @@ export const eventService = {
 
     async getAllEvents(): Promise<Event[]> {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/events/all`)
+            const response = await authenticatedFetch(`${API_BASE_URL}/api/events/all`)
 
             if (!response.ok) {
                 throw new Error(`Failed to fetch all events: ${response.status}`)
@@ -67,7 +68,7 @@ export const eventService = {
             const path = url.pathname + url.search
             const encodedPath = encodeURIComponent(path)
             
-            const response = await fetch(`${API_BASE_URL}/api/bitrix/image?path=${encodedPath}`)
+            const response = await authenticatedFetch(`${API_BASE_URL}/api/bitrix/image?path=${encodedPath}`)
 
             if (!response.ok) {
                 throw new Error(`Failed to fetch HTML: ${response.status}`)

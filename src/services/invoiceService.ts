@@ -1,4 +1,5 @@
 import { API_BASE_URL } from '../config/api'
+import { authenticatedFetch } from '../utils/apiClient'
 
 export enum PaymentPurpose {
     DEPOSIT = 'DEPOSIT',
@@ -24,7 +25,7 @@ export interface PaymentRequestDto {
 
 export const invoiceService = {
     async createInvoice(dto: PaymentRequestDto): Promise<void> {
-        const response = await fetch(`${API_BASE_URL}/api/transactions`, {
+        const response = await authenticatedFetch(`${API_BASE_URL}/api/transactions`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
