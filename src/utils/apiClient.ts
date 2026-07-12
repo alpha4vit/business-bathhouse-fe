@@ -10,14 +10,20 @@ export const AUTH_ERROR_EVENT = 'authError';
  */
 export async function authenticatedFetch(
   url: string,
-  options: RequestInit = {}
+  options: RequestInit = {},
+  contentType: string = 'application/json'
 ): Promise<Response> {
   const authHeader = telegramUtils.getAuthHeader();
   
-  const headers: HeadersInit = {
-    ...options.headers,
+  const headers: Record<string, string> = {
+    ...(options.headers as Record<string, string> || {}),
     ...(authHeader || {})
   };
+
+  // Если body - FormData, не устанавливаем Content-Type чтобы браузер установил его автоматически с boundary
+  if (!(options.body instanceof FormData)) {
+    headers['Content-Type'] = contentType;
+  }
 
   const response = await fetch(url, {
     ...options,

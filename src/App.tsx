@@ -18,6 +18,7 @@ import ChatsPage from "./components/ChatsPage.tsx";
 import AccessDenied from "./components/AccessDenied.tsx";
 import {AUTH_ERROR_EVENT} from "./utils/apiClient.ts";
 import {UserProvider} from "./contexts/UserContext.tsx";
+import SupportPage from "./components/SupportPage.tsx";
 
 function AppContent() {
     const [searchParams] = useSearchParams();
@@ -60,6 +61,7 @@ function AppContent() {
                 <Route path="/events" element={<EventsPage/>}/>
                 <Route path="/events/registration" element={<EventRegistrationsPage/>}/>
                 <Route path="/chats" element={<ChatsPage/>}/>
+                <Route path="/support" element={<SupportPage/>}/>
                 <Route path="/admin/newsletter" element={<NewsletterSender/>}/>
                 <Route path="/admin/points/adjustments" element={<PointsAdjustmentsTable/>}/>
                 <Route path="/admin/balance/adjustment" element={<BalanceAdjustmentPage/>}/>

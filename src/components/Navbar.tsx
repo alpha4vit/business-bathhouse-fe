@@ -64,6 +64,9 @@ function Navbar() {
                     <Link to="/chats" className="navbar-item">
                         <span className="navbar-text">Чаты сообщества</span>
                     </Link>
+                    <Link to="/support" className="navbar-item">
+                        <span className="navbar-text">Техподдержка</span>
+                    </Link>
                     {isAdmin && (
                         <div className="navbar-item navbar-dropdown">
                             <span className="navbar-text">Админ-панель</span>
@@ -131,6 +134,9 @@ function Navbar() {
                         </Link>
                         <Link to="/chats" className="navbar-drawer-link" onClick={() => setIsMenuOpen(false)}>
                             <span>Чаты сообщества</span>
+                        </Link>
+                        <Link to="/support" className="navbar-drawer-link" onClick={() => setIsMenuOpen(false)}>
+                            <span>Техподдержка</span>
                         </Link>
                         {isAdmin && (
                             <div className="navbar-drawer-submenu">
