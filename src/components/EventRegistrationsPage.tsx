@@ -2,6 +2,7 @@ import {useEffect, useState} from 'react'
 import './EventRegistrationsPage.css'
 import {Event, eventService} from '../services/eventService'
 import {API_BASE_URL} from "../config/api.ts";
+import {authenticatedFetch} from "../utils/apiClient.ts";
 
 export type EventParticipationStatus = 'PENDING' | 'REGISTERED' | 'VISITED' | 'NO_SHOW' | 'PENDING_CANCEL' | 'CANCELED'
 
@@ -81,7 +82,7 @@ function EventRegistrationsPage() {
     const loadRegistrations = async (eventId: string) => {
         setLoadingRegistrations(true)
         try {
-            const response = await fetch(`${API_BASE_URL}/api/events/registrations/${eventId}`)
+            const response = await authenticatedFetch(`${API_BASE_URL}/api/events/registrations/${eventId}`)
             if (!response.ok) {
                 throw new Error(`Failed to fetch registrations: ${response.status}`)
             }
@@ -128,7 +129,7 @@ function EventRegistrationsPage() {
                 }))
             }
 
-            const response = await fetch(`${API_BASE_URL}/api/events/registrations`, {
+            const response = await authenticatedFetch(`${API_BASE_URL}/api/events/registrations`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -158,7 +159,7 @@ function EventRegistrationsPage() {
 
     const handleCancelEvent = async () => {
         try {
-            const response = await fetch(`${API_BASE_URL}/api/events/cancel/${selectedEventId}`, {
+            const response = await authenticatedFetch(`${API_BASE_URL}/api/events/cancel/${selectedEventId}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'

@@ -1,5 +1,4 @@
 import {createContext, ReactNode, useContext, useEffect, useState} from 'react';
-import {telegramUtils} from '../utils/telegram';
 import {TelegramUserResponse, userService} from '../services/userService';
 
 interface UserContextType {
@@ -35,13 +34,7 @@ export const UserProvider = ({ children }: UserProviderProps) => {
         setError(null);
         
         try {
-            const initData = telegramUtils.getInitData();
-            
-            if (!initData) {
-                throw new Error('Telegram initData not available');
-            }
-
-            const userData = await userService.login(initData);
+            const userData = await userService.getCurrentUser();
             setUser(userData);
             setRole(userData.role || null);
         } catch (err) {

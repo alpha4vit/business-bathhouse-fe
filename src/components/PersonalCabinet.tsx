@@ -1,12 +1,18 @@
 import {useEffect, useState} from 'react'
 import './PersonalCabinet.css'
-import {userService, UserDataDto} from '../services/userService'
-import {useUserId} from '../hooks/useUserId'
+import './Notification.css'
+import {UserDataDto, userService, Gender} from '../services/userService'
+import {useAuthUser} from '../hooks/useAuthUser'
 import {useCache} from '../utils/cache'
+import {API_BASE_URL} from '../config/api'
+import {authenticatedFetch} from '../utils/apiClient'
+import {useNotification} from '../hooks/useNotification'
 import arrowIcon from '../img/arrow.svg'
 
 function PersonalCabinet() {
-    const chatId = useUserId()
+    const { user: authUser, loading: authLoading, error: authError } = useAuthUser()
+    const userId = authUser?.company?.id?.toString() || null
+    const { notification, showSuccess, showError } = useNotification()
 
     const [userData, setUserData] = useState<UserDataDto | null>(null)
     const [loading, setLoading] = useState<boolean>(true)
@@ -29,14 +35,31 @@ function PersonalCabinet() {
             setLoading(true)
             setError(null)
             try {
-                if (!chatId) {
-                    setError('Требуется ID пользователя. Укажите параметр ?id= в URL.')
-                    setUserData(null)
+                if (!userId) {
+                    // Если нет компании (NON_RESIDENT), используем данные из authUser как фолбэк
+                    if (authUser) {
+                        setUserData({
+                            fullName: authUser.fullName || '',
+                            businessDescription: authUser.businessDescription || '',
+                            phoneNumber: authUser.phoneNumber || '',
+                            role: authUser.role || '',
+                            status: authUser.status || '',
+                            companyTitle: '',
+                            balance: { amount: 0, currency: 'RUB' },
+                            points: 0,
+                            pointsHistory: [],
+                            company: undefined,
+                            gender: authUser.gender
+                        })
+                    } else {
+                        setError('Требуется авторизация')
+                        setUserData(null)
+                    }
                     setLoading(false)
                     return
                 }
 
-                const data = await userService.getUserData(chatId)
+                const data = await userService.getUserData(userId)
                 console.log('User data:', data)
                 setUserData(data)
 
@@ -70,10 +93,10 @@ function PersonalCabinet() {
             }
         }
 
-        if (chatId) {
+        if (authUser) {
             fetchUserData()
         }
-    }, [chatId])
+    }, [userId, authUser])
 
     // Очистка URL объекта при размонтировании
     useEffect(() => {
@@ -108,11 +131,23 @@ function PersonalCabinet() {
         return 'баллов'
     }
 
-    if (!chatId) {
+    if (authLoading) {
+        return (
+            <div className="cabinet-container">
+                <div className="cabinet-content">
+                    <div className="cabinet-loading">
+                        Загрузка данных...
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    if (authError) {
         return (
             <div className="cabinet-error">
                 <h1>Ошибка</h1>
-                <p>Требуется ID пользователя. Укажите параметр ?id= в URL.</p>
+                <p>{authError || 'Требуется авторизация'}</p>
             </div>
         )
     }
@@ -140,6 +175,11 @@ function PersonalCabinet() {
 
     return (
         <div className="cabinet-container">
+            {notification && (
+                <div className={`notification notification-${notification.type}`}>
+                    {notification.message}
+                </div>
+            )}
             <div className="cabinet-content">
                 <div className="cabinet-header">
                     <h1>Мой личный кабинет</h1>
@@ -180,16 +220,18 @@ function PersonalCabinet() {
                                 <span className="cabinet-info-label">ФИО:</span>
                                 <span className="cabinet-info-value">{userData.fullName || 'Не указано'}</span>
                             </div>
-                            
+
                             <div className="cabinet-info-item">
                                 <span className="cabinet-info-label">Телефон:</span>
                                 <span className="cabinet-info-value">{userData.phoneNumber || 'Не указано'}</span>
                             </div>
-                            
-                            <div className="cabinet-info-item">
-                                <span className="cabinet-info-label">Компания:</span>
-                                <span className="cabinet-info-value">{userData.companyTitle || 'Не указано'}</span>
-                            </div>
+
+                            {userData.company && (
+                                <div className="cabinet-info-item">
+                                    <span className="cabinet-info-label">Компания:</span>
+                                    <span className="cabinet-info-value">{userData.companyTitle || 'Не указано'}</span>
+                                </div>
+                            )}
                         </div>
                     </div>
 
@@ -199,67 +241,98 @@ function PersonalCabinet() {
                             <p className="cabinet-description-text">{userData.businessDescription}</p>
                         </div>
                     )}
-                </div>
 
-                <div className="cabinet-card">
-                    <h2>Баланс и баллы</h2>
-                    
-                    <div className="cabinet-balance-points-container">
-                        <div className="cabinet-balance-display">
-                            <div className="cabinet-balance-amount">
-                                {userData.balance.amount.toLocaleString('ru-RU')} {userData.balance.currency}
-                            </div>
-                            <div className="cabinet-balance-label">Текущий баланс</div>
-                        </div>
-                        
-                        <div className="cabinet-points-display">
-                            <div className="cabinet-points-amount">
-                                {userData.points}
-                            </div>
-                            <div className="cabinet-points-emoji">⭐</div>
-                            <div className="cabinet-points-label">Всего баллов</div>
-                        </div>
-                    </div>
-
-                    <div className="cabinet-deposit-button-container">
-                        <button 
-                            className="cabinet-deposit-button"
-                            onClick={() => {
-                                // Переходим на страницу выставления счета
-                                window.location.href = `/invoice/?id=${chatId}`
+                    {userData.role === 'NON_RESIDENT' && userData.gender == Gender.MALE && (
+                        <button
+                            className="cabinet-join-button"
+                            onClick={async () => {
+                                try {
+                                    const response = await authenticatedFetch(`${API_BASE_URL}/api/users/community/join`, {
+                                        method: 'POST'
+                                    })
+                                    if (response.ok) {
+                                        showSuccess('Заявка успешно отправлена!')
+                                    } else {
+                                        const contentType = response.headers.get('content-type')
+                                        if (contentType && contentType.includes('application/json')) {
+                                            const errorData = await response.json()
+                                            showError(errorData.message || 'Ошибка при отправке заявки')
+                                        } else {
+                                            showError('Ошибка при отправке заявки')
+                                        }
+                                    }
+                                } catch (error) {
+                                    console.error('Error sending join request:', error)
+                                    showError('Ошибка при отправке заявки')
+                                }
                             }}
                         >
-                            <span className="cabinet-deposit-button-text">Пополнить лицевой счет</span>
+                            Подать заявку на вступление в сообщество
                         </button>
-                    </div>
-
-                    <div className="cabinet-buttons-row">
-                        <button 
-                            className="cabinet-leaderboard-button"
-                            onClick={fetchLeaderboard}
-                        >
-                            <span>Рейтинг резидентов</span>
-                            <img 
-                                src={arrowIcon} 
-                                alt="arrow" 
-                                className={`cabinet-button-icon ${showLeaderboard ? 'rotated' : ''}`}
-                            />
-                        </button>
-                        <button
-                            className="cabinet-instructions-button"
-                            onClick={() => setShowInstructions(!showInstructions)}
-                        >
-                            <span>Как заработать баллы</span>
-                            <img 
-                                src={arrowIcon} 
-                                alt="arrow" 
-                                className={`cabinet-button-icon ${showInstructions ? 'rotated' : ''}`}
-                            />
-                        </button>
-                    </div>
+                    )}
                 </div>
 
-                {showLeaderboard && (
+                {userData.role != "NON_RESIDENT" && (
+                    <div className="cabinet-card">
+                        <h2>Баланс и баллы</h2>
+
+                        <div className="cabinet-balance-points-container">
+                            <div className="cabinet-balance-display">
+                                <div className="cabinet-balance-amount">
+                                    {userData.balance.amount.toLocaleString('ru-RU')} {userData.balance.currency}
+                                </div>
+                                <div className="cabinet-balance-label">Текущий баланс</div>
+                            </div>
+
+                            <div className="cabinet-points-display">
+                                <div className="cabinet-points-amount">
+                                    {userData.points}
+                                </div>
+                                <div className="cabinet-points-emoji">⭐</div>
+                                <div className="cabinet-points-label">Всего баллов</div>
+                            </div>
+                        </div>
+
+                        <div className="cabinet-deposit-button-container">
+                            <button
+                                className="cabinet-deposit-button"
+                                onClick={() => {
+                                    // Переходим на страницу выставления счета
+                                    window.location.href = `/invoice/`
+                                }}
+                            >
+                                <span className="cabinet-deposit-button-text">Пополнить лицевой счет</span>
+                            </button>
+                        </div>
+
+                        <div className="cabinet-buttons-row">
+                            <button
+                                className="cabinet-leaderboard-button"
+                                onClick={fetchLeaderboard}
+                            >
+                                <span>Рейтинг резидентов</span>
+                                <img
+                                    src={arrowIcon}
+                                    alt="arrow"
+                                    className={`cabinet-button-icon ${showLeaderboard ? 'rotated' : ''}`}
+                                />
+                            </button>
+                            <button
+                                className="cabinet-instructions-button"
+                                onClick={() => setShowInstructions(!showInstructions)}
+                            >
+                                <span>Как заработать баллы</span>
+                                <img
+                                    src={arrowIcon}
+                                    alt="arrow"
+                                    className={`cabinet-button-icon ${showInstructions ? 'rotated' : ''}`}
+                                />
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {userData.role != "NON_RESIDENT" && showLeaderboard && (
                     <div className="cabinet-card leaderboard-card">
                         <h2>🏆 Рейтинг резидентов</h2>
                         
@@ -277,7 +350,7 @@ function PersonalCabinet() {
                                     {leaderboard.slice(0, visibleCount).map((item, index) => (
                                         <div 
                                             key={item.chatId} 
-                                            className={`cabinet-leaderboard-item ${item.chatId === Number(chatId) ? 'current-user' : ''}`}
+                                            className={`cabinet-leaderboard-item ${item.chatId === Number(userId) ? 'current-user' : ''}`}
                                         >
                                             <div className="cabinet-leaderboard-rank">
                                                 {index + 1}
@@ -317,7 +390,7 @@ function PersonalCabinet() {
                     </div>
                 )}
 
-                {showInstructions && (
+                {userData.role != "NON_RESIDENT" && showInstructions && (
                     <div className="cabinet-card instructions-card">
                         <h2>Как заработать баллы</h2>
 
@@ -396,27 +469,29 @@ function PersonalCabinet() {
                     </div>
                 )}
 
-                <div className="cabinet-card">
-                    <h2>История баллов</h2>
-                    
-                    {userData.pointsHistory && userData.pointsHistory.length > 0 ? (
-                        <div className="cabinet-history-list">
-                            {userData.pointsHistory.map((item, index) => (
-                                <div key={index} className="cabinet-history-item">
-                                    <div className="cabinet-history-date">{item.date}</div>
-                                    <div className="cabinet-history-title">{item.title}</div>
-                                    <div className={`cabinet-history-amount ${item.amount > 0 ? 'positive' : 'negative'}`}>
-                                        {item.amount > 0 ? '+' : ''}{item.amount} {getPointsWord(item.amount)}
+                {userData.role !== 'NON_RESIDENT' && (
+                    <div className="cabinet-card">
+                        <h2>История баллов</h2>
+
+                        {userData.pointsHistory && userData.pointsHistory.length > 0 ? (
+                            <div className="cabinet-history-list">
+                                {userData.pointsHistory.map((item, index) => (
+                                    <div key={index} className="cabinet-history-item">
+                                        <div className="cabinet-history-date">{item.date}</div>
+                                        <div className="cabinet-history-title">{item.title}</div>
+                                        <div className={`cabinet-history-amount ${item.amount > 0 ? 'positive' : 'negative'}`}>
+                                            {item.amount > 0 ? '+' : ''}{item.amount} {getPointsWord(item.amount)}
+                                        </div>
                                     </div>
-                                </div>
-                            ))}
-                        </div>
-                    ) : (
-                        <div className="cabinet-empty-history">
-                            История начисления баллов отсутствует
-                        </div>
-                    )}
-                </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="cabinet-empty-history">
+                                История начисления баллов отсутствует
+                            </div>
+                        )}
+                    </div>
+                )}
             </div>
         </div>
     )

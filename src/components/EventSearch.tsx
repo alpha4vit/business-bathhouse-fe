@@ -11,11 +11,17 @@ interface EventSearchProps {
     disabled?: boolean
 }
 
-const formatDate = (dateString: string): string => {
-    if (!dateString) return ''
+const formatDate = (dateValue: string | number[]): string => {
+    if (!dateValue) return ''
 
     try {
-        const date = new Date(dateString)
+        let date: Date
+        if (Array.isArray(dateValue)) {
+            const [year, month, day, hour, minute] = dateValue
+            date = new Date(year, month - 1, day, hour, minute)
+        } else {
+            date = new Date(dateValue)
+        }
         const options: Intl.DateTimeFormatOptions = {
             day: 'numeric',
             month: 'long',
@@ -25,7 +31,7 @@ const formatDate = (dateString: string): string => {
         }
         return date.toLocaleDateString('ru-RU', options)
     } catch (error) {
-        return dateString
+        return Array.isArray(dateValue) ? dateValue.join('/') : dateValue
     }
 }
 

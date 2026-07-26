@@ -1,11 +1,12 @@
 import {useEffect, useState} from 'react'
 import {transactionService, TransactionDto, TransactionDirection} from '../services/transactionService'
 import {userService, UserDataDto} from '../services/userService'
-import {useUserId} from '../hooks/useUserId'
+import {useAuthUser} from '../hooks/useAuthUser'
 import './TransactionHistory.css'
 
 export default function TransactionHistory() {
-    const userId = useUserId()
+    const { user: authUser, loading: authLoading, error: authError } = useAuthUser()
+    const userId = authUser?.company?.id?.toString() || null
     const [transactions, setTransactions] = useState<TransactionDto[]>([])
     const [userData, setUserData] = useState<UserDataDto | null>(null)
     const [loading, setLoading] = useState(false)
@@ -74,6 +75,28 @@ export default function TransactionHistory() {
 
     const getDirectionClass = (direction: TransactionDirection) => {
         return direction === TransactionDirection.CREDIT ? 'credit' : 'debit'
+    }
+
+    if (authLoading) {
+        return (
+            <div className="transactions-container">
+                <div className="transactions-content">
+                    <div className="transactions-loading">Загрузка...</div>
+                </div>
+            </div>
+        )
+    }
+
+    if (authError || !userId) {
+        return (
+            <div className="transactions-container">
+                <div className="transactions-content">
+                    <div className="transactions-error">
+                        {authError || 'Требуется авторизация'}
+                    </div>
+                </div>
+            </div>
+        )
     }
 
     if (loading) {

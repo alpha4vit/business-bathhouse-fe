@@ -1,25 +1,30 @@
-import React, { useState } from 'react'
+import React, {useState} from 'react'
 import './IndividualInvoice.css'
-import { useUserId } from '../hooks/useUserId'
+import './Notification.css'
+import {useAuthUser} from '../hooks/useAuthUser'
+import {useNotification} from '../hooks/useNotification'
 import {API_BASE_URL} from "../config/api.ts";
+import {authenticatedFetch} from "../utils/apiClient.ts";
 
 enum PaymentPurpose {
     DEPOSIT = 'DEPOSIT',
     CHARITY = 'CHARITY',
+    DOWN_PAYMENT = 'DOWN_PAYMENT',
     SUBSCRIPTION_RENEWAL = 'SUBSCRIPTION_RENEWAL',
     BATHHOUSE_EVENT = 'BATHHOUSE_EVENT'
 }
 
 function IndividualInvoice() {
-    const userId = useUserId()
+    const {user: authUser, loading: authLoading, error: authError} = useAuthUser()
+    const userId = authUser?.company?.id?.toString() || null
+    const {notification, showError} = useNotification()
+    const [paymentPurpose, setPaymentPurpose] = useState<PaymentPurpose | ''>('')
 
     const [invoiceAmount, setInvoiceAmount] = useState<string>('')
-    const [paymentPurpose] = useState<PaymentPurpose>(PaymentPurpose.DEPOSIT)
     const [isCreatingInvoice, setIsCreatingInvoice] = useState<boolean>(false)
     const [isPressed, setIsPressed] = useState<boolean>(false)
     const [createdTransaction, setCreatedTransaction] = useState<any>(null)
     const [copiedUrl, setCopiedUrl] = useState<boolean>(false)
-    const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
 
     const handleInvoiceAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value
@@ -28,14 +33,9 @@ function IndividualInvoice() {
         }
     }
 
-    const showNotification = (type: 'success' | 'error', message: string) => {
-        setNotification({ type, message })
-        setTimeout(() => setNotification(null), 3000)
-    }
-
     const handleCreateInvoice = async () => {
         if (!invoiceAmount) {
-            showNotification('error', 'Пожалуйста, введите сумму для начисления')
+            showError('Пожалуйста, введите сумму для начисления')
             return
         }
 
@@ -52,7 +52,7 @@ function IndividualInvoice() {
 
             console.log('Creating fast transaction:', transactionData)
 
-            const response = await fetch(`${API_BASE_URL}/api/transactions`, {
+            const response = await authenticatedFetch(`${API_BASE_URL}/api/transactions`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -98,7 +98,7 @@ function IndividualInvoice() {
                 }
             }
 
-            showNotification('error', errorMessage)
+            showError(errorMessage)
         } finally {
             setIsCreatingInvoice(false)
         }
@@ -128,11 +128,23 @@ function IndividualInvoice() {
         setCopiedUrl(false)
     }
 
-    if (!userId) {
+    if (authLoading) {
+        return (
+            <div className="individual-invoice-container">
+                <div className="individual-invoice-content">
+                    <div className="individual-invoice-loading">
+                        Загрузка...
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    if (authError || !userId) {
         return (
             <div className="individual-invoice-error">
                 <h1>Ошибка</h1>
-                <p>Требуется ID пользователя. Укажите параметр ?id= в URL.</p>
+                <p>{authError || 'Требуется авторизация'}</p>
             </div>
         )
     }
@@ -151,9 +163,8 @@ function IndividualInvoice() {
                             <h2>СБП успешно создан!</h2>
                             {/*<p className="transaction-notice"> Данные платежа отправлены в личные сообщения с Ботом Бизнес Бани</p>*/}
                         </div>
-                        
 
-                        
+
                         <div className="transaction-details">
                             <div className="qr-code-container">
                                 <img
@@ -177,15 +188,15 @@ function IndividualInvoice() {
                                 })}</span>
                             </div>
                         </div>
-                        
+
                         {transactionUrl && (
                             <div className="transaction-url-container">
                                 <p className="transaction-url-label">Ссылка для оплаты:</p>
                                 <div className="transaction-url-wrapper">
-                                    <a 
-                                        href={transactionUrl} 
-                                        target="_blank" 
-                                        rel="noopener noreferrer" 
+                                    <a
+                                        href={transactionUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
                                         className="transaction-url-link"
                                     >
                                         {transactionUrl}
@@ -200,7 +211,7 @@ function IndividualInvoice() {
                                 </div>
                             </div>
                         )}
-                        
+
                         <div className="transaction-actions">
                             <button
                                 onClick={handleReset}
@@ -228,16 +239,39 @@ function IndividualInvoice() {
 
                     <div className="individual-input-group">
                         <label>
-                            Сумма начисления
+                            Выберите назначение платежа
                         </label>
+                        <select
+                            value={paymentPurpose}
+                            onChange={(e) => {
+                                const value = e.target.value as PaymentPurpose | ''
+                                setPaymentPurpose(value)
+
+                                if (value === PaymentPurpose.DOWN_PAYMENT) {
+                                    setInvoiceAmount("26000")
+                                }
+                            }}
+                            className="legal-invoice-select"
+                        >
+                            <option value="">Выберите назначение...</option>
+                            <option value={PaymentPurpose.DEPOSIT}>Пополнение лицевого счета резидента для оплаты
+                                мероприятий (Бизнес Бани, бизнес завтраков / ужинов и т д)
+                            </option>
+                            <option value={PaymentPurpose.DOWN_PAYMENT}>Первоначальный взнос</option>
+                        </select>
+
+                        <label>Сумма начисления</label>
                         <div className="individual-input-wrapper">
+                            {/* 2. Блокируем инпут через disabled и передаем чистую строку в value */}
                             <input
                                 type="text"
+                                disabled={paymentPurpose === PaymentPurpose.DOWN_PAYMENT}
                                 value={invoiceAmount}
                                 onChange={handleInvoiceAmountChange}
                                 placeholder="Введите сумму для начисления"
                                 className="individual-input"
                             />
+                            <div className="individual-ruble-symbol">₽</div>
                             <div className="individual-ruble-symbol">
                                 ₽
                             </div>

@@ -32,14 +32,20 @@ export async function authenticatedFetch(
 
   // Обработка ошибок авторизации
   if (response.status === 401 || response.status === 403) {
+    // Если это запрос к /api/auth/telegram и мы на главной странице, редиректим на регистрацию
+    if (url.includes('/api/auth/telegram') && window.location.pathname === '/') {
+      window.location.href = '/register';
+      return response;
+    }
+
+    // Для остальных случаев отправляем событие для глобальной обработки
     const error = {
       status: response.status,
-      message: response.status === 401 
-        ? 'Требуется авторизация' 
+      message: response.status === 401
+        ? 'Требуется авторизация'
         : 'Недостаточно прав для доступа к ресурсу'
     };
-    
-    // Отправляем событие для глобальной обработки
+
     window.dispatchEvent(new CustomEvent(AUTH_ERROR_EVENT, { detail: error }));
   }
 

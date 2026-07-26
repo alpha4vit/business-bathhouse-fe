@@ -2,11 +2,13 @@ import {useState} from 'react'
 import './InvoicePage.css'
 import LegalInvoice from './LegalInvoice'
 import IndividualInvoice from './IndividualInvoice'
+import {useAuthUser} from "../hooks/useAuthUser.ts";
 
 type InvoiceType = 'legal' | 'individual'
 
 function InvoicePage() {
-    const [activeTab, setActiveTab] = useState<InvoiceType>('legal')
+    const [activeTab, setActiveTab] = useState<InvoiceType>('individual')
+    const { user: user } = useAuthUser()
 
     return (
         <div className="invoice-page-container">
@@ -18,6 +20,7 @@ function InvoicePage() {
                 <div className="invoice-page-nav">
                     <div className="invoice-nav-tabs">
                         <button
+                            disabled={user?.role === 'NON_RESIDENT'}
                             className={`invoice-nav-tab ${activeTab === 'legal' ? 'active' : ''}`}
                             onClick={() => setActiveTab('legal')}
                         >

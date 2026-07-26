@@ -9,8 +9,9 @@ export interface EventPhoto {
 
 export interface Event {
     id: string
+    externalId?: string
     title: string
-    carryDate: string
+    carryDate: string | number[]
     type: string
     price?: number
     points?: number
@@ -20,6 +21,8 @@ export interface Event {
     registrationLink?: string
     status: string
     privacy: string
+    createdAt?: number
+    extraRegistrationLink?: string
 }
 
 export const eventService = {

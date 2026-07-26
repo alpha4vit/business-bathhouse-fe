@@ -2,6 +2,7 @@ import {useEffect, useState} from 'react'
 import {userService, UserSearchDto} from '../services/userService'
 import './NewsletterSender.css'
 import {API_BASE_URL} from "../config/api.ts";
+import {authenticatedFetch} from "../utils/apiClient.ts";
 
 export default function NewsletterSender() {
     const [users, setUsers] = useState<UserSearchDto[]>([])
@@ -22,6 +23,7 @@ export default function NewsletterSender() {
     const [fileError, setFileError] = useState<string | null>(null)
     const [isDragging, setIsDragging] = useState(false)
     const [notificationMode, setNotificationMode] = useState<'PERSONAL' | 'BUSINESS'>('PERSONAL')
+    const [parseMode, setParseMode] = useState<'NONE' | 'HTML'>('NONE')
     const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
 
     useEffect(() => {
@@ -249,7 +251,8 @@ export default function NewsletterSender() {
         const dto = {
             consumers: recipients.map(id => parseInt(id)),
             text: messageText.trim() || null,
-            mode: notificationMode
+            mode: notificationMode,
+            parseMode: parseMode
         }
 
         console.log(dto)
@@ -268,7 +271,7 @@ export default function NewsletterSender() {
         }
 
         try {
-            const response = await fetch(`${API_BASE_URL}/api/notifications`, {
+            const response = await authenticatedFetch(`${API_BASE_URL}/api/notifications`, {
                 method: 'POST',
                 body: formData
             })
@@ -499,6 +502,20 @@ export default function NewsletterSender() {
                                     onClick={() => setNotificationMode('BUSINESS')}
                                 >
                                     От Максима
+                                </button>
+                            </div>
+                            <div className="newsletter-notification-mode-toggle">
+                                <button
+                                    className={`toggle-option ${parseMode === 'NONE' ? 'active' : ''}`}
+                                    onClick={() => setParseMode('NONE')}
+                                >
+                                    Обычный
+                                </button>
+                                <button
+                                    className={`toggle-option ${parseMode === 'HTML' ? 'active' : ''}`}
+                                    onClick={() => setParseMode('HTML')}
+                                >
+                                    HTML
                                 </button>
                             </div>
                         </div>

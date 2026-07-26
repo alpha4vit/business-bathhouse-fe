@@ -1,6 +1,11 @@
 import {API_BASE_URL} from '../config/api'
 import { authenticatedFetch } from '../utils/apiClient'
 
+export enum Gender {
+    MALE = '273098',
+    FEMALE = '273100'
+}
+
 export interface BalanceDto {
     amount: number
     currency: string
@@ -20,7 +25,8 @@ export interface UserDataDto {
     status: string
     companyTitle: string
     balance: BalanceDto
-    points: number
+    points: number,
+    gender?: string,
     pointsHistory: PointsHistoryItem[]
     company?: {
         id: string
@@ -80,6 +86,7 @@ export interface TelegramUserResponse {
     phoneNumber?: string
     role?: string
     status?: string
+    gender?: string
     company?: {
         id: string
         title?: string
@@ -111,64 +118,69 @@ const photoCache = new Map<string, string>()
 const pendingPhotoRequests = new Map<string, Promise<string>>()
 
 export const userService = {
-    async login(initData: string): Promise<TelegramUserResponse> {
+    async getCurrentUser(): Promise<TelegramUserResponse> {
         try {
             const response = await authenticatedFetch(`${API_BASE_URL}/api/auth/telegram`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: initData
+                method: 'GET'
             });
 
             if (!response.ok) {
-                throw new Error(`Failed to login: ${response.status}`);
+                throw new Error(`Failed to get current user: ${response.status}`);
             }
 
             return await response.json();
         } catch (error) {
-            console.error('Error during login:', error);
+            console.error('Error getting current user:', error);
             throw error;
         }
     },
 
     async getUserData(externalId: string): Promise<UserDataDto> {
         try {
-            const [userResponse, adjustmentsResponse] = await Promise.all([
-                authenticatedFetch(`${API_BASE_URL}/api/users/${externalId}`),
-                authenticatedFetch(`${API_BASE_URL}/api/points/adjustment/${externalId}`)
-            ])
+            const userResponse = await authenticatedFetch(`${API_BASE_URL}/api/users/${externalId}`)
 
             if (!userResponse.ok) {
                 throw new Error(`Failed to fetch user data: ${userResponse.status}`)
             }
 
-            if (!adjustmentsResponse.ok) {
-                throw new Error(`Failed to fetch points history: ${adjustmentsResponse.status}`)
-            }
-
             const user: TelegramUserResponse = await userResponse.json()
-            const adjustments: PointsAdjustmentResponse[] = await adjustmentsResponse.json()
 
-            const dateFormatter = new Intl.DateTimeFormat('ru-RU', {
-                day: '2-digit',
-                month: '2-digit',
-                year: 'numeric'
-            })
+            // Only fetch points history if user has a company (RESIDENT)
+            let pointsHistory: PointsHistoryItem[] = []
+            if (user.role != "NON_RESIDENT") {
+                try {
+                    const adjustmentsResponse = await authenticatedFetch(`${API_BASE_URL}/api/points/adjustments/${externalId}`)
 
-            const pointsHistory: PointsHistoryItem[] = adjustments
-                .map(adj => {
-                    const date = new Date(adj.date)
+                    if (adjustmentsResponse.ok) {
+                        const adjustments: PointsAdjustmentResponse[] = await adjustmentsResponse.json()
 
-                    if (isNaN(date.getTime())) {
-                        console.warn(`Invalid date value: ${adj.date}`)
-                        return null
+                        const dateFormatter = new Intl.DateTimeFormat('ru-RU', {
+                            day: '2-digit',
+                            month: '2-digit',
+                            year: 'numeric'
+                        })
+
+                        pointsHistory = adjustments
+                            .map(adj => {
+                                const date = new Date(adj.date)
+
+                                if (isNaN(date.getTime())) {
+                                    console.warn(`Invalid date value: ${adj.date}`)
+                                    return null
+                                }
+                                return {
+                                    date: dateFormatter.format(date),
+                                    amount: adj.amount,
+                                    title: adj.title
+                                }
+                            })
+                            .filter((item): item is PointsHistoryItem => item !== null)
                     }
-                    return {
-                        date: dateFormatter.format(date),
-                        amount: adj.amount,
-                        title: adj.title
-                    }
-                })
-                .filter((item): item is PointsHistoryItem => item !== null)
+                } catch (error) {
+                    console.error('Failed to fetch points history:', error)
+                    // Don't throw error - continue without points history
+                }
+            }
 
             return {
                 fullName: user.fullName || '',
@@ -182,6 +194,7 @@ export const userService = {
                     currency: user.company?.balance?.currency || 'RUB'
                 },
                 points: user.company?.points || 0,
+                gender: user.gender as Gender || Gender.MALE,
                 pointsHistory,
                 company: user.company ? {
                     ...user.company,
@@ -349,5 +362,23 @@ export const userService = {
         }
 
         return await response.json()
+    },
+
+    async register(data: {
+        fullName: string
+        phoneNumber: string
+        business: string
+        referrerId?: string
+        gender: string
+    }): Promise<void> {
+        const response = await authenticatedFetch(`${API_BASE_URL}/api/auth/register`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(data)
+        })
+
+        if (!response.ok) {
+            throw new Error(`Failed to register: ${response.status}`)
+        }
     }
 }

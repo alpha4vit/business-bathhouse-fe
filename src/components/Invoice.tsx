@@ -1,7 +1,7 @@
 import React, {useEffect, useState} from 'react'
 import './Invoice.css'
 import {Company, companyService, CreateCompanyDto} from '../services/companyService'
-import {useUserId} from '../hooks/useUserId'
+import {useAuthUser} from '../hooks/useAuthUser'
 import CompanyRequisitesInput from './CompanyRequisitesInput'
 import {
     invoiceService,
@@ -22,7 +22,8 @@ interface CompanyData {
 }
 
 function Invoice() {
-    const userId = useUserId()
+    const { user: authUser, loading: authLoading, error: authError } = useAuthUser()
+    const userId = authUser?.company?.id?.toString() || null
 
     const [legalEntities, setCompanies] = useState<Company[]>([])
     const [selectedEntity, setSelectedEntity] = useState<string>('')
@@ -189,11 +190,23 @@ function Invoice() {
         setManualEntryMode(false)
     }
 
-    if (!userId) {
+    if (authLoading) {
+        return (
+            <div className="invoice-container">
+                <div className="invoice-content">
+                    <div className="invoice-loading">
+                        Загрузка...
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    if (authError || !userId) {
         return (
             <div className="invoice-error">
                 <h1>Ошибка</h1>
-                <p>Требуется ID пользователя. Укажите параметр ?id= в URL.</p>
+                <p>{authError || 'Требуется авторизация'}</p>
             </div>
         )
     }

@@ -1,7 +1,9 @@
 import React, {useEffect, useState} from 'react'
 import './LegalInvoice.css'
+import './Notification.css'
 import {Company, companyService} from '../services/companyService'
-import {useUserId} from '../hooks/useUserId'
+import {useAuthUser} from '../hooks/useAuthUser'
+import {useNotification} from '../hooks/useNotification'
 import CompanyRequisitesInput from './CompanyRequisitesInput'
 import {
     invoiceService,
@@ -22,7 +24,9 @@ interface CompanyData {
 }
 
 function LegalInvoice() {
-    const userId = useUserId()
+    const { user: authUser, loading: authLoading, error: authError } = useAuthUser()
+    const userId = authUser?.company?.id?.toString() || null
+    const { notification, showSuccess, showError } = useNotification()
 
     const [legalEntities, setCompanies] = useState<Company[]>([])
     const [selectedEntity, setSelectedEntity] = useState<string>('')
@@ -44,7 +48,6 @@ function LegalInvoice() {
         okved: ''
     })
     const [paymentPurpose, setPaymentPurpose] = useState<PaymentPurpose | ''>('')
-    const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
 
     const handleInvoiceAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const value = e.target.value
@@ -57,17 +60,11 @@ function LegalInvoice() {
         setCompanyData(data)
     }
 
-    const showNotification = (type: 'success' | 'error', message: string) => {
-        setNotification({type, message})
-        setTimeout(() => setNotification(null), 3000)
-    }
-
     useEffect(() => {
         const fetchCompanies = async () => {
             setLoading(true)
             setError(null)
             try {
-
                 if (!userId) {
                     setCompanies([])
                     setLoading(false)
@@ -110,7 +107,7 @@ function LegalInvoice() {
 
     const handleCreateInvoice = async () => {
         if (!invoiceAmount || !paymentPurpose) {
-            showNotification('error', 'Пожалуйста, введите сумму счета и выберите назначение платежа')
+            showError('Пожалуйста, введите сумму счета и выберите назначение платежа')
             return
         }
 
@@ -122,7 +119,7 @@ function LegalInvoice() {
             if (manualEntryMode) {
                 // Режим ручного ввода: сначала создаем компанию
                 if (!companyData.title || !companyData.inn) {
-                    showNotification('error', 'Пожалуйста, заполните все обязательные поля компании')
+                    showError('Пожалуйста, заполните все обязательные поля компании')
                     setIsCreatingInvoice(false)
                     return
                 }
@@ -154,11 +151,11 @@ function LegalInvoice() {
                 }
 
                 await invoiceService.createInvoice(paymentDto)
-                showNotification('success', 'Счет успешно создан!')
+                showSuccess('Счет успешно создан!')
             } else {
                 // Режим выбора существующей компании
                 if (!selectedEntity) {
-                    showNotification('error', 'Пожалуйста, выберите юридическое лицо')
+                    showError('Пожалуйста, выберите юридическое лицо')
                     setIsCreatingInvoice(false)
                     return
                 }
@@ -173,12 +170,12 @@ function LegalInvoice() {
                 }
 
                 await invoiceService.createInvoice(paymentDto)
-                showNotification('success', 'Счет успешно создан!')
+                showSuccess('Счет успешно создан!')
             }
         } catch (error) {
             console.error('Error creating invoice:', error)
             const errorMessage = error instanceof Error ? error.message : 'Ошибка при создании счета. Пожалуйста, попробуйте позже.'
-            showNotification('error', errorMessage)
+            showError(errorMessage)
         } finally {
             setIsCreatingInvoice(false)
         }
@@ -197,11 +194,23 @@ function LegalInvoice() {
         setManualEntryMode(false)
     }
 
-    if (!userId) {
+    if (authLoading) {
+        return (
+            <div className="legal-invoice-container">
+                <div className="legal-invoice-content">
+                    <div className="legal-invoice-loading">
+                        Загрузка...
+                    </div>
+                </div>
+            </div>
+        )
+    }
+
+    if (authError || !userId) {
         return (
             <div className="legal-invoice-error">
                 <h1>Ошибка</h1>
-                <p>Требуется ID пользователя. Укажите параметр ?id= в URL.</p>
+                <p>{authError || 'Требуется авторизация'}</p>
             </div>
         )
     }
@@ -219,7 +228,7 @@ function LegalInvoice() {
         <div className="legal-invoice-container">
             {notification && (
                 <div className={`notification notification-${notification.type}`}>
-                    {notification.message}
+                    {notification.type === 'success' ? '✅' : '❌'} {notification.message}
                 </div>
             )}
             <div className="legal-invoice-content">

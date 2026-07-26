@@ -7,6 +7,33 @@
     max-width: 100%;
 }
 
+.user-search-clear-button {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    transition: color 0.2s;
+    border-radius: 4px;
+}
+
+.user-search-clear-button:hover:not(:disabled) {
+    color: #dc3545;
+    background-color: #f8d7da;
+}
+
+.user-search-clear-button:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+}
+
 .user-search-input {
     width: 100%;
     max-width: 100%;

@@ -1,0 +1,183 @@
+.registration-page {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  color: #2D2D2D;
+  line-height: 1.6;
+  min-height: 100vh;
+  padding: clamp(10px, 2vw, 15px) clamp(10px, 3vw, 15px);
+  box-sizing: border-box;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 20px;
+}
+
+.registration-container {
+  background: white;
+  border-radius: 15px;
+  padding: clamp(20px, 5vw, 25px) clamp(15px, 4vw, 20px);
+  max-width: 500px;
+  width: 100%;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  box-sizing: border-box;
+}
+
+.registration-header {
+  background: linear-gradient(135deg, #00A9E8 0%, #0080b8 100%);
+  color: white;
+  padding: clamp(20px, 5vw, 30px) clamp(15px, 4vw, 20px);
+  border-radius: 20px;
+  margin-bottom: 25px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 169, 232, 0.3);
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.registration-header h1 {
+  font-size: clamp(20px, 5vw, 24px);
+  font-weight: 700;
+  margin-bottom: 10px;
+  position: relative;
+  z-index: 1;
+}
+
+.registration-header p {
+  font-size: clamp(14px, 4vw, 16px);
+  opacity: 0.9;
+  position: relative;
+  z-index: 1;
+  margin: 0;
+}
+
+.registration-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-group label {
+  font-size: clamp(14px, 4vw, 16px);
+  font-weight: 600;
+  color: #2D2D2D;
+}
+
+.form-group input[type="text"],
+.form-group input[type="tel"] {
+  width: 100%;
+  padding: 12px 15px;
+  border: 2px solid #e0e0e0;
+  border-radius: 10px;
+  font-size: clamp(14px, 4vw, 16px);
+  font-family: inherit;
+  transition: border-color 0.3s ease;
+  box-sizing: border-box;
+  background: #fafafa;
+}
+
+.form-group input[type="text"]:focus,
+.form-group input[type="tel"]:focus {
+  outline: none;
+  border-color: #00A9E8;
+  background: white;
+}
+
+.form-group input.error {
+  border-color: #dc3545;
+}
+
+.form-group input.error:focus {
+  border-color: #dc3545;
+  box-shadow: 0 0 0 3px rgba(220, 53, 69, 0.1);
+}
+
+.error-message {
+  font-size: clamp(12px, 3vw, 13px);
+  color: #dc3545;
+  margin-top: -4px;
+}
+
+.gender-options {
+  display: flex;
+  gap: 20px;
+}
+
+.gender-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.gender-option input[type="radio"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: #00A9E8;
+}
+
+.gender-option span {
+  font-size: clamp(14px, 4vw, 16px);
+  color: #2D2D2D;
+}
+
+.submit-error {
+  padding: 15px;
+  background: #f8d7da;
+  border: 1px solid #f5c6cb;
+  border-radius: 10px;
+  color: #721c24;
+  font-size: clamp(14px, 4vw, 16px);
+  text-align: center;
+  font-weight: 500;
+}
+
+.submit-button {
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(135deg, #00A9E8 0%, #0080b8 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: clamp(16px, 4vw, 18px);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 169, 232, 0.3);
+  margin-top: 10px;
+}
+
+.submit-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 169, 232, 0.4);
+}
+
+.submit-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.submit-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+@media (max-width: 480px) {
+  .registration-page {
+    padding: 10px;
+  }
+
+  .registration-container {
+    padding: 20px 15px;
+  }
+
+  .registration-header {
+    padding: 20px 15px;
+  }
+}

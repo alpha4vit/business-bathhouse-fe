@@ -1,28 +1,34 @@
-import {BrowserRouter as Router, Route, Routes, useSearchParams} from 'react-router-dom'
-import {useEffect, useState} from 'react'
-import InvoicePage from "./components/InvoicePage.tsx";
-import PersonalCabinet from "./components/PersonalCabinet.tsx";
-import SpecialOffers from "./components/SpecialOffers.tsx";
-import PointsInstructions from "./components/PointsInstructions.tsx";
-import ResidentSearch from "./components/ResidentSearch.tsx";
-import PointsAdjustmentsTable from "./components/PointsAdjustmentsTable.tsx";
-import TransactionHistory from "./components/TransactionHistory.tsx";
-import EventsPage from "./components/EventsPage.tsx";
-import NewsletterSender from "./components/NewsletterSender.tsx";
+import {BrowserRouter as Router, Route, Routes, useLocation, useNavigate, useSearchParams} from 'react-router-dom'
+import {lazy, Suspense, useEffect, useState} from 'react'
+import LoadingScreen from "./components/LoadingScreen.tsx";
 import Navbar from "./components/Navbar.tsx";
 import {userStorage} from "./utils/userStorage.ts";
-import EventRegistrationsPage from "./components/EventRegistrationsPage.tsx";
-import BalanceAdjustmentPage from "./components/BalanceAdjustmentPage.tsx"
-import UserDeactivationPage from "./components/UserDeactivationPage.tsx";
-import ChatsPage from "./components/ChatsPage.tsx";
-import AccessDenied from "./components/AccessDenied.tsx";
 import {AUTH_ERROR_EVENT} from "./utils/apiClient.ts";
 import {UserProvider} from "./contexts/UserContext.tsx";
-import SupportPage from "./components/SupportPage.tsx";
+import AccessDenied from "./components/AccessDenied.tsx";
+
+const InvoicePage = lazy(() => import("./components/InvoicePage.tsx"));
+const PersonalCabinet = lazy(() => import("./components/PersonalCabinet.tsx"));
+const SpecialOffers = lazy(() => import("./components/SpecialOffers.tsx"));
+const PointsInstructions = lazy(() => import("./components/PointsInstructions.tsx"));
+const ResidentSearch = lazy(() => import("./components/ResidentSearch.tsx"));
+const PointsAdjustmentsTable = lazy(() => import("./components/PointsAdjustmentsTable.tsx"));
+const TransactionHistory = lazy(() => import("./components/TransactionHistory.tsx"));
+const EventsPage = lazy(() => import("./components/EventsPage.tsx"));
+const NewsletterSender = lazy(() => import("./components/NewsletterSender.tsx"));
+const EventRegistrationsPage = lazy(() => import("./components/EventRegistrationsPage.tsx"));
+const BalanceAdjustmentPage = lazy(() => import("./components/BalanceAdjustmentPage.tsx"));
+const UserDeactivationPage = lazy(() => import("./components/UserDeactivationPage.tsx"));
+const ChatsPage = lazy(() => import("./components/ChatsPage.tsx"));
+const SupportPage = lazy(() => import("./components/SupportPage.tsx"));
+const RegistrationPage = lazy(() => import("./components/RegistrationPage.tsx"));
 
 function AppContent() {
     const [searchParams] = useSearchParams();
+    const navigate = useNavigate();
+    const location = useLocation();
     const [authError, setAuthError] = useState<{ message: string } | null>(null);
+    const isRegisterPage = location.pathname === '/register';
 
     useEffect(() => {
         // Получаем ID пользователя из URL параметров
@@ -32,11 +38,22 @@ function AppContent() {
             // Сохраняем ID в localStorage если его нет или он отличается
             userStorage.setUserId(userId);
         }
-    }, [searchParams]);
+
+        // Обработка параметра startapp для навигации
+        const startApp = searchParams.get('startapp');
+        if (startApp && location.pathname === '/') {
+            navigate(startApp);
+        }
+    }, [searchParams, navigate, location.pathname]);
 
     useEffect(() => {
         const handleAuthError = (event: Event) => {
-            const customEvent = event as CustomEvent<{ message: string }>;
+            const customEvent = event as CustomEvent<{ message: string; status: number }>;
+            // Не показывать модалку если пользователь уже был редиректнут на регистрацию
+            if (window.location.pathname === '/register') {
+                return;
+            }
+            // Don't redirect to registration page on 403 error - let users see their profile
             setAuthError(customEvent.detail);
         };
 
@@ -45,28 +62,32 @@ function AppContent() {
         return () => {
             window.removeEventListener(AUTH_ERROR_EVENT, handleAuthError);
         };
-    }, []);
+    }, [navigate]);
 
     return (
         <div>
-            <Navbar/>
-            <Routes>
-                <Route path="/" element={<PersonalCabinet/>}/>
-                <Route path="/invoice" element={<InvoicePage/>}/>
-                <Route path="/cabinet"/>
-                <Route path="/offers" element={<SpecialOffers/>}/>
-                <Route path="/points/instructions" element={<PointsInstructions/>}/>
-                <Route path="/residents/search" element={<ResidentSearch/>}/>
-                <Route path="/transactions" element={<TransactionHistory/>}/>
-                <Route path="/events" element={<EventsPage/>}/>
-                <Route path="/events/registration" element={<EventRegistrationsPage/>}/>
-                <Route path="/chats" element={<ChatsPage/>}/>
-                <Route path="/support" element={<SupportPage/>}/>
-                <Route path="/admin/newsletter" element={<NewsletterSender/>}/>
-                <Route path="/admin/points/adjustments" element={<PointsAdjustmentsTable/>}/>
-                <Route path="/admin/balance/adjustment" element={<BalanceAdjustmentPage/>}/>
-                <Route path="/admin/users/deactivate" element={<UserDeactivationPage/>}/>
-            </Routes>
+            <Navbar hideMenuButton={isRegisterPage} />
+            <Suspense fallback={<LoadingScreen/>}>
+                <Routes>
+                    <Route path="/" element={<PersonalCabinet/>}/>
+                    <Route path="/invoice" element={<InvoicePage/>}/>
+                    <Route path="/invoice/individual" element={<InvoicePage/>}/>
+                    <Route path="/cabinet" element={<PersonalCabinet/>}/>
+                    <Route path="/offers" element={<SpecialOffers/>}/>
+                    <Route path="/points/instructions" element={<PointsInstructions/>}/>
+                    <Route path="/residents/search" element={<ResidentSearch/>}/>
+                    <Route path="/transactions" element={<TransactionHistory/>}/>
+                    <Route path="/events" element={<EventsPage/>}/>
+                    <Route path="/events/registration" element={<EventRegistrationsPage/>}/>
+                    <Route path="/chats" element={<ChatsPage/>}/>
+                    <Route path="/support" element={<SupportPage/>}/>
+                    <Route path="/admin/newsletter" element={<NewsletterSender/>}/>
+                    <Route path="/admin/points/adjustments" element={<PointsAdjustmentsTable/>}/>
+                    <Route path="/admin/balance/adjustment" element={<BalanceAdjustmentPage/>}/>
+                    <Route path="/admin/users/deactivate" element={<UserDeactivationPage/>}/>
+                    <Route path="/register" element={<RegistrationPage/>}/>
+                </Routes>
+            </Suspense>
             {authError && (
                 <AccessDenied
                     message={authError.message}

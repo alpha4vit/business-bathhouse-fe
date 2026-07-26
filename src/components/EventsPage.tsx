@@ -5,6 +5,8 @@ import {userService} from '../services/userService'
 import {userStorage} from '../utils/userStorage'
 import {API_BASE_URL} from "../config/api.ts"
 import SwipeCard from './SwipeCard'
+import {authenticatedFetch} from "../utils/apiClient.ts"
+import {useUser} from '../contexts/UserContext'
 
 const eventTypeLabels: Record<string, string> = {
     'ENTERTAINMENT': 'Развлекательные мероприятия',
@@ -15,6 +17,7 @@ const eventTypeLabels: Record<string, string> = {
 }
 
 function EventsPage() {
+    const {user} = useUser()
     const [events, setEvents] = useState<Event[]>([])
     const [loading, setLoading] = useState(true)
     const [currentIndex, setCurrentIndex] = useState(0)
@@ -64,12 +67,12 @@ function EventsPage() {
         setLoadingImages(prev => new Set(prev).add(event.id))
 
         try {
-            const fullPhotoUrl = event.photo.showUrl.startsWith('http') 
-                ? event.photo.showUrl 
+            const fullPhotoUrl = event.photo.showUrl.startsWith('http')
+                ? event.photo.showUrl
                 : `https://prime-ural.bitrix24.ru/${event.photo.showUrl}`
-            
+
             const imageUrl = await userService.getPhoto(fullPhotoUrl)
-            
+
             updateEventImage(event.id, imageUrl)
             console.log(`[EventsPage] ✅ Изображение загружено для мероприятия ${event.title}`)
         } catch (error) {
@@ -85,17 +88,17 @@ function EventsPage() {
 
         console.log(`[EventsPage] 📄 Загрузка HTML описания для мероприятия ${event.id}`)
         console.log(`[EventsPage] 🔗 Исходный URL из Битрикса:`, event.previewDescription.showUrl)
-        
-        const fullHtmlUrl = event.previewDescription.showUrl.startsWith('http') 
-            ? event.previewDescription.showUrl 
+
+        const fullHtmlUrl = event.previewDescription.showUrl.startsWith('http')
+            ? event.previewDescription.showUrl
             : `https://prime-ural.bitrix24.ru/${event.previewDescription.showUrl}`
-        
+
         console.log(`[EventsPage] 🔗 Полный URL для запроса:`, fullHtmlUrl)
         setLoadingHtml(prev => new Set(prev).add(event.id))
 
         try {
             const html = await eventService.getHtml(fullHtmlUrl)
-            
+
             console.log(`[EventsPage] 📄 HTML содержимое для мероприятия ${event.id}:`, html)
             setHtmlDescriptions(prev => {
                 const newMap = new Map(prev).set(event.id, html)
@@ -115,9 +118,9 @@ function EventsPage() {
     }
 
     const updateEventImage = (eventId: string, imageUrl: string | undefined) => {
-        setEvents(prev => prev.map(evt => 
-            evt.id === eventId 
-                ? { ...evt, photo: imageUrl ? { ...evt.photo!, showUrl: imageUrl } : evt.photo }
+        setEvents(prev => prev.map(evt =>
+            evt.id === eventId
+                ? {...evt, photo: imageUrl ? {...evt.photo!, showUrl: imageUrl} : evt.photo}
                 : evt
         ))
         setLoadingImages(prev => {
@@ -165,8 +168,14 @@ function EventsPage() {
     }, [])
 
 
-    const formatDate = (dateString: string) => {
-        const date = new Date(dateString)
+    const formatDate = (dateValue: string | number[]) => {
+        let date: Date
+        if (Array.isArray(dateValue)) {
+            const [year, month, day, hour, minute] = dateValue
+            date = new Date(year, month - 1, day, hour, minute)
+        } else {
+            date = new Date(dateValue)
+        }
         return new Intl.DateTimeFormat('ru-RU', {
             day: '2-digit',
             month: '2-digit',
@@ -179,13 +188,11 @@ function EventsPage() {
     const handleRegistration = async (event: Event) => {
         setSelectedEvent(event)
         setRegistrationModalOpen(true)
-        
-        const userId = userStorage.getUserId()
-        if (userId) {
+
+        if (user) {
             setLoadingBalance(true)
             try {
-                const userData = await userService.getUserData(userId)
-                setUserBalance(userData.balance.amount)
+                setUserBalance(user?.company?.balance?.amount ?? 0)
             } catch (error) {
                 console.error('[EventsPage] Error loading user balance:', error)
                 setUserBalance(0)
@@ -208,18 +215,12 @@ function EventsPage() {
     }
 
     const showNotification = (type: 'success' | 'error', message: string) => {
-        setNotification({ type, message })
+        setNotification({type, message})
         setTimeout(() => setNotification(null), 3000)
     }
 
     const handleTransaction = async (paymentType: 'FAST_PAYMENT' | 'PERSONAL_ACCOUNT') => {
         if (!selectedEvent) return
-
-        const userId = userStorage.getUserId()
-        if (!userId) {
-            showNotification('error', 'Требуется авторизация')
-            return
-        }
 
         setIsProcessingTransaction(true)
 
@@ -227,7 +228,7 @@ function EventsPage() {
             const purpose = selectedEvent.type === 'BATH' ? 'BATHHOUSE_EVENT' : 'EVENT'
 
             const transactionData = {
-                userId: userId,
+                userId: user?.company?.id?.toString() || '',
                 amount: Math.ceil((selectedEvent.price || 0) * 100),
                 currency: 'RUB',
                 purpose: purpose,
@@ -237,7 +238,7 @@ function EventsPage() {
 
             console.log('Creating transaction:', transactionData)
 
-            const response = await fetch(`${API_BASE_URL}/api/transactions`, {
+            const response = await authenticatedFetch(`${API_BASE_URL}/api/transactions`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -321,7 +322,7 @@ function EventsPage() {
                     <div className="events-results-count">
                         {currentIndex + 1} из {events.length}
                     </div>
-                    
+
                     <SwipeCard
                         items={events}
                         currentIndex={currentIndex}
@@ -333,8 +334,8 @@ function EventsPage() {
                                     {evt.photo?.showUrl && loadingImages.has(evt.id) ? (
                                         <div className="events-result-image-skeleton"></div>
                                     ) : evt.photo?.showUrl && !failedImages.has(evt.id) ? (
-                                        <img 
-                                            src={evt.photo.showUrl} 
+                                        <img
+                                            src={evt.photo.showUrl}
                                             alt={`Изображение ${evt.title}`}
                                             className="events-result-image-img"
                                             onLoad={() => handleImageLoad(evt.id)}
@@ -380,11 +381,15 @@ function EventsPage() {
                                             onClick={() => toggleDescription(evt.id)}
                                         >
                                             {expandedDescriptions.has(evt.id) ? (
-                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                                     stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+                                                     strokeLinejoin="round">
                                                     <polyline points="6 9 12 15 18 9"></polyline>
                                                 </svg>
                                             ) : (
-                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
+                                                     stroke="currentColor" strokeWidth="2" strokeLinecap="round"
+                                                     strokeLinejoin="round">
                                                     <polyline points="18 15 12 9 6 15"></polyline>
                                                 </svg>
                                             )}
@@ -393,20 +398,22 @@ function EventsPage() {
                                         {expandedDescriptions.has(evt.id) && (
                                             <div className="events-result-description">
                                                 {loadingHtml.has(evt.id) ? (
-                                                    <div className="events-result-description-loading">Загрузка описания...</div>
+                                                    <div className="events-result-description-loading">Загрузка
+                                                        описания...</div>
                                                 ) : htmlDescriptions.has(evt.id) ? (
                                                     (() => {
                                                         const htmlContent = htmlDescriptions.get(evt.id) || ''
                                                         console.log(`[EventsPage] 🖼️ Рендеринг HTML для ${evt.id}:`, htmlContent)
                                                         return (
-                                                            <div 
+                                                            <div
                                                                 className="events-result-description-content"
-                                                                dangerouslySetInnerHTML={{ __html: htmlContent }}
+                                                                dangerouslySetInnerHTML={{__html: htmlContent}}
                                                             />
                                                         )
                                                     })()
                                                 ) : (
-                                                    <div className="events-result-description-loading">Загрузка описания...</div>
+                                                    <div className="events-result-description-loading">Загрузка
+                                                        описания...</div>
                                                 )}
                                             </div>
                                         )}
@@ -466,11 +473,13 @@ function EventsPage() {
                                             </div>
                                             <div className="transaction-detail-item">
                                                 <span className="detail-label">Сумма платежа:</span>
-                                                <span className="detail-value">{(createdTransaction.amount / 100).toFixed(2)} ₽</span>
+                                                <span
+                                                    className="detail-value">{(createdTransaction.amount / 100).toFixed(2)} ₽</span>
                                             </div>
                                             <div className="transaction-detail-item">
                                                 <span className="detail-label">Дата выставления:</span>
-                                                <span className="detail-value">{new Date(createdTransaction.createdAt || createdTransaction.issuedAt).toLocaleDateString('ru-RU', {
+                                                <span
+                                                    className="detail-value">{new Date(createdTransaction.createdAt || createdTransaction.issuedAt).toLocaleDateString('ru-RU', {
                                                     day: 'numeric',
                                                     month: 'long',
                                                     year: 'numeric',
