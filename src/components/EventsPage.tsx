@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react'
 import './EventsPage.css'
 import {Event, eventService} from '../services/eventService'
-import {userService} from '../services/userService'
+import {TelegramUserResponse, userService} from '../services/userService'
 import {userStorage} from '../utils/userStorage'
 import {API_BASE_URL} from "../config/api.ts"
 import SwipeCard from './SwipeCard'
@@ -536,36 +536,41 @@ function EventsPage() {
                                         )}
                                     </div>
 
-                                    <div className="registration-modal-balance">
-                                        <h4>Ваш баланс лицевого счета</h4>
-                                        <div className="registration-modal-balance-amount">
-                                            {loadingBalance ? (
-                                                <span className="registration-modal-balance-loading">Загрузка...</span>
-                                            ) : (
-                                                `${userBalance.toLocaleString('ru-RU')} ₽`
-                                            )}
+                                    {!isNonResident(user) && (
+                                        <div className="registration-modal-balance">
+                                            <h4>Ваш баланс лицевого счета</h4>
+                                            <div className="registration-modal-balance-amount">
+                                                {loadingBalance ? (
+                                                    <span
+                                                        className="registration-modal-balance-loading">Загрузка...</span>
+                                                ) : (
+                                                    `${userBalance.toLocaleString('ru-RU')} ₽`
+                                                )}
+                                            </div>
                                         </div>
-                                    </div>
+                                    )}
 
                                     <div className="registration-modal-transaction-methods">
-                                        {userBalance >= (selectedEvent.price || 0) ? (
-                                            <button
-                                                className="registration-modal-transaction-btn registration-modal-transaction-account"
-                                                onClick={() => handleTransaction('PERSONAL_ACCOUNT')}
-                                                disabled={isProcessingTransaction}
-                                            >
-                                                <span className="registration-modal-transaction-icon">💳</span>
-                                                <span>Списать с лицевого счета</span>
-                                            </button>
-                                        ) : (
-                                            <button
-                                                className="registration-modal-transaction-btn registration-modal-transaction-account"
-                                                onClick={handleTopUpBalance}
-                                                disabled={isProcessingTransaction}
-                                            >
-                                                <span className="registration-modal-transaction-icon">💳</span>
-                                                <span>Пополнить лицевой счет</span>
-                                            </button>
+                                        {!isNonResident(user) && (
+                                            userBalance >= (selectedEvent.price || 0) ? (
+                                                <button
+                                                    className="registration-modal-transaction-btn registration-modal-transaction-account"
+                                                    onClick={() => handleTransaction('PERSONAL_ACCOUNT')}
+                                                    disabled={isProcessingTransaction}
+                                                >
+                                                    <span className="registration-modal-transaction-icon">💳</span>
+                                                    <span>Списать с лицевого счета</span>
+                                                </button>
+                                            ) : (
+                                                <button
+                                                    className="registration-modal-transaction-btn registration-modal-transaction-account"
+                                                    onClick={handleTopUpBalance}
+                                                    disabled={isProcessingTransaction}
+                                                >
+                                                    <span className="registration-modal-transaction-icon">💳</span>
+                                                    <span>Пополнить лицевой счет</span>
+                                                </button>
+                                            )
                                         )}
 
                                         <button
@@ -585,6 +590,10 @@ function EventsPage() {
             )}
         </div>
     )
+}
+
+function isNonResident(user?: TelegramUserResponse | null): boolean {
+    return user != null && user?.role !== undefined && user.role == 'NON_RESIDENT'
 }
 
 export default EventsPage
