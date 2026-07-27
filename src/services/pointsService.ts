@@ -19,7 +19,7 @@ export interface CompanyDto {
 export const pointsService = {
     async getEventAdjustments(eventId: string): Promise<PointsAdjustmentDto[]> {
         try {
-            const response = await authenticatedFetch(`${API_BASE_URL}/api/points/adjustments/${eventId}`)
+            const response = await authenticatedFetch(`${API_BASE_URL}/api/points/adjustments/event/${eventId}`)
 
             if (!response.ok) {
                 throw new Error(`Failed to fetch event adjustments: ${response.status}`)

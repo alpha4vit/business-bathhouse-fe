@@ -1,5 +1,5 @@
 import {API_BASE_URL} from '../config/api'
-import { authenticatedFetch } from '../utils/apiClient'
+import {authenticatedFetch} from '../utils/apiClient'
 
 export enum Gender {
     MALE = '273098',
@@ -125,6 +125,11 @@ export const userService = {
             });
 
             if (!response.ok) {
+                if (window.location.pathname === '/' || window.location.pathname.startsWith("/cabinet")) {
+                    window.location.href = '/register';
+
+                    return new Promise(() => {});
+                }
                 throw new Error(`Failed to get current user: ${response.status}`);
             }
 
@@ -224,10 +229,10 @@ export const userService = {
                 // Извлекаем path из Bitrix URL
                 const url = new URL(photoUrl)
                 const path = url.pathname + url.search
-                
+
                 // Кодируем path для безопасной передачи
                 const encodedPath = encodeURIComponent(path)
-                
+
                 const response = await authenticatedFetch(`${API_BASE_URL}/api/bitrix/image?path=${encodedPath}`)
 
                 if (!response.ok) {
@@ -236,10 +241,10 @@ export const userService = {
 
                 const blob = await response.blob()
                 const blobUrl = URL.createObjectURL(blob)
-                
+
                 // Сохраняем в кеш
                 photoCache.set(photoUrl, blobUrl)
-                
+
                 return blobUrl
             } catch (error) {
                 console.error('Error fetching photo:', error)
@@ -252,7 +257,7 @@ export const userService = {
 
         // Сохраняем активный запрос
         pendingPhotoRequests.set(photoUrl, photoPromise)
-        
+
         return photoPromise
     },
 
@@ -353,7 +358,7 @@ export const userService = {
     async deactivate(companyIds: string[]): Promise<string[]> {
         const response = await authenticatedFetch(`${API_BASE_URL}/api/users/deactivate`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(companyIds)
         })
 
@@ -373,7 +378,7 @@ export const userService = {
     }): Promise<void> {
         const response = await authenticatedFetch(`${API_BASE_URL}/api/auth/register`, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: {'Content-Type': 'application/json'},
             body: JSON.stringify(data)
         })
 
@@ -381,4 +386,8 @@ export const userService = {
             throw new Error(`Failed to register: ${response.status}`)
         }
     }
+}
+
+export function isNonResident(user?: TelegramUserResponse | null): boolean {
+    return user != null && user?.role !== undefined && user.role == 'NON_RESIDENT'
 }

@@ -1,5 +1,5 @@
 import {API_BASE_URL} from '../config/api'
-import { authenticatedFetch } from '../utils/apiClient'
+import {authenticatedFetch} from '../utils/apiClient'
 
 export interface Chat {
     id: number
@@ -61,6 +61,16 @@ export const chatService = {
         } catch (error) {
             console.error('Error fetching invite link:', error)
             return null
+        }
+    },
+
+    async sendJoinChatRequest(chatId: number): Promise<void> {
+        const response = await authenticatedFetch(`${API_BASE_URL}/api/chats/${chatId}/request`, {
+            method: 'POST',
+        })
+
+        if (!response.ok) {
+            throw new Error("Ошибка отправки запроса на вступление в чат!")
         }
     }
 }

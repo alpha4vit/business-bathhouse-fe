@@ -1,9 +1,14 @@
-import { useEffect, useState } from 'react'
+import {useEffect, useState} from 'react'
 import SwipeCard from './SwipeCard'
-import { chatService, Chat } from '../services/chatService'
+import {Chat, chatService} from '../services/chatService'
 import './ChatsPage.css'
+import {useUser} from "../contexts/UserContext.tsx";
+import {isNonResident} from "../services/userService.ts";
+import {useNotification} from "../hooks/useNotification.ts";
 
 function ChatsPage() {
+    const {user} = useUser()
+    const {notification, showSuccess, showError} = useNotification()
     const [chats, setChats] = useState<Chat[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
@@ -11,6 +16,7 @@ function ChatsPage() {
     const [chatImages, setChatImages] = useState<Map<number, string>>(new Map())
     const [loadingImages, setLoadingImages] = useState<Set<number>>(new Set())
     const [inviteLinks, setInviteLinks] = useState<Map<number, string>>(new Map())
+    const [requestingChatId, setRequestingChatId] = useState<number | null>(null)
 
     useEffect(() => {
         loadChats()
@@ -21,11 +27,12 @@ function ChatsPage() {
             if (!chatImages.has(chat.id) && !loadingImages.has(chat.id)) {
                 loadChatImage(chat.id)
             }
-            if (!inviteLinks.has(chat.id)) {
+
+            if (!isNonResident(user) && !inviteLinks.has(chat.id)) {
                 loadInviteLink(chat.id)
             }
         })
-    }, [chats])
+    }, [chats, user])
 
     const loadChats = async () => {
         try {
@@ -66,6 +73,19 @@ function ChatsPage() {
             }
         } catch (err) {
             console.error(`Failed to load invite link for chat ${chatId}:`, err)
+        }
+    }
+
+    const handleJoinChatRequest = async (chatId: number) => {
+        try {
+            setRequestingChatId(chatId)
+            await chatService.sendJoinChatRequest(chatId)
+            showSuccess('Заявка успешно отправлена!')
+        } catch (error) {
+            console.error('Error sending join request:', error)
+            showError('Ошибка при отправке заявки, попробуйте еще раз!')
+        } finally {
+            setRequestingChatId(null)
         }
     }
 
@@ -129,7 +149,7 @@ function ChatsPage() {
                                                 {chat.title.charAt(0)}
                                             </div>
                                         ) : chatImages.get(chat.id) ? (
-                                            <img src={chatImages.get(chat.id)} alt={chat.title} />
+                                            <img src={chatImages.get(chat.id)} alt={chat.title}/>
                                         ) : (
                                             <div className="chats-avatar-placeholder">
                                                 {chat.title.charAt(0)}
@@ -152,16 +172,6 @@ function ChatsPage() {
                                     </div>
                                 )}
 
-                                {chat.lastMessage && (
-                                    <div className="chats-last-message">
-                                        <div className="chats-last-message-label">Последнее сообщение:</div>
-                                        <div className="chats-last-message-text">{chat.lastMessage}</div>
-                                        {chat.lastMessageTime && (
-                                            <div className="chats-last-message-time">{chat.lastMessageTime}</div>
-                                        )}
-                                    </div>
-                                )}
-
                                 {chat.link && (
                                     <a
                                         href={chat.link}
@@ -173,18 +183,30 @@ function ChatsPage() {
                                     </a>
                                 )}
 
-                                {inviteLinks.get(chat.id) ? (
-                                    <a
-                                        href={inviteLinks.get(chat.id)}
-                                        target="_blank"
-                                        rel="noopener noreferrer"
+                                {!isNonResident(user) && (
+                                    inviteLinks.get(chat.id) ? (
+                                        <a
+                                            href={inviteLinks.get(chat.id)}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="chats-join-button"
+                                        >
+                                            Вступить
+                                        </a>
+                                    ) : (
+                                        <button className="chats-join-button" disabled>
+                                            Вступить
+                                        </button>
+                                    )
+                                )}
+
+                                {isNonResident(user) && (
+                                    <button 
+                                        onClick={() => handleJoinChatRequest(chat.id)} 
                                         className="chats-join-button"
+                                        disabled={requestingChatId === chat.id}
                                     >
-                                        Вступить
-                                    </a>
-                                ) : (
-                                    <button className="chats-join-button" disabled>
-                                        Вступить
+                                        {requestingChatId === chat.id ? 'Отправка...' : 'Подать заявку на вступление'}
                                     </button>
                                 )}
                             </div>

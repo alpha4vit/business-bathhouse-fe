@@ -135,6 +135,9 @@ function Navbar({hideMenuButton = false}: { hideMenuButton?: boolean }) {
                                 <Link to="/events" className="navbar-drawer-link" onClick={() => setIsMenuOpen(false)}>
                                     <span>Календарь мероприятий</span>
                                 </Link>
+                                <Link to="/chats" className="navbar-drawer-link" onClick={() => setIsMenuOpen(false)}>
+                                    <span>Чаты сообщества</span>
+                                </Link>
                                 <Link to="/support" className="navbar-drawer-link" onClick={() => setIsMenuOpen(false)}>
                                     <span>Техподдержка</span>
                                 </Link>

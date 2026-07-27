@@ -33,7 +33,7 @@ export async function authenticatedFetch(
   // Обработка ошибок авторизации
   if (response.status === 401 || response.status === 403) {
     // Если это запрос к /api/auth/telegram и мы на главной странице, редиректим на регистрацию
-    if (url.includes('/api/auth/telegram') && window.location.pathname === '/') {
+    if (url.includes('/api/auth/telegram') && (window.location.pathname === '/' || window.location.pathname.startsWith("/cabinet"))) {
       window.location.href = '/register';
       return response;
     }

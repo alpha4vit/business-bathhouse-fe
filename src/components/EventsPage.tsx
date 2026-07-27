@@ -1,7 +1,7 @@
 import {useEffect, useState} from 'react'
 import './EventsPage.css'
 import {Event, eventService} from '../services/eventService'
-import {TelegramUserResponse, userService} from '../services/userService'
+import {isNonResident, userService} from '../services/userService'
 import {userStorage} from '../utils/userStorage'
 import {API_BASE_URL} from "../config/api.ts"
 import SwipeCard from './SwipeCard'
@@ -590,10 +590,6 @@ function EventsPage() {
             )}
         </div>
     )
-}
-
-function isNonResident(user?: TelegramUserResponse | null): boolean {
-    return user != null && user?.role !== undefined && user.role == 'NON_RESIDENT'
 }
 
 export default EventsPage
