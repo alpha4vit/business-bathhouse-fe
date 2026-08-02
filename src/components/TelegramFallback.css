@@ -1,0 +1,81 @@
+.telegram-fallback {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+.telegram-fallback-content {
+    background: white;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    max-width: 500px;
+    width: 100%;
+    text-align: center;
+}
+
+.telegram-fallback-icon {
+    font-size: 64px;
+    margin-bottom: 20px;
+}
+
+.telegram-fallback-title {
+    color: #333;
+    margin: 0 0 15px 0;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.telegram-fallback-message {
+    color: #666;
+    margin: 0 0 25px 0;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.telegram-fallback-instructions {
+    text-align: left;
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+}
+
+.telegram-fallback-instructions h3 {
+    color: #333;
+    margin: 0 0 15px 0;
+    font-size: 18px;
+}
+
+.telegram-fallback-instructions ol {
+    color: #666;
+    margin: 0;
+    padding-left: 20px;
+    font-size: 14px;
+    line-height: 1.8;
+}
+
+.telegram-fallback-button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 25px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.telegram-fallback-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+}
+
+.telegram-fallback-button:active {
+    transform: translateY(0);
+}
