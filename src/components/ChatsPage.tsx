@@ -8,7 +8,7 @@ import {useNotification} from "../hooks/useNotification.ts";
 
 function ChatsPage() {
     const {user} = useUser()
-    const {notification, showSuccess, showError} = useNotification()
+    const {showSuccess, showError} = useNotification()
     const [chats, setChats] = useState<Chat[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
@@ -201,8 +201,8 @@ function ChatsPage() {
                                 )}
 
                                 {isNonResident(user) && (
-                                    <button 
-                                        onClick={() => handleJoinChatRequest(chat.id)} 
+                                    <button
+                                        onClick={() => handleJoinChatRequest(chat.id)}
                                         className="chats-join-button"
                                         disabled={requestingChatId === chat.id}
                                     >
