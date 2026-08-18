@@ -10,6 +10,7 @@ import AccessDenied from "./components/AccessDenied.tsx";
 const InvoicePage = lazy(() => import("./components/InvoicePage.tsx"));
 const PersonalCabinet = lazy(() => import("./components/PersonalCabinet.tsx"));
 const SpecialOffers = lazy(() => import("./components/SpecialOffers.tsx"));
+const SpecialOffersAdmin = lazy(() => import("./components/SpecialOffersAdmin.tsx"));
 const PointsInstructions = lazy(() => import("./components/PointsInstructions.tsx"));
 const ResidentSearch = lazy(() => import("./components/ResidentSearch.tsx"));
 const PointsAdjustmentsTable = lazy(() => import("./components/PointsAdjustmentsTable.tsx"));
@@ -87,6 +88,7 @@ function AppContent() {
                     <Route path="/admin/balance/adjustment" element={<BalanceAdjustmentPage/>}/>
                     <Route path="/admin/users/deactivate" element={<UserDeactivationPage/>}/>
                     <Route path="/admin/reports" element={<ReportsPage/>}/>
+                    <Route path="/admin/special-offers" element={<SpecialOffersAdmin/>}/>
                     <Route path="/register" element={<RegistrationPage/>}/>
                 </Routes>
             </Suspense>
