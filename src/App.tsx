@@ -22,6 +22,7 @@ const UserDeactivationPage = lazy(() => import("./components/UserDeactivationPag
 const ChatsPage = lazy(() => import("./components/ChatsPage.tsx"));
 const SupportPage = lazy(() => import("./components/SupportPage.tsx"));
 const RegistrationPage = lazy(() => import("./components/RegistrationPage.tsx"));
+const ReportsPage = lazy(() => import("./components/ReportsPage.tsx"));
 
 function AppContent() {
     const [searchParams] = useSearchParams();
@@ -85,6 +86,7 @@ function AppContent() {
                     <Route path="/admin/points/adjustments" element={<PointsAdjustmentsTable/>}/>
                     <Route path="/admin/balance/adjustment" element={<BalanceAdjustmentPage/>}/>
                     <Route path="/admin/users/deactivate" element={<UserDeactivationPage/>}/>
+                    <Route path="/admin/reports" element={<ReportsPage/>}/>
                     <Route path="/register" element={<RegistrationPage/>}/>
                 </Routes>
             </Suspense>
