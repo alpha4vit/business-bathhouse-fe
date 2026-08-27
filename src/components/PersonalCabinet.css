@@ -463,6 +463,31 @@
   background: rgba(255, 255, 255, 0.3);
 }
 
+.cabinet-hide-instructions-button {
+  width: 100%;
+  padding: clamp(12px, 3vw, 15px);
+  background: linear-gradient(135deg, #e9ecef 0%, #dee2e6 100%);
+  color: #2D2D2D;
+  border: 2px solid #ced4da;
+  border-radius: 12px;
+  font-size: clamp(14px, 3.5vw, 15px);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.cabinet-hide-instructions-button:hover {
+  background: linear-gradient(135deg, #dee2e6 0%, #ced4da 100%);
+  border-color: #adb5bd;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.cabinet-hide-instructions-button:active {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
 .cabinet-history-list {
   display: flex;
   flex-direction: column;

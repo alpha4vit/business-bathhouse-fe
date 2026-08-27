@@ -3,9 +3,10 @@ import {lazy, Suspense, useEffect, useState} from 'react'
 import LoadingScreen from "./components/LoadingScreen.tsx";
 import Navbar from "./components/Navbar.tsx";
 import {userStorage} from "./utils/userStorage.ts";
-import {AUTH_ERROR_EVENT} from "./utils/apiClient.ts";
+import {AUTH_ERROR_EVENT, MANDATORY_CHAT_SUBSCRIPTION_EVENT} from "./utils/apiClient.ts";
 import {UserProvider} from "./contexts/UserContext.tsx";
 import AccessDenied from "./components/AccessDenied.tsx";
+import MandatoryChatsPage from "./components/MandatoryChatsPage.tsx";
 
 const InvoicePage = lazy(() => import("./components/InvoicePage.tsx"));
 const PersonalCabinet = lazy(() => import("./components/PersonalCabinet.tsx"));
@@ -30,6 +31,7 @@ function AppContent() {
     const navigate = useNavigate();
     const location = useLocation();
     const [authError, setAuthError] = useState<{ message: string } | null>(null);
+    const [showMandatoryChats, setShowMandatoryChats] = useState(false);
     const isRegisterPage = location.pathname === '/register';
 
     useEffect(() => {
@@ -59,10 +61,16 @@ function AppContent() {
             setAuthError(customEvent.detail);
         };
 
+        const handleMandatoryChatSubscription = () => {
+            setShowMandatoryChats(true);
+        };
+
         window.addEventListener(AUTH_ERROR_EVENT, handleAuthError);
+        window.addEventListener(MANDATORY_CHAT_SUBSCRIPTION_EVENT, handleMandatoryChatSubscription);
 
         return () => {
             window.removeEventListener(AUTH_ERROR_EVENT, handleAuthError);
+            window.removeEventListener(MANDATORY_CHAT_SUBSCRIPTION_EVENT, handleMandatoryChatSubscription);
         };
     }, [navigate]);
 
@@ -70,27 +78,31 @@ function AppContent() {
         <div>
             <Navbar hideMenuButton={isRegisterPage} />
             <Suspense fallback={<LoadingScreen/>}>
-                <Routes>
-                    <Route path="/" element={<PersonalCabinet/>}/>
-                    <Route path="/invoice" element={<InvoicePage/>}/>
-                    <Route path="/invoice/individual" element={<InvoicePage/>}/>
-                    <Route path="/cabinet" element={<PersonalCabinet/>}/>
-                    <Route path="/offers" element={<SpecialOffers/>}/>
-                    <Route path="/points/instructions" element={<PointsInstructions/>}/>
-                    <Route path="/residents/search" element={<ResidentSearch/>}/>
-                    <Route path="/transactions" element={<TransactionHistory/>}/>
-                    <Route path="/events" element={<EventsPage/>}/>
-                    <Route path="/events/registration" element={<EventRegistrationsPage/>}/>
-                    <Route path="/chats" element={<ChatsPage/>}/>
-                    <Route path="/support" element={<SupportPage/>}/>
-                    <Route path="/admin/newsletter" element={<NewsletterSender/>}/>
-                    <Route path="/admin/points/adjustments" element={<PointsAdjustmentsTable/>}/>
-                    <Route path="/admin/balance/adjustment" element={<BalanceAdjustmentPage/>}/>
-                    <Route path="/admin/users/deactivate" element={<UserDeactivationPage/>}/>
-                    <Route path="/admin/reports" element={<ReportsPage/>}/>
-                    <Route path="/admin/special-offers" element={<SpecialOffersAdmin/>}/>
-                    <Route path="/register" element={<RegistrationPage/>}/>
-                </Routes>
+                {showMandatoryChats ? (
+                    <MandatoryChatsPage />
+                ) : (
+                    <Routes>
+                        <Route path="/" element={<PersonalCabinet/>}/>
+                        <Route path="/invoice" element={<InvoicePage/>}/>
+                        <Route path="/invoice/individual" element={<InvoicePage/>}/>
+                        <Route path="/cabinet" element={<PersonalCabinet/>}/>
+                        <Route path="/offers" element={<SpecialOffers/>}/>
+                        <Route path="/points/instructions" element={<PointsInstructions/>}/>
+                        <Route path="/residents/search" element={<ResidentSearch/>}/>
+                        <Route path="/transactions" element={<TransactionHistory/>}/>
+                        <Route path="/events" element={<EventsPage/>}/>
+                        <Route path="/events/registration" element={<EventRegistrationsPage/>}/>
+                        <Route path="/chats" element={<ChatsPage/>}/>
+                        <Route path="/support" element={<SupportPage/>}/>
+                        <Route path="/admin/newsletter" element={<NewsletterSender/>}/>
+                        <Route path="/admin/points/adjustments" element={<PointsAdjustmentsTable/>}/>
+                        <Route path="/admin/balance/adjustment" element={<BalanceAdjustmentPage/>}/>
+                        <Route path="/admin/users/deactivate" element={<UserDeactivationPage/>}/>
+                        <Route path="/admin/reports" element={<ReportsPage/>}/>
+                        <Route path="/admin/special-offers" element={<SpecialOffersAdmin/>}/>
+                        <Route path="/register" element={<RegistrationPage/>}/>
+                    </Routes>
+                )}
             </Suspense>
             {authError && (
                 <AccessDenied

@@ -326,6 +326,45 @@
   color: #FF5722;
 }
 
+.offers-empty-state {
+  background: white;
+  border-radius: 20px;
+  padding: clamp(40px, 10vw, 60px) clamp(25px, 6vw, 35px);
+  text-align: center;
+  box-shadow: 0 5px 20px rgba(45, 45, 45, 0.1);
+  margin-top: 25px;
+}
+
+.offers-empty-icon {
+  font-size: clamp(60px, 12vw, 80px);
+  margin-bottom: 20px;
+  animation: float 3s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-10px);
+  }
+}
+
+.offers-empty-title {
+  font-size: clamp(18px, 4.5vw, 22px);
+  font-weight: 600;
+  color: #2D2D2D;
+  margin-bottom: 15px;
+}
+
+.offers-empty-description {
+  font-size: clamp(14px, 3.5vw, 16px);
+  color: #6c757d;
+  line-height: 1.6;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
 /* Responsive adjustments */
 @media (max-width: 480px) {
   .offers-container {

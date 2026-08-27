@@ -32,7 +32,19 @@ function SpecialOffers() {
     }
 
     if (offers.length === 0) {
-        return <div className="offers-container">Нет активных специальных предложений</div>
+        return (
+            <div className="offers-container">
+                <div className="offers-content">
+                    <div className="offers-empty-state">
+                        <div className="offers-empty-icon">🎁</div>
+                        <h2 className="offers-empty-title">Нет активных специальных предложений</h2>
+                        <p className="offers-empty-description">
+                            В данный момент специальных предложений нет. Следите за обновлениями!
+                        </p>
+                    </div>
+                </div>
+            </div>
+        )
     }
 
     return (

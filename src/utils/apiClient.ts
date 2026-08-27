@@ -6,6 +6,11 @@ import { telegramUtils } from './telegram';
 export const AUTH_ERROR_EVENT = 'authError';
 
 /**
+ * Событие для обработки отсутствия подписки на обязательные чаты
+ */
+export const MANDATORY_CHAT_SUBSCRIPTION_EVENT = 'mandatoryChatSubscription';
+
+/**
  * Централизованный fetch wrapper с автоматическим добавлением заголовка авторизации
  */
 export async function authenticatedFetch(
@@ -47,6 +52,12 @@ export async function authenticatedFetch(
     };
 
     window.dispatchEvent(new CustomEvent(AUTH_ERROR_EVENT, { detail: error }));
+  }
+
+  // Обработка отсутствия подписки на обязательные чаты
+  // Не отправляем событие для запросов ссылок чатов, чтобы избежать цикла
+  if (response.status === 428 && !url.includes('/api/chats/link')) {
+    window.dispatchEvent(new CustomEvent(MANDATORY_CHAT_SUBSCRIPTION_EVENT, { detail: {} }));
   }
 
   return response;
