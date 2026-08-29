@@ -7,6 +7,7 @@ import {AUTH_ERROR_EVENT, MANDATORY_CHAT_SUBSCRIPTION_EVENT} from "./utils/apiCl
 import {UserProvider} from "./contexts/UserContext.tsx";
 import AccessDenied from "./components/AccessDenied.tsx";
 import MandatoryChatsPage from "./components/MandatoryChatsPage.tsx";
+import './App.css';
 
 const InvoicePage = lazy(() => import("./components/InvoicePage.tsx"));
 const PersonalCabinet = lazy(() => import("./components/PersonalCabinet.tsx"));
@@ -62,7 +63,10 @@ function AppContent() {
         };
 
         const handleMandatoryChatSubscription = () => {
-            setShowMandatoryChats(true);
+            // Only show mandatory chats page if not already on it
+            if (!showMandatoryChats) {
+                setShowMandatoryChats(true);
+            }
         };
 
         window.addEventListener(AUTH_ERROR_EVENT, handleAuthError);
@@ -72,38 +76,46 @@ function AppContent() {
             window.removeEventListener(AUTH_ERROR_EVENT, handleAuthError);
             window.removeEventListener(MANDATORY_CHAT_SUBSCRIPTION_EVENT, handleMandatoryChatSubscription);
         };
-    }, [navigate]);
+    }, [navigate, showMandatoryChats]);
+
+    // Reset mandatory chats state when navigating to cabinet or other routes
+    useEffect(() => {
+        if (showMandatoryChats && (location.pathname === '/cabinet' || location.pathname === '/')) {
+            setShowMandatoryChats(false);
+        }
+    }, [location.pathname, showMandatoryChats]);
 
     return (
         <div>
-            <Navbar hideMenuButton={isRegisterPage} />
+            <Navbar hideMenuButton={isRegisterPage || showMandatoryChats} />
             <Suspense fallback={<LoadingScreen/>}>
-                {showMandatoryChats ? (
-                    <MandatoryChatsPage />
-                ) : (
-                    <Routes>
-                        <Route path="/" element={<PersonalCabinet/>}/>
-                        <Route path="/invoice" element={<InvoicePage/>}/>
-                        <Route path="/invoice/individual" element={<InvoicePage/>}/>
-                        <Route path="/cabinet" element={<PersonalCabinet/>}/>
-                        <Route path="/offers" element={<SpecialOffers/>}/>
-                        <Route path="/points/instructions" element={<PointsInstructions/>}/>
-                        <Route path="/residents/search" element={<ResidentSearch/>}/>
-                        <Route path="/transactions" element={<TransactionHistory/>}/>
-                        <Route path="/events" element={<EventsPage/>}/>
-                        <Route path="/events/registration" element={<EventRegistrationsPage/>}/>
-                        <Route path="/chats" element={<ChatsPage/>}/>
-                        <Route path="/support" element={<SupportPage/>}/>
-                        <Route path="/admin/newsletter" element={<NewsletterSender/>}/>
-                        <Route path="/admin/points/adjustments" element={<PointsAdjustmentsTable/>}/>
-                        <Route path="/admin/balance/adjustment" element={<BalanceAdjustmentPage/>}/>
-                        <Route path="/admin/users/deactivate" element={<UserDeactivationPage/>}/>
-                        <Route path="/admin/reports" element={<ReportsPage/>}/>
-                        <Route path="/admin/special-offers" element={<SpecialOffersAdmin/>}/>
-                        <Route path="/register" element={<RegistrationPage/>}/>
-                    </Routes>
-                )}
+                <Routes>
+                    <Route path="/" element={<PersonalCabinet/>}/>
+                    <Route path="/invoice" element={<InvoicePage/>}/>
+                    <Route path="/invoice/individual" element={<InvoicePage/>}/>
+                    <Route path="/cabinet" element={<PersonalCabinet/>}/>
+                    <Route path="/offers" element={<SpecialOffers/>}/>
+                    <Route path="/points/instructions" element={<PointsInstructions/>}/>
+                    <Route path="/residents/search" element={<ResidentSearch/>}/>
+                    <Route path="/transactions" element={<TransactionHistory/>}/>
+                    <Route path="/events" element={<EventsPage/>}/>
+                    <Route path="/events/registration" element={<EventRegistrationsPage/>}/>
+                    <Route path="/chats" element={<ChatsPage/>}/>
+                    <Route path="/support" element={<SupportPage/>}/>
+                    <Route path="/admin/newsletter" element={<NewsletterSender/>}/>
+                    <Route path="/admin/points/adjustments" element={<PointsAdjustmentsTable/>}/>
+                    <Route path="/admin/balance/adjustment" element={<BalanceAdjustmentPage/>}/>
+                    <Route path="/admin/users/deactivate" element={<UserDeactivationPage/>}/>
+                    <Route path="/admin/reports" element={<ReportsPage/>}/>
+                    <Route path="/admin/special-offers" element={<SpecialOffersAdmin/>}/>
+                    <Route path="/register" element={<RegistrationPage/>}/>
+                </Routes>
             </Suspense>
+            {showMandatoryChats && (
+                <div className="mandatory-chats-overlay">
+                    <MandatoryChatsPage />
+                </div>
+            )}
             {authError && (
                 <AccessDenied
                     message={authError.message}

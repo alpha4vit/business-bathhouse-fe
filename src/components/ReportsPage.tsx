@@ -80,21 +80,7 @@ function ReportsPage() {
                 metadata
             }
 
-            const blob = await reportService.generateReport(request)
-            console.log(blob.size)
-            // Create download link
-            const url = window.URL.createObjectURL(blob)
-            const a = document.createElement('a')
-            a.href = url
-
-            // Get report label for filename
-            const filename = `report-${selectedReportConfig.label.replace(/\s+/g, '_')}-${new Date().toISOString().split('T')[0]}.xlsx`
-            a.download = filename
-
-            document.body.appendChild(a)
-            a.click()
-            window.URL.revokeObjectURL(url)
-            document.body.removeChild(a)
+            await reportService.generateReport(request)
 
             showNotification('success', 'Отчет успешно сгенерирован и скачан')
         } catch (error) {

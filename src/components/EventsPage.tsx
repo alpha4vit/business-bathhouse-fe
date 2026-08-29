@@ -155,7 +155,25 @@ function EventsPage() {
             try {
                 const data = await eventService.getEvents()
                 console.log('[EventsPage] Получено мероприятий:', data.length)
-                setEvents(data)
+
+                const sortedData = [...data].sort((a, b) => {
+                    const parseDate = (dateValue: string | number[]): Date => {
+                        if (Array.isArray(dateValue)) {
+                            const [year, month, day, hour, minute] = dateValue
+                            return new Date(year, month - 1, day, hour, minute)
+                        } else {
+                            return new Date(dateValue)
+                        }
+                    }
+
+                    const dateA = parseDate(a.carryDate)
+                    const dateB = parseDate(b.carryDate)
+                    return dateA.getTime() - dateB.getTime()
+                })
+
+                console.log("Отсортированные: ", sortedData)
+
+                setEvents(sortedData)
                 setCurrentIndex(0)
             } catch (error) {
                 console.error('[EventsPage] Error loading events:', error)
