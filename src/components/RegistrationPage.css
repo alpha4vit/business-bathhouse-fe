@@ -54,7 +54,7 @@
 .registration-form {
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  gap: 10px;
 }
 
 .form-group {
@@ -166,6 +166,24 @@
 .submit-button:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.text-link-container {
+  text-align: center;
+  margin-top: 15px;
+}
+
+.text-link {
+  color: #6c757d;
+  font-size: clamp(14px, 4vw, 16px);
+  cursor: pointer;
+  transition: color 0.3s ease;
+  text-decoration: none;
+}
+
+.text-link:hover {
+  color: #00A9E8;
+  text-decoration: underline;
 }
 
 @media (max-width: 480px) {

@@ -1,5 +1,5 @@
 import {API_BASE_URL} from '../config/api'
-import { authenticatedFetch } from '../utils/apiClient'
+import { authenticatedFetch, handleApiError } from '../utils/apiClient'
 
 export interface PointsAdjustmentDto {
     id: string
@@ -43,8 +43,7 @@ export const pointsService = {
             })
 
             if (!response.ok) {
-                const errorData = await response.json()
-                throw new Error(errorData.message || 'Failed to adjust event points')
+                await handleApiError(response, 'Failed to adjust event points')
             }
         } catch (error) {
             console.error('Error adjusting event points:', error)

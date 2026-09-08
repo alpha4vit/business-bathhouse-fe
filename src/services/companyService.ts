@@ -18,7 +18,7 @@ export interface CreateCompanyDto {
 }
 
 import {API_BASE_URL} from '../config/api'
-import { authenticatedFetch } from '../utils/apiClient'
+import { authenticatedFetch, handleApiError } from '../utils/apiClient'
 
 export const companyService = {
   async createCompany(dto: CreateCompanyDto): Promise<string> {
@@ -31,8 +31,7 @@ export const companyService = {
     })
 
     if (!response.ok) {
-      const errorData = await response.json()
-      throw new Error(errorData.message || 'Failed to create company')
+      await handleApiError(response, 'Failed to create company')
     }
 
     return await response.text()

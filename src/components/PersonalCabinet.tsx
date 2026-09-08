@@ -10,7 +10,7 @@ import {useNotification} from '../hooks/useNotification'
 import arrowIcon from '../img/arrow.svg'
 
 function PersonalCabinet() {
-    const { user: authUser, loading: authLoading, error: authError } = useAuthUser()
+    const { user: authUser, refreshUser } = useAuthUser()
     const userId = authUser?.company?.id?.toString() || null
     const { notification, showSuccess, showError } = useNotification()
 
@@ -29,6 +29,11 @@ function PersonalCabinet() {
         () => userService.getLeaderboard(),
         [] // Пустые зависимости - кеш обновится только при перерендеринге компонента
     )
+
+    // Перезагружаем данные пользователя при монтировании компонента
+    useEffect(() => {
+        refreshUser()
+    }, [])
 
     useEffect(() => {
         const fetchUserData = async () => {
@@ -131,26 +136,7 @@ function PersonalCabinet() {
         return 'баллов'
     }
 
-    if (authLoading) {
-        return (
-            <div className="cabinet-container">
-                <div className="cabinet-content">
-                    <div className="cabinet-loading">
-                        Загрузка данных...
-                    </div>
-                </div>
-            </div>
-        )
-    }
-
-    if (authError) {
-        return (
-            <div className="cabinet-error">
-                <h1>Ошибка</h1>
-                <p>{authError || 'Требуется авторизация'}</p>
-            </div>
-        )
-    }
+    // authError больше не обрабатываем здесь - редирект происходит в UserContext
 
     if (loading) {
         return (

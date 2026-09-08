@@ -1,5 +1,5 @@
 import {API_BASE_URL} from '../config/api'
-import { authenticatedFetch } from '../utils/apiClient'
+import {authenticatedFetch} from '../utils/apiClient'
 
 export interface EventPhoto {
     fileId?: number

@@ -1,5 +1,5 @@
 import {API_BASE_URL} from '../config/api'
-import {authenticatedFetch} from '../utils/apiClient'
+import {authenticatedFetch, handleApiError} from '../utils/apiClient'
 
 export enum ReportType {
     REGISTRATION_STATUS = 'REGISTRATION_STATUS',
@@ -99,7 +99,7 @@ export const reportService = {
             })
 
             if (!response.ok) {
-                throw new Error(`Failed to generate report: ${response.status}`)
+                await handleApiError(response, 'Failed to generate report')
             }
 
             return await response.blob()

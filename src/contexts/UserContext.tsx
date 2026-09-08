@@ -37,11 +37,16 @@ export const UserProvider = ({ children }: UserProviderProps) => {
             const userData = await userService.getCurrentUser();
             setUser(userData);
             setRole(userData.role || null);
+            setIsLoading(false);
         } catch (err) {
             console.error('Error fetching user data:', err);
-            setError(err instanceof Error ? err.message : 'Failed to fetch user data');
-        } finally {
-            setIsLoading(false);
+            // При ошибке авторизации редиректим на регистрацию
+            // Не устанавливаем isLoading=false чтобы предотвратить моргание
+            if (window.location.pathname !== '/register' && window.location.pathname !== '/otp-login') {
+                window.location.href = '/register';
+            } else {
+                setIsLoading(false);
+            }
         }
     };
 

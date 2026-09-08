@@ -260,7 +260,8 @@ function IndividualInvoice() {
                             <option value={PaymentPurpose.DOWN_PAYMENT}>Первоначальный взнос</option>
                         </select>
 
-                        <label>Сумма начисления</label>
+                        <label style={{ marginTop: 20 }}>Сумма начисления</label>
+
                         <div className="individual-input-wrapper">
                             {/* 2. Блокируем инпут через disabled и передаем чистую строку в value */}
                             <input

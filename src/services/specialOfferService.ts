@@ -1,5 +1,5 @@
 import {API_BASE_URL} from '../config/api'
-import {authenticatedFetch} from '../utils/apiClient'
+import {authenticatedFetch, handleApiError} from '../utils/apiClient'
 
 export enum SpecialOfferStatus {
     ACTIVE = 'ACTIVE',
@@ -96,7 +96,7 @@ export const specialOfferService = {
                 body: JSON.stringify(request)
             })
             if (!response.ok) {
-                throw new Error(`Failed to create offer: ${response.status}`)
+                await handleApiError(response, 'Failed to create offer')
             }
             return await response.json()
         } catch (error) {
@@ -113,7 +113,7 @@ export const specialOfferService = {
                 body: JSON.stringify(request)
             })
             if (!response.ok) {
-                throw new Error(`Failed to update offer: ${response.status}`)
+                await handleApiError(response, 'Failed to update offer')
             }
             return await response.json()
         } catch (error) {
@@ -130,7 +130,7 @@ export const specialOfferService = {
                 body: JSON.stringify({status})
             })
             if (!response.ok) {
-                throw new Error(`Failed to update offer status: ${response.status}`)
+                await handleApiError(response, 'Failed to update offer status')
             }
             return await response.json()
         } catch (error) {
@@ -145,7 +145,7 @@ export const specialOfferService = {
                 method: 'DELETE'
             })
             if (!response.ok) {
-                throw new Error(`Failed to delete offer: ${response.status}`)
+                await handleApiError(response, 'Failed to delete offer')
             }
         } catch (error) {
             console.error('Error deleting offer:', error)

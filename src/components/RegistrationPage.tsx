@@ -185,6 +185,15 @@ function RegistrationPage() {
                     >
                         {isSubmitting ? 'Регистрация...' : 'Зарегистрироваться'}
                     </button>
+
+                    <div className="text-link-container">
+                        <span
+                            className="text-link"
+                            onClick={() => navigate('/otp-login')}
+                        >
+                            Войти в аккаунт
+                        </span>
+                    </div>
                 </form>
             </div>
         </div>

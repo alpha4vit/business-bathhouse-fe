@@ -1,5 +1,5 @@
 import { API_BASE_URL } from '../config/api'
-import { authenticatedFetch } from '../utils/apiClient'
+import { authenticatedFetch, handleApiError } from '../utils/apiClient'
 
 export enum TransactionPurpose {
     DOWN_PAYMENT = 'DOWN_PAYMENT',
@@ -40,8 +40,7 @@ export const balanceAdjustmentService = {
         })
 
         if (!response.ok) {
-            const errorData = await response.json()
-            throw new Error(errorData.message || 'Failed to adjust balance')
+            await handleApiError(response, 'Failed to adjust balance')
         }
     }
 }

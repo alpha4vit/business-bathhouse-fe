@@ -1,5 +1,5 @@
 import {API_BASE_URL} from '../config/api'
-import {authenticatedFetch} from '../utils/apiClient'
+import {authenticatedFetch, handleApiError} from '../utils/apiClient'
 
 export interface Chat {
     id: number
@@ -75,7 +75,7 @@ export const chatService = {
         })
 
         if (!response.ok) {
-            throw new Error("Ошибка отправки запроса на вступление в чат!")
+            await handleApiError(response, 'Ошибка отправки запроса на вступление в чат!')
         }
     },
 

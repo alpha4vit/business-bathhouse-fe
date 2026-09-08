@@ -1,9 +1,62 @@
 import {defineConfig} from 'vite'
 import react from '@vitejs/plugin-react'
+import {VitePWA} from 'vite-plugin-pwa'
 
 // https://vite.dev/config/
 export default defineConfig({
-    plugins: [react()],
+    plugins: [
+        react(),
+        VitePWA({
+            registerType: 'autoUpdate',
+            includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'mask-icon.svg'],
+            manifest: {
+                name: 'Business Bathhouse',
+                short_name: 'Bathhouse',
+                description: 'Business Bathhouse management application',
+                theme_color: '#2563eb',
+                background_color: '#ffffff',
+                display: 'standalone',
+                orientation: 'portrait',
+                scope: '/',
+                start_url: '/',
+                icons: [
+                    {
+                        src: '/icon.svg',
+                        sizes: '192x192',
+                        type: 'image/svg+xml',
+                        purpose: 'any maskable'
+                    }
+                ]
+            },
+            workbox: {
+                globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2}'],
+                runtimeCaching: [
+                    {
+                        urlPattern: /^https:\/\/telegram\.org\/.*/i,
+                        handler: 'NetworkFirst',
+                        options: {
+                            cacheName: 'telegram-cache',
+                            expiration: {
+                                maxEntries: 10,
+                                maxAgeSeconds: 60 * 60 * 24 * 30
+                            }
+                        }
+                    },
+                    {
+                        urlPattern: /\/api\/.*/i,
+                        handler: 'NetworkFirst',
+                        options: {
+                            cacheName: 'api-cache',
+                            expiration: {
+                                maxEntries: 50,
+                                maxAgeSeconds: 60 * 60 * 24 * 1
+                            }
+                        }
+                    }
+                ]
+            }
+        })
+    ],
     build: {
         rollupOptions: {
             output: {

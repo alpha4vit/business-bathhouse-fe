@@ -1,5 +1,5 @@
 import {API_BASE_URL} from '../config/api'
-import {authenticatedFetch} from '../utils/apiClient'
+import {authenticatedFetch, handleApiError} from '../utils/apiClient'
 
 export enum Gender {
     MALE = '273098',
@@ -125,11 +125,6 @@ export const userService = {
             });
 
             if (!response.ok) {
-                if (window.location.pathname === '/' || window.location.pathname.startsWith("/cabinet")) {
-                    window.location.href = '/register';
-
-                    return new Promise(() => {});
-                }
                 throw new Error(`Failed to get current user: ${response.status}`);
             }
 
@@ -363,7 +358,7 @@ export const userService = {
         })
 
         if (!response.ok) {
-            throw new Error(`Failed to deactivate users: ${response.status}`)
+            await handleApiError(response, 'Failed to deactivate users')
         }
 
         return await response.json()
@@ -383,7 +378,7 @@ export const userService = {
         })
 
         if (!response.ok) {
-            throw new Error(`Failed to register: ${response.status}`)
+            await handleApiError(response, 'Failed to register')
         }
     }
 }

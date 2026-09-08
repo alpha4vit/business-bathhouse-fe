@@ -1,4 +1,5 @@
-import { telegramUtils } from './telegram';
+import {telegramUtils} from './telegram';
+import {userStorage} from './userStorage';
 
 /**
  * Событие для обработки ошибок авторизации
@@ -19,11 +20,17 @@ export async function authenticatedFetch(
   contentType: string = 'application/json'
 ): Promise<Response> {
   const authHeader = telegramUtils.getAuthHeader();
+  const accessToken = userStorage.getAccessToken();
   
   const headers: Record<string, string> = {
     ...(options.headers as Record<string, string> || {}),
     ...(authHeader || {})
   };
+
+  // Use JWT bearer token if available (fallback to Telegram auth)
+  if (accessToken) {
+    headers['Authorization'] = `Bearer ${accessToken}`;
+  }
 
   // Если body - FormData, не устанавливаем Content-Type чтобы браузер установил его автоматически с boundary
   if (!(options.body instanceof FormData)) {
@@ -37,10 +44,28 @@ export async function authenticatedFetch(
 
   // Обработка ошибок авторизации
   if (response.status === 401 || response.status === 403) {
-    // Если это запрос к /api/auth/telegram и мы на главной странице, редиректим на регистрацию
-    if (url.includes('/api/auth/telegram') && (window.location.pathname === '/' || window.location.pathname.startsWith("/cabinet"))) {
-      window.location.href = '/register';
-      return response;
+
+    // Если это 401, проверяем код ошибки в теле ответа
+    if (response.status === 401) {
+      try {
+        const errorBody = await response.clone().json();
+        // Если код ошибки TOKEN_EXPIRED
+        if (errorBody.code === 'TOKEN_EXPIRED' || errorBody.code === 'UNAUTHORIZED') {
+          // Для /api/auth/login/otp/create только очищаем токен, не редиректим
+          if (url.includes('/api/auth/login/otp/create')) {
+            userStorage.setAccessToken(null);
+            return response;
+          }
+          // Для остальных URL редиректим на OTP логин
+          if (window.location.pathname !== '/otp-login') {
+            userStorage.setAccessToken(null);
+            window.location.href = '/otp-login';
+            return response;
+          }
+        }
+      } catch (e) {
+        // Если не удалось распарсить JSON, продолжаем с обычной обработкой
+      }
     }
 
     // Для остальных случаев отправляем событие для глобальной обработки
@@ -121,4 +146,20 @@ export async function del(url: string): Promise<Response> {
   return authenticatedFetch(url, {
     method: 'DELETE'
   });
+}
+
+/**
+ * Вспомогательная функция для обработки ошибок API
+ * Извлекает message из ответа бэкенда в формате {message: "", code: ""}
+ */
+export async function handleApiError(response: Response, defaultMessage: string = 'Произошла ошибка'): Promise<never> {
+  try {
+    const errorData = await response.json();
+    throw new Error(errorData.message || defaultMessage);
+  } catch (e) {
+    if (e instanceof Error) {
+      throw e;
+    }
+    throw new Error(defaultMessage);
+  }
 }

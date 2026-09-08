@@ -2,10 +2,8 @@ import {BrowserRouter as Router, Route, Routes, useLocation, useNavigate, useSea
 import {lazy, Suspense, useEffect, useState} from 'react'
 import LoadingScreen from "./components/LoadingScreen.tsx";
 import Navbar from "./components/Navbar.tsx";
-import {userStorage} from "./utils/userStorage.ts";
 import {AUTH_ERROR_EVENT, MANDATORY_CHAT_SUBSCRIPTION_EVENT} from "./utils/apiClient.ts";
 import {UserProvider} from "./contexts/UserContext.tsx";
-import AccessDenied from "./components/AccessDenied.tsx";
 import MandatoryChatsPage from "./components/MandatoryChatsPage.tsx";
 import './App.css';
 
@@ -26,25 +24,17 @@ const ChatsPage = lazy(() => import("./components/ChatsPage.tsx"));
 const SupportPage = lazy(() => import("./components/SupportPage.tsx"));
 const RegistrationPage = lazy(() => import("./components/RegistrationPage.tsx"));
 const ReportsPage = lazy(() => import("./components/ReportsPage.tsx"));
+const OtpLoginPage = lazy(() => import("./components/OtpLoginPage.tsx"));
 
 function AppContent() {
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
     const location = useLocation();
-    const [authError, setAuthError] = useState<{ message: string } | null>(null);
+    const [_, setAuthError] = useState<{ message: string } | null>(null);
     const [showMandatoryChats, setShowMandatoryChats] = useState(false);
-    const isRegisterPage = location.pathname === '/register';
+    const isRegisterPage = location.pathname === '/register' || location.pathname === '/otp-login';
 
     useEffect(() => {
-        // Получаем ID пользователя из URL параметров
-        const userId = searchParams.get('id');
-
-        if (userId) {
-            // Сохраняем ID в localStorage если его нет или он отличается
-            userStorage.setUserId(userId);
-        }
-
-        // Обработка параметра startapp для навигации
         const startApp = searchParams.get('startapp');
         if (startApp && location.pathname === '/') {
             navigate(startApp);
@@ -62,6 +52,13 @@ function AppContent() {
             setAuthError(customEvent.detail);
         };
 
+        window.addEventListener(AUTH_ERROR_EVENT, handleAuthError);
+        return () => {
+            window.removeEventListener(AUTH_ERROR_EVENT, handleAuthError);
+        };
+    }, [navigate, showMandatoryChats])
+
+    useEffect(() => {
         const handleMandatoryChatSubscription = () => {
             // Only show mandatory chats page if not already on it
             if (!showMandatoryChats) {
@@ -69,11 +66,9 @@ function AppContent() {
             }
         };
 
-        window.addEventListener(AUTH_ERROR_EVENT, handleAuthError);
         window.addEventListener(MANDATORY_CHAT_SUBSCRIPTION_EVENT, handleMandatoryChatSubscription);
 
         return () => {
-            window.removeEventListener(AUTH_ERROR_EVENT, handleAuthError);
             window.removeEventListener(MANDATORY_CHAT_SUBSCRIPTION_EVENT, handleMandatoryChatSubscription);
         };
     }, [navigate, showMandatoryChats]);
@@ -87,7 +82,7 @@ function AppContent() {
 
     return (
         <div>
-            <Navbar hideMenuButton={isRegisterPage || showMandatoryChats} />
+            <Navbar hideMenuButton={isRegisterPage || showMandatoryChats}/>
             <Suspense fallback={<LoadingScreen/>}>
                 <Routes>
                     <Route path="/" element={<PersonalCabinet/>}/>
@@ -109,18 +104,13 @@ function AppContent() {
                     <Route path="/admin/reports" element={<ReportsPage/>}/>
                     <Route path="/admin/special-offers" element={<SpecialOffersAdmin/>}/>
                     <Route path="/register" element={<RegistrationPage/>}/>
+                    <Route path="/otp-login" element={<OtpLoginPage/>}/>
                 </Routes>
             </Suspense>
             {showMandatoryChats && (
                 <div className="mandatory-chats-overlay">
-                    <MandatoryChatsPage />
+                    <MandatoryChatsPage/>
                 </div>
-            )}
-            {authError && (
-                <AccessDenied
-                    message={authError.message}
-                    onDismiss={() => setAuthError(null)}
-                />
             )}
         </div>
     );

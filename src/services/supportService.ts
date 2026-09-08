@@ -1,5 +1,5 @@
 import {API_BASE_URL} from '../config/api'
-import {authenticatedFetch} from '../utils/apiClient'
+import {authenticatedFetch, handleApiError} from '../utils/apiClient'
 
 export interface SupportRequestDto {
     text: string
@@ -30,7 +30,7 @@ export const supportService = {
         )
 
         if (!response.ok) {
-            throw new Error('Не удалось отправить обращение в техподдержку')
+            await handleApiError(response, 'Не удалось отправить обращение в техподдержку')
         }
     }
 }

@@ -1,5 +1,5 @@
 import { API_BASE_URL } from '../config/api'
-import { authenticatedFetch } from '../utils/apiClient'
+import { authenticatedFetch, handleApiError } from '../utils/apiClient'
 
 export enum PaymentPurpose {
     DEPOSIT = 'DEPOSIT',
@@ -34,8 +34,7 @@ export const invoiceService = {
         })
 
         if (!response.ok) {
-            const errorData = await response.json()
-            throw new Error(errorData.message || 'Failed to create invoice')
+            await handleApiError(response, 'Failed to create invoice')
         }
     }
 }
