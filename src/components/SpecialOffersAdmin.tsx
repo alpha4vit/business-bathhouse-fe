@@ -7,6 +7,7 @@ import {
     CreateSpecialOfferRequest,
     UpdateSpecialOfferRequest
 } from '../services/specialOfferService'
+import Loading from "./Loading.tsx";
 
 function SpecialOffersAdmin() {
     const [offers, setOffers] = useState<SpecialOffer[]>([])
@@ -136,7 +137,9 @@ function SpecialOffersAdmin() {
         : offers.filter(o => o.status === filter)
 
     if (loading) {
-        return <div className="admin-offers-container">Загрузка...</div>
+        return <div className="admin-offers-container">
+            <Loading message={"Загрузка..."}/>
+        </div>
     }
 
     return (

@@ -163,17 +163,6 @@
   color: #2D2D2D;
 }
 
-.submit-error {
-  padding: 15px;
-  background: #f8d7da;
-  border: 1px solid #f5c6cb;
-  border-radius: 10px;
-  color: #721c24;
-  font-size: clamp(14px, 4vw, 16px);
-  text-align: center;
-  font-weight: 500;
-}
-
 .submit-button {
   width: 100%;
   padding: 15px;

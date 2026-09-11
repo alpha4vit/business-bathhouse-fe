@@ -8,12 +8,18 @@
   font-size: 14px;
   font-weight: 500;
   box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-  z-index: 1000;
+  z-index: 9999;
   animation: slideInDown 0.3s ease-out;
   max-width: 500px;
   display: flex;
   align-items: center;
   gap: 8px;
+  transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+
+.notification.notification-fading {
+  opacity: 0;
+  transform: translateX(-50%) translateY(-20px);
 }
 
 .notification-success {

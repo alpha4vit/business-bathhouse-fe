@@ -1,6 +1,7 @@
 import './SpecialOffers.css'
 import {useEffect, useState} from 'react'
 import {SpecialOffer, specialOfferService} from '../services/specialOfferService'
+import Loading from "./Loading.tsx";
 
 function SpecialOffers() {
     const [offers, setOffers] = useState<SpecialOffer[]>([])
@@ -24,7 +25,9 @@ function SpecialOffers() {
     }, [])
 
     if (loading) {
-        return <div className="offers-container">Загрузка...</div>
+        return <div className="offers-container">
+            <Loading message={"Загрузка..."}></Loading>
+        </div>
     }
 
     if (error) {

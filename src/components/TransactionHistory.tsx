@@ -3,6 +3,7 @@ import {transactionService, TransactionDto, TransactionDirection} from '../servi
 import {userService, UserDataDto} from '../services/userService'
 import {useAuthUser} from '../hooks/useAuthUser'
 import './TransactionHistory.css'
+import Loading from './Loading'
 
 export default function TransactionHistory() {
     const { user: authUser, loading: authLoading, error: authError } = useAuthUser()
@@ -81,7 +82,7 @@ export default function TransactionHistory() {
         return (
             <div className="transactions-container">
                 <div className="transactions-content">
-                    <div className="transactions-loading">Загрузка...</div>
+                    <Loading />
                 </div>
             </div>
         )
@@ -103,7 +104,7 @@ export default function TransactionHistory() {
         return (
             <div className="transactions-container">
                 <div className="transactions-content">
-                    <div className="transactions-loading">Загрузка...</div>
+                    <Loading />
                 </div>
             </div>
         )
@@ -146,9 +147,9 @@ export default function TransactionHistory() {
                                     </thead>
                                     <tbody>
                                     {transactions.map((transaction) => (
-                                        <tr key={transaction.date}>
+                                        <tr key={transaction.id}>
                                             <td className="transactions-date">
-                                                {formatDate(transaction.date)}
+                                                {formatDate(transaction.createdAt)}
                                             </td>
                                             <td className="transactions-title">
                                                 {transaction.title}
@@ -166,9 +167,9 @@ export default function TransactionHistory() {
                             </div>
                             <div className="transactions-cards mobile-only">
                                 {transactions.map((transaction) => (
-                                    <div key={transaction.date} className="transaction-card">
+                                    <div key={transaction.id} className="transaction-card">
                                         <div className="transaction-card-header">
-                                            <span className="transaction-card-date">{formatDate(transaction.date)}</span>
+                                            <span className="transaction-card-date">{formatDate(transaction.createdAt)}</span>
                                             <span className={`transaction-card-direction ${getDirectionClass(transaction.direction)}`}>
                                                 {getDirectionLabel(transaction.direction)}
                                             </span>

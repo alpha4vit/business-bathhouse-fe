@@ -329,7 +329,7 @@ export default function PointsAdjustmentsTable() {
         try {
             const data = await eventService.getAllEvents()
             const sortedData = [...data].sort((a, b) =>
-                parseCarryDate(b.carryDate).getTime() - parseCarryDate(a.carryDate).getTime()
+                parseCarryDate(b.carry_date).getTime() - parseCarryDate(a.carry_date).getTime()
             )
             setEvents(sortedData)
         } catch (err) {

@@ -237,12 +237,25 @@
   align-items: center;
   z-index: 1000;
   backdrop-filter: blur(5px);
+  padding: 20px;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
 .admin-offers-modal.open {
   opacity: 1;
+  visibility: visible;
+  animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .admin-offers-modal-content {
@@ -254,12 +267,18 @@
   max-height: 85vh;
   overflow-y: auto;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  transform: scale(0.9);
-  transition: transform 0.3s ease;
+  animation: slideUp 0.3s ease;
 }
 
-.admin-offers-modal.open .admin-offers-modal-content {
-  transform: scale(1);
+@keyframes slideUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .admin-offers-modal-content h2 {

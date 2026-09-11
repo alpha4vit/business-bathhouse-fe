@@ -16,7 +16,7 @@
 }
 
 .navbar-container {
-  max-width: 1200px;
+  max-width: 1400px;
   margin: 0 auto;
   padding: clamp(14px, 3vw, 18px) clamp(18px, 4vw, 24px);
   display: flex;
@@ -385,7 +385,7 @@
 }
 
 .navbar-drawer-submenu-links.open {
-  max-height: 390px;
+  max-height: 100vh;
 }
 
 .navbar-drawer-sublink {

@@ -3,6 +3,7 @@ import './Invoice.css'
 import {Company, companyService, CreateCompanyDto} from '../services/companyService'
 import {useAuthUser} from '../hooks/useAuthUser'
 import CompanyRequisitesInput from './CompanyRequisitesInput'
+import Loading from './Loading'
 import {
     invoiceService,
     PaymentPurpose,
@@ -194,9 +195,7 @@ function Invoice() {
         return (
             <div className="invoice-container">
                 <div className="invoice-content">
-                    <div className="invoice-loading">
-                        Загрузка...
-                    </div>
+                    <Loading />
                 </div>
             </div>
         )
@@ -236,9 +235,7 @@ function Invoice() {
                     <h2>Выбор юридического лица</h2>
 
                     {loading ? (
-                        <div className="invoice-loading">
-                            Загрузка юридических лиц...
-                        </div>
+                        <Loading message="Загрузка юридических лиц..." />
                     ) : (
                         <select
                             value={selectedEntity}

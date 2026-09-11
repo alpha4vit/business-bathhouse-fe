@@ -158,7 +158,7 @@ function EventSearch({
                                 onMouseDown={() => handleEventSelect(event)}
                             >
                                 <div className="autocomplete-item-title">{event.title}</div>
-                                <div className="autocomplete-item-date">{formatDate(event.carryDate)}</div>
+                                <div className="autocomplete-item-date">{formatDate(event.carry_date)}</div>
                             </div>
                         ))}
                     </div>

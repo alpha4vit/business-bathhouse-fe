@@ -1,18 +1,19 @@
 import {useEffect, useState} from 'react'
 import './PersonalCabinet.css'
 import './Notification.css'
-import {UserDataDto, userService, Gender} from '../services/userService'
+import {Gender, UserDataDto, userService} from '../services/userService'
 import {useAuthUser} from '../hooks/useAuthUser'
 import {useCache} from '../utils/cache'
 import {API_BASE_URL} from '../config/api'
 import {authenticatedFetch} from '../utils/apiClient'
 import {useNotification} from '../hooks/useNotification'
 import arrowIcon from '../img/arrow.svg'
+import Loading from "./Loading.tsx";
 
 function PersonalCabinet() {
-    const { user: authUser, refreshUser } = useAuthUser()
+    const {user: authUser, refreshUser} = useAuthUser()
     const userId = authUser?.company?.id?.toString() || null
-    const { notification, showSuccess, showError } = useNotification()
+    const {notification, showSuccess, showError} = useNotification()
 
     const [userData, setUserData] = useState<UserDataDto | null>(null)
     const [loading, setLoading] = useState<boolean>(true)
@@ -22,9 +23,9 @@ function PersonalCabinet() {
     const [showInstructions, setShowInstructions] = useState<boolean>(false)
     const [userPhotoUrl, setUserPhotoUrl] = useState<string | null>(null)
     const [photoLoading, setPhotoLoading] = useState<boolean>(false)
-    
+
     // Используем кеш для рейтинга резидентов
-    const { data: leaderboard, loading: leaderboardLoading, error: leaderboardError } = useCache(
+    const {data: leaderboard, loading: leaderboardLoading, error: leaderboardError} = useCache(
         'leaderboard',
         () => userService.getLeaderboard(),
         [] // Пустые зависимости - кеш обновится только при перерендеринге компонента
@@ -50,7 +51,7 @@ function PersonalCabinet() {
                             role: authUser.role || '',
                             status: authUser.status || '',
                             companyTitle: '',
-                            balance: { amount: 0, currency: 'RUB' },
+                            balance: {amount: 0, currency: 'RUB'},
                             points: 0,
                             pointsHistory: [],
                             company: undefined,
@@ -120,19 +121,19 @@ function PersonalCabinet() {
         const absCount = Math.abs(count)
         const lastDigit = absCount % 10
         const lastTwoDigits = absCount % 100
-        
+
         if (lastTwoDigits >= 11 && lastTwoDigits <= 19) {
             return 'баллов'
         }
-        
+
         if (lastDigit === 1) {
             return 'балл'
         }
-        
+
         if (lastDigit >= 2 && lastDigit <= 4) {
             return 'балла'
         }
-        
+
         return 'баллов'
     }
 
@@ -143,7 +144,7 @@ function PersonalCabinet() {
             <div className="cabinet-container">
                 <div className="cabinet-content">
                     <div className="cabinet-loading">
-                        Загрузка данных...
+                        <Loading message={"Загрузка данных..."}></Loading>
                     </div>
                 </div>
             </div>
@@ -176,16 +177,16 @@ function PersonalCabinet() {
 
                 <div className="cabinet-card">
                     <h2>Профиль</h2>
-                    
+
                     <div className="cabinet-profile-container">
                         <div className="cabinet-photo-section">
                             {photoLoading ? (
                                 <div className="cabinet-photo-loading"></div>
                             ) : userPhotoUrl ? (
                                 <div className="cabinet-photo-wrapper">
-                                    <img 
-                                        src={userPhotoUrl} 
-                                        alt="Фото резидента" 
+                                    <img
+                                        src={userPhotoUrl}
+                                        alt="Фото резидента"
                                         className="cabinet-user-photo"
                                         onError={() => {
                                             console.error('Failed to load user photo image')
@@ -200,7 +201,7 @@ function PersonalCabinet() {
                                 </div>
                             )}
                         </div>
-                        
+
                         <div className="cabinet-info-group">
                             <div className="cabinet-info-item">
                                 <span className="cabinet-info-label">ФИО:</span>
@@ -321,7 +322,7 @@ function PersonalCabinet() {
                 {userData.role != "NON_RESIDENT" && showLeaderboard && (
                     <div className="cabinet-card leaderboard-card">
                         <h2>🏆 Рейтинг резидентов</h2>
-                        
+
                         {leaderboardLoading ? (
                             <div className="cabinet-loading">
                                 Загрузка рейтинга...
@@ -334,8 +335,8 @@ function PersonalCabinet() {
                             <>
                                 <div className="cabinet-leaderboard-list">
                                     {leaderboard.slice(0, visibleCount).map((item, index) => (
-                                        <div 
-                                            key={item.chatId} 
+                                        <div
+                                            key={item.chatId}
                                             className={`cabinet-leaderboard-item ${item.chatId === Number(userId) ? 'current-user' : ''}`}
                                         >
                                             <div className="cabinet-leaderboard-rank">
@@ -350,17 +351,17 @@ function PersonalCabinet() {
                                         </div>
                                     ))}
                                 </div>
-                                
+
                                 <div className="cabinet-leaderboard-buttons">
                                     {visibleCount < leaderboard.length && (
-                                        <button 
+                                        <button
                                             className="cabinet-load-more-button"
                                             onClick={() => setVisibleCount(prev => prev + 20)}
                                         >
                                             Показать еще
                                         </button>
                                     )}
-                                    <button 
+                                    <button
                                         className="cabinet-hide-leaderboard-button"
                                         onClick={fetchLeaderboard}
                                     >
@@ -381,7 +382,8 @@ function PersonalCabinet() {
                         <h2>Как заработать баллы</h2>
 
                         <div className="cabinet-instructions-intro">
-                            В целях формирования объективного рейтинга участников бизнес-сообщества «Бизнес Баня» баллы начисляются за следующие активности.
+                            В целях формирования объективного рейтинга участников бизнес-сообщества «Бизнес Баня» баллы
+                            начисляются за следующие активности.
                         </div>
 
                         <div className="cabinet-instructions-item">
@@ -392,9 +394,11 @@ function PersonalCabinet() {
                             <div className="cabinet-instructions-content">
                                 <p>За участие в мероприятиях сообщества резидентам начисляются баллы.</p>
                                 <div className="cabinet-instructions-highlight">
-                                    <p>Перечень ближайших мероприятий, за которые предусмотрено начисление баллов, публикуется один раз в две недели совместно с обновлённой версией рейтинга.</p>
+                                    <p>Перечень ближайших мероприятий, за которые предусмотрено начисление баллов,
+                                        публикуется один раз в две недели совместно с обновлённой версией рейтинга.</p>
                                 </div>
-                                <p>Также баллы могут начисляться за участие в партнёрских мероприятиях. Факт начисления баллов в таких случаях всегда указывается в анонсе мероприятия.</p>
+                                <p>Также баллы могут начисляться за участие в партнёрских мероприятиях. Факт начисления
+                                    баллов в таких случаях всегда указывается в анонсе мероприятия.</p>
                             </div>
                         </div>
 
@@ -406,7 +410,8 @@ function PersonalCabinet() {
                             <div className="cabinet-instructions-content">
                                 <p>Баллы начисляются за посещение активностей спортивных клубов сообщества.</p>
                                 <div className="cabinet-instructions-highlight cabinet-instructions-pulse">
-                                    <p><strong>Важно:</strong> Следите за анонсами спортивных мероприятий и активно участвуйте в жизни клубов!</p>
+                                    <p><strong>Важно:</strong> Следите за анонсами спортивных мероприятий и активно
+                                        участвуйте в жизни клубов!</p>
                                 </div>
                             </div>
                         </div>
@@ -419,10 +424,12 @@ function PersonalCabinet() {
                             <div className="cabinet-instructions-content">
                                 <p>В рамках данного проекта начисление баллов осуществляется следующим образом:</p>
                                 <div className="cabinet-instructions-list-item">
-                                    <strong>Инициатор встречи</strong> — <span className="cabinet-instructions-badge">5 баллов</span> за каждую состоявшуюся встречу
+                                    <strong>Инициатор встречи</strong> — <span className="cabinet-instructions-badge">5 баллов</span> за
+                                    каждую состоявшуюся встречу
                                 </div>
                                 <div className="cabinet-instructions-highlight">
-                                    <p><strong>Совет:</strong> Будьте proactive! Иницируйте встречи с другими резидентами для расширения нетворка и заработка дополнительных баллов.</p>
+                                    <p><strong>Совет:</strong> Будьте proactive! Иницируйте встречи с другими
+                                        резидентами для расширения нетворка и заработка дополнительных баллов.</p>
                                 </div>
                             </div>
                         </div>
@@ -434,9 +441,11 @@ function PersonalCabinet() {
                             </div>
                             <div className="cabinet-instructions-content">
                                 <div className="cabinet-instructions-highlight">
-                                    <p>Актуальный рейтинг и перечень мероприятий с начислением баллов публикуются с периодичностью один раз в две недели.</p>
+                                    <p>Актуальный рейтинг и перечень мероприятий с начислением баллов публикуются с
+                                        периодичностью один раз в две недели.</p>
                                 </div>
-                                <p>Следите за обновлениями в сообществе, чтобы не упустить возможности для заработка баллов!</p>
+                                <p>Следите за обновлениями в сообществе, чтобы не упустить возможности для заработка
+                                    баллов!</p>
                             </div>
                         </div>
 
@@ -465,7 +474,8 @@ function PersonalCabinet() {
                                     <div key={index} className="cabinet-history-item">
                                         <div className="cabinet-history-date">{item.date}</div>
                                         <div className="cabinet-history-title">{item.title}</div>
-                                        <div className={`cabinet-history-amount ${item.amount > 0 ? 'positive' : 'negative'}`}>
+                                        <div
+                                            className={`cabinet-history-amount ${item.amount > 0 ? 'positive' : 'negative'}`}>
                                             {item.amount > 0 ? '+' : ''}{item.amount} {getPointsWord(item.amount)}
                                         </div>
                                     </div>

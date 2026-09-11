@@ -108,6 +108,9 @@ function Navbar({hideMenuButton = false}: { hideMenuButton?: boolean }) {
                                         <Link to="/admin/special-offers" className="navbar-dropdown-item">
                                             <span>Спецпредложения</span>
                                         </Link>
+                                        <Link to="/admin/events" className="navbar-dropdown-item">
+                                            <span>Управление мероприятиями</span>
+                                        </Link>
                                         <Link to="/admin/users/deactivate" className="navbar-dropdown-item">
                                             <span>Деактивация пользователей</span>
                                         </Link>
@@ -253,6 +256,13 @@ function Navbar({hideMenuButton = false}: { hideMenuButton?: boolean }) {
                                                 setIsAdminSubmenuOpen(false);
                                             }}>
                                                 <span>Спецпредложения</span>
+                                            </Link>
+                                            <Link to="/admin/events"
+                                                  className="navbar-drawer-link navbar-drawer-sublink" onClick={() => {
+                                                setIsMenuOpen(false);
+                                                setIsAdminSubmenuOpen(false);
+                                            }}>
+                                                <span>Управление мероприятиями</span>
                                             </Link>
                                         </div>
                                     </div>

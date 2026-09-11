@@ -5,12 +5,8 @@ import {Company, companyService} from '../services/companyService'
 import {useAuthUser} from '../hooks/useAuthUser'
 import {useNotification} from '../hooks/useNotification'
 import CompanyRequisitesInput from './CompanyRequisitesInput'
-import {
-    invoiceService,
-    PaymentPurpose,
-    PaymentRequestDto,
-    PaymentType
-} from '../services/invoiceService'
+import Loading from './Loading'
+import {invoiceService, PaymentPurpose, PaymentRequestDto, PaymentType} from '../services/invoiceService'
 
 interface CompanyData {
     title: string
@@ -24,9 +20,9 @@ interface CompanyData {
 }
 
 function LegalInvoice() {
-    const { user: authUser, loading: authLoading, error: authError } = useAuthUser()
+    const {user: authUser, loading: authLoading, error: authError} = useAuthUser()
     const userId = authUser?.company?.id?.toString() || null
-    const { notification, showSuccess, showError } = useNotification()
+    const {notification, showSuccess, showError} = useNotification()
 
     const [legalEntities, setCompanies] = useState<Company[]>([])
     const [selectedEntity, setSelectedEntity] = useState<string>('')
@@ -198,9 +194,7 @@ function LegalInvoice() {
         return (
             <div className="legal-invoice-container">
                 <div className="legal-invoice-content">
-                    <div className="legal-invoice-loading">
-                        Загрузка...
-                    </div>
+                    <Loading/>
                 </div>
             </div>
         )

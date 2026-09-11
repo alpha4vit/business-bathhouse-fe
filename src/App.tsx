@@ -18,6 +18,7 @@ const TransactionHistory = lazy(() => import("./components/TransactionHistory.ts
 const EventsPage = lazy(() => import("./components/EventsPage.tsx"));
 const NewsletterSender = lazy(() => import("./components/NewsletterSender.tsx"));
 const EventRegistrationsPage = lazy(() => import("./components/EventRegistrationsPage.tsx"));
+const EventsAdmin = lazy(() => import("./components/EventsAdmin.tsx"));
 const BalanceAdjustmentPage = lazy(() => import("./components/BalanceAdjustmentPage.tsx"));
 const UserDeactivationPage = lazy(() => import("./components/UserDeactivationPage.tsx"));
 const ChatsPage = lazy(() => import("./components/ChatsPage.tsx"));
@@ -95,6 +96,7 @@ function AppContent() {
                     <Route path="/transactions" element={<TransactionHistory/>}/>
                     <Route path="/events" element={<EventsPage/>}/>
                     <Route path="/events/registration" element={<EventRegistrationsPage/>}/>
+                    <Route path="/admin/events" element={<EventsAdmin/>}/>
                     <Route path="/chats" element={<ChatsPage/>}/>
                     <Route path="/support" element={<SupportPage/>}/>
                     <Route path="/admin/newsletter" element={<NewsletterSender/>}/>

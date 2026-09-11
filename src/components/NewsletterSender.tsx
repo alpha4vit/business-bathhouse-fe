@@ -1,23 +1,28 @@
 import {useEffect, useState} from 'react'
-import {userService, UserSearchDto} from '../services/userService'
+import {UserSearchDto, userService} from '../services/userService'
 import './NewsletterSender.css'
 import {API_BASE_URL} from "../config/api.ts";
 import {authenticatedFetch} from "../utils/apiClient.ts";
+import Loading from "./Loading.tsx";
 
 export default function NewsletterSender() {
     const [users, setUsers] = useState<UserSearchDto[]>([])
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
-    
+
     const [sendToResidents, setSendToResidents] = useState(false)
     const [sendToNonResidents, setSendToNonResidents] = useState(false)
     const [selectedUsers, setSelectedUsers] = useState<UserSearchDto[]>([])
-    
+
     const [searchQuery, setSearchQuery] = useState('')
     const [filteredUsers, setFilteredUsers] = useState<UserSearchDto[]>([])
     const [autocompleteOpen, setAutocompleteOpen] = useState(false)
-    const [autocompletePosition, setAutocompletePosition] = useState<{ top: number; left: number; width: number } | null>(null)
-    
+    const [autocompletePosition, setAutocompletePosition] = useState<{
+        top: number;
+        left: number;
+        width: number
+    } | null>(null)
+
     const [messageText, setMessageText] = useState('')
     const [attachedFiles, setAttachedFiles] = useState<File[]>([])
     const [fileError, setFileError] = useState<string | null>(null)
@@ -104,7 +109,7 @@ export default function NewsletterSender() {
     }
 
     const showNotification = (type: 'success' | 'error', message: string) => {
-        setNotification({ type, message })
+        setNotification({type, message})
         setTimeout(() => setNotification(null), 3000)
     }
 
@@ -117,7 +122,7 @@ export default function NewsletterSender() {
 
         for (let i = 0; i < files.length; i++) {
             const file = files[i]
-            
+
             let maxSize: number
             if (file.type.startsWith('video/')) {
                 maxSize = 50 * 1024 * 1024 // 50MB для видео
@@ -167,7 +172,7 @@ export default function NewsletterSender() {
     const handleDrop = (e: React.DragEvent) => {
         e.preventDefault()
         setIsDragging(false)
-        
+
         const files = e.dataTransfer.files
         if (!files || files.length === 0) return
 
@@ -176,7 +181,7 @@ export default function NewsletterSender() {
 
         for (let i = 0; i < files.length; i++) {
             const file = files[i]
-            
+
             let maxSize: number
             if (file.type.startsWith('video/')) {
                 maxSize = 50 * 1024 * 1024 // 50MB для видео
@@ -211,12 +216,12 @@ export default function NewsletterSender() {
     const handleSendNewsletter = async () => {
         // Собираем список получателей
         const recipients: string[] = []
-        
+
         // Добавляем выбранных пользователей
         selectedUsers.forEach(user => {
             recipients.push(user.chatId.toString())
         })
-        
+
         // Добавляем резидентов если выбран чекбокс
         if (sendToResidents) {
             users.filter(u => u.role === 'RESIDENT').forEach(user => {
@@ -225,7 +230,7 @@ export default function NewsletterSender() {
                 }
             })
         }
-        
+
         // Добавляем не резидентов если выбран чекбокс
         if (sendToNonResidents) {
             users.filter(u => u.role !== 'RESIDENT').forEach(user => {
@@ -257,11 +262,11 @@ export default function NewsletterSender() {
 
         console.log(dto)
 
-        const jsonBlob = new Blob([JSON.stringify(dto)], { type: 'application/json' })
+        const jsonBlob = new Blob([JSON.stringify(dto)], {type: 'application/json'})
 
         // Добавляем наш JSON-блок на верхний уровень FormData
         formData.append('dto', jsonBlob)
-        
+
         // Добавляем файлы только если они есть
         if (attachedFiles.length > 0) {
             attachedFiles.forEach(file => {
@@ -287,7 +292,7 @@ export default function NewsletterSender() {
             setSendToResidents(false)
             setSendToNonResidents(false)
             setError(null)
-            
+
             showNotification('success', 'Рассылка успешно отправлена!')
         } catch (err) {
             console.error('Error sending newsletter:', err)
@@ -298,7 +303,9 @@ export default function NewsletterSender() {
     if (loading) {
         return (
             <div className="newsletter-sender">
-                <div className="newsletter-loading">Загрузка...</div>
+                <div className="newsletter-loading">
+                    <Loading message={"Загрузка..."}/>
+                </div>
             </div>
         )
     }
@@ -324,7 +331,7 @@ export default function NewsletterSender() {
 
                     <div className="newsletter-section">
                         <h2>Выберите получателей</h2>
-                        
+
                         <div className="newsletter-checkboxes">
                             <label className="newsletter-checkbox">
                                 <input
@@ -334,7 +341,7 @@ export default function NewsletterSender() {
                                 />
                                 <span>Отправить резидентам</span>
                             </label>
-                            
+
                             <label className="newsletter-checkbox">
                                 <input
                                     type="checkbox"
@@ -373,13 +380,14 @@ export default function NewsletterSender() {
                                                 onClick={() => handleUserSelect(user)}
                                             >
                                                 <div className="autocomplete-item-name">{user.fullName}</div>
-                                                <div className="autocomplete-item-role">{getRoleDisplay(user.role)}</div>
+                                                <div
+                                                    className="autocomplete-item-role">{getRoleDisplay(user.role)}</div>
                                             </div>
                                         ))}
                                     </div>
                                 )}
                             </div>
-                            
+
                             {selectedUsers.length > 0 && (
                                 <div className="newsletter-selected-users">
                                     {selectedUsers.map(user => (
@@ -395,7 +403,8 @@ export default function NewsletterSender() {
                                                     title="Удалить"
                                                 >
                                                     <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                                        <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                                                        <path d="M12 4L4 12M4 4L12 12" stroke="currentColor"
+                                                              strokeWidth="2" strokeLinecap="round"/>
                                                     </svg>
                                                 </button>
                                             </div>
@@ -408,7 +417,7 @@ export default function NewsletterSender() {
 
                     <div className="newsletter-section">
                         <h2>Текст рассылки</h2>
-                        <div 
+                        <div
                             className={`newsletter-message-container ${isDragging ? 'dragging' : ''}`}
                             onDragOver={handleDragOver}
                             onDragLeave={handleDragLeave}
@@ -431,7 +440,8 @@ export default function NewsletterSender() {
                                         className="newsletter-file-input"
                                     />
                                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                        <path d="M10 5V15M5 10H15" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                                        <path d="M10 5V15M5 10H15" stroke="currentColor" strokeWidth="2"
+                                              strokeLinecap="round"/>
                                     </svg>
                                     <span>Прикрепить файлы</span>
                                 </label>
@@ -439,7 +449,8 @@ export default function NewsletterSender() {
                             {isDragging && (
                                 <div className="newsletter-drag-overlay">
                                     <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
-                                        <path d="M24 12V36M12 24H36" stroke="currentColor" strokeWidth="3" strokeLinecap="round"/>
+                                        <path d="M24 12V36M12 24H36" stroke="currentColor" strokeWidth="3"
+                                              strokeLinecap="round"/>
                                     </svg>
                                     <span>Перетащите файлы сюда</span>
                                 </div>
@@ -458,13 +469,19 @@ export default function NewsletterSender() {
                                             <span className="file-icon">
                                                 {file.type.startsWith('video/') ? (
                                                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                                        <path d="M4 4L16 10L4 16V4Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                                                        <path d="M4 4L16 10L4 16V4Z" stroke="currentColor"
+                                                              strokeWidth="2" strokeLinecap="round"
+                                                              strokeLinejoin="round"/>
                                                     </svg>
                                                 ) : (
                                                     <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-                                                        <rect x="3" y="3" width="14" height="14" rx="2" stroke="currentColor" strokeWidth="2"/>
-                                                        <circle cx="10" cy="8" r="2" stroke="currentColor" strokeWidth="2"/>
-                                                        <path d="M6 14C6 14 8 12 10 12C12 12 14 14 14 14" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                                                        <rect x="3" y="3" width="14" height="14" rx="2"
+                                                              stroke="currentColor" strokeWidth="2"/>
+                                                        <circle cx="10" cy="8" r="2" stroke="currentColor"
+                                                                strokeWidth="2"/>
+                                                        <path d="M6 14C6 14 8 12 10 12C12 12 14 14 14 14"
+                                                              stroke="currentColor" strokeWidth="2"
+                                                              strokeLinecap="round"/>
                                                     </svg>
                                                 )}
                                             </span>
@@ -476,7 +493,8 @@ export default function NewsletterSender() {
                                             className="file-remove-button"
                                         >
                                             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-                                                <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                                                <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" strokeWidth="2"
+                                                      strokeLinecap="round"/>
                                             </svg>
                                         </button>
                                     </div>

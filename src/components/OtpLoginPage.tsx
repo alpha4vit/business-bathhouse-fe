@@ -2,16 +2,18 @@ import { useState, useRef, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { authService } from '../services/authService'
 import { userStorage } from '../utils/userStorage'
+import { useNotification } from '../hooks/useNotification'
 import './OtpLoginPage.css'
+import './Notification.css'
 
 function OtpLoginPage() {
     const navigate = useNavigate()
+    const { notification, showError } = useNotification()
     const [phoneNumber, setPhoneNumber] = useState('')
     const [otpDigits, setOtpDigits] = useState(['', '', '', '', '', ''])
     const [step, setStep] = useState<'phone' | 'otp'>('phone')
     const [errors, setErrors] = useState<{ phone?: string; otp?: string }>({})
     const [isSubmitting, setIsSubmitting] = useState(false)
-    const [submitError, setSubmitError] = useState<string | null>(null)
     const inputRefs = useRef<(HTMLInputElement | null)[]>([])
 
     // Auto-submit when all 6 digits are entered
@@ -37,7 +39,6 @@ function OtpLoginPage() {
 
     const handleSendCode = async (e: React.FormEvent) => {
         e.preventDefault()
-        setSubmitError(null)
 
         if (!validatePhone()) {
             return
@@ -54,14 +55,13 @@ function OtpLoginPage() {
             }, 100)
         } catch (error) {
             console.error('Error creating OTP code:', error)
-            setSubmitError(error instanceof Error ? error.message : 'Ошибка при отправке кода')
+            showError(error instanceof Error ? error.message : 'Ошибка при отправке кода')
         } finally {
             setIsSubmitting(false)
         }
     }
 
     const handleVerifyCode = async () => {
-        setSubmitError(null)
         setErrors(prev => ({ ...prev, otp: undefined }))
 
         const code = otpDigits.join('')
@@ -81,7 +81,7 @@ function OtpLoginPage() {
             navigate('/cabinet')
         } catch (error) {
             console.error('Error verifying OTP code:', error)
-            setSubmitError(error instanceof Error ? error.message : 'Ошибка при проверке кода')
+            showError(error instanceof Error ? error.message : 'Ошибка при проверке кода')
             setErrors(prev => ({ ...prev, otp: 'Неверный код' }))
             inputRefs.current[0]?.focus()
         } finally {
@@ -143,11 +143,15 @@ function OtpLoginPage() {
         setPhoneNumber('')
         setOtpDigits(['', '', '', '', '', ''])
         setErrors({})
-        setSubmitError(null)
     }
 
     return (
         <div className="otp-login-page">
+            {notification && (
+                <div className={`notification notification-${notification.type}`}>
+                    {notification.message}
+                </div>
+            )}
             <div className="otp-login-container">
                 <div className="otp-login-header">
                     <h1>{step === 'phone' ? 'Вход по номеру телефона' : 'Введите код'}</h1>
@@ -179,8 +183,6 @@ function OtpLoginPage() {
                             />
                             {errors.phone && <span className="error-message">{errors.phone}</span>}
                         </div>
-
-                        {submitError && <div className="submit-error">{submitError}</div>}
 
                         <button
                             type="submit"
@@ -227,8 +229,6 @@ function OtpLoginPage() {
                             </div>
                             {errors.otp && <span className="error-message">{errors.otp}</span>}
                         </div>
-
-                        {/*{submitError && <div className="submit-error">{submitError}</div>}*/}
 
                         <button
                             type="button"

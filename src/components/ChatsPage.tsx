@@ -5,6 +5,7 @@ import './ChatsPage.css'
 import {useUser} from "../contexts/UserContext.tsx";
 import {isNonResident} from "../services/userService.ts";
 import {useNotification} from "../hooks/useNotification.ts";
+import Loading from "./Loading.tsx";
 
 function ChatsPage() {
     const {user} = useUser()
@@ -99,7 +100,9 @@ function ChatsPage() {
                             Сообщество «Бизнес Баня»
                         </div>
                     </div>
-                    <div className="chats-loading">Загрузка...</div>
+                    <div className="chats-loading">
+                        <Loading message={"Загрузка..."}></Loading>
+                    </div>
                 </div>
             </div>
         )
