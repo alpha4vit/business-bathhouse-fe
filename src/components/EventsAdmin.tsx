@@ -49,7 +49,8 @@ function EventsAdmin() {
         privacy: 'PUBLIC',
         registration_link: '',
         extra_registration_link: '',
-        carry_date: ''
+        carry_date: '',
+        send_notification: true
     })
 
     useEffect(() => {
@@ -231,6 +232,7 @@ function EventsAdmin() {
             registration_link: event.registration_link || '',
             extra_registration_link: '',
             carry_date: carryDateValue,
+            send_notification: true
         }
 
         setFormData(newFormData)
@@ -271,7 +273,8 @@ function EventsAdmin() {
             privacy: 'PUBLIC',
             registration_link: '',
             extra_registration_link: '',
-            carry_date: ''
+            carry_date: '',
+            send_notification: true
         })
         setImageFile(null)
         setImagePreview(null)
@@ -575,6 +578,19 @@ function EventsAdmin() {
                                             </button>
                                         </div>
                                     )}
+                                </div>
+                                <div className="admin-events-form-group">
+                                    <label className="checkbox-label">
+                                        <input
+                                            type="checkbox"
+                                            checked={formData.send_notification}
+                                            onChange={(e) => setFormData({
+                                                ...formData,
+                                                send_notification: e.target.checked
+                                            })}
+                                        />
+                                        <span>Отправить рассылку</span>
+                                    </label>
                                 </div>
                                 <div className="admin-events-modal-actions">
                                     <button

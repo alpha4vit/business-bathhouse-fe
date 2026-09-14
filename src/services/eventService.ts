@@ -25,6 +25,7 @@ export interface CreateEventRequest {
     registration_link: string
     extra_registration_link: string
     carry_date: string
+    send_notification: boolean
 }
 
 export interface UpdateEventRequest {
@@ -38,6 +39,7 @@ export interface UpdateEventRequest {
     extra_registration_link: string
     carry_date: string
     delete_image: boolean
+    send_notification: boolean
 }
 
 export const eventService = {
