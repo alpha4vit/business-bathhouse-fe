@@ -24,6 +24,7 @@ function EventsPage() {
     const [currentIndex, setCurrentIndex] = useState(0)
     const [eventImages, setEventImages] = useState<Map<string, string>>(new Map())
     const [loadingImages, setLoadingImages] = useState<Set<string>>(new Set())
+    const [eventsWithoutImage, setEventsWithoutImage] = useState<Set<string>>(new Set())
     const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false)
     const [registrationModalOpen, setRegistrationModalOpen] = useState(false)
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
@@ -35,7 +36,7 @@ function EventsPage() {
     const [copiedUrl, setCopiedUrl] = useState<boolean>(false)
 
     const loadEventImage = async (event: Event) => {
-        if (eventImages.has(event.id) || loadingImages.has(event.id)) {
+        if (eventImages.has(event.id) || loadingImages.has(event.id) || eventsWithoutImage.has(event.id)) {
             return
         }
 
@@ -49,10 +50,12 @@ function EventsPage() {
                 setEventImages(prev => new Map(prev).set(event.id, imageUrl))
                 console.log(`[EventsPage] ✅ Изображение загружено для мероприятия ${event.title}`)
             } else {
+                setEventsWithoutImage(prev => new Set(prev).add(event.id))
                 console.log(`[EventsPage] ℹ️ Изображение не найдено для мероприятия ${event.title}`)
             }
         } catch (error) {
             console.error(`[EventsPage] ❌ Ошибка загрузки изображения для мероприятия ${event.title}:`, error)
+            setEventsWithoutImage(prev => new Set(prev).add(event.id))
         } finally {
             setLoadingImages(prev => {
                 const newSet = new Set(prev)
@@ -251,9 +254,7 @@ function EventsPage() {
                             renderCard={(evt) => (
                                 <>
                                     <div className="events-result-image">
-                                        {loadingImages.has(evt.id) ? (
-                                            <div className="events-result-image-skeleton"></div>
-                                        ) : eventImages.has(evt.id) ? (
+                                        {eventImages.has(evt.id) ? (
                                             <img
                                                 src={eventImages.get(evt.id)}
                                                 alt={`Изображение ${evt.title}`}
@@ -328,12 +329,23 @@ function EventsPage() {
                                         </>
                                     )}
 
-                                    <button
-                                        className="events-result-registration"
-                                        onClick={() => handleRegistration(evt)}
-                                    >
-                                        Зарегистрироваться
-                                    </button>
+                                    {evt.registration_link ? (
+                                        <a
+                                            href={evt.registration_link}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="events-result-registration"
+                                        >
+                                            Зарегистрироваться
+                                        </a>
+                                    ) : (
+                                        <button
+                                            className="events-result-registration"
+                                            onClick={() => handleRegistration(evt)}
+                                        >
+                                            Зарегистрироваться
+                                        </button>
+                                    )}
                                 </>
                             )}
                         />

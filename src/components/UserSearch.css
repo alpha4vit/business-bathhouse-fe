@@ -71,6 +71,9 @@
     cursor: pointer;
     transition: background-color 0.2s;
     border-bottom: 1px solid #f0f0f0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }
 
 .user-search-autocomplete-item:last-child {
@@ -79,6 +82,17 @@
 
 .user-search-autocomplete-item:hover {
     background-color: #f8f9fa;
+}
+
+.user-search-autocomplete-item.selected {
+    background-color: #e8f4fd;
+}
+
+.user-search-checkbox {
+    cursor: pointer;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
 }
 
 .autocomplete-item-name {

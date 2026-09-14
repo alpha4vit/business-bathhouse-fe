@@ -59,26 +59,44 @@ function UserSearch({
                 width: rect.width
             })
         }
-        if (value.length > 0) {
-            const filtered = users.filter(user =>
-                user.fullName && user.fullName.toLowerCase().includes(value.toLowerCase())
-            )
-            setFilteredUsers(filtered)
-            setAutocompleteOpen(true)
-        } else {
-            setFilteredUsers([])
-            setAutocompleteOpen(false)
-        }
+        const filtered = users.filter(user =>
+            user.fullName && user.fullName.toLowerCase().includes(value.toLowerCase())
+        )
+        setFilteredUsers(filtered)
+        setAutocompleteOpen(true)
     }
 
-    const handleUserSelect = (user: UserSearchDto) => {
-        if (!selectedUsers.find(u => u.chatId === user.chatId)) {
+    const handleFocus = (event: React.FocusEvent<HTMLInputElement>) => {
+        const rect = event.target.getBoundingClientRect()
+        setAutocompletePosition({
+            top: rect.bottom + 4,
+            left: rect.left,
+            width: rect.width
+        })
+        const filtered = users.filter(user =>
+            user.fullName && user.fullName.toLowerCase().includes(searchQuery.toLowerCase())
+        )
+        setFilteredUsers(filtered)
+        setAutocompleteOpen(true)
+    }
+
+    const handleBlur = () => {
+        setTimeout(() => {
+            setAutocompleteOpen(false)
+            setAutocompletePosition(null)
+        }, 300)
+    }
+
+    const handleUserToggle = (user: UserSearchDto, event?: React.MouseEvent) => {
+        if (event) {
+            event.preventDefault()
+        }
+        const isSelected = selectedUsers.find(u => u.chatId === user.chatId)
+        if (isSelected) {
+            onUsersChange(selectedUsers.filter(u => u.chatId !== user.chatId))
+        } else {
             onUsersChange([...selectedUsers, user])
         }
-        setSearchQuery('')
-        setFilteredUsers([])
-        setAutocompleteOpen(false)
-        setAutocompletePosition(null)
     }
 
     const handleRemoveUser = (chatId: number) => {
@@ -104,6 +122,8 @@ function UserSearch({
                     type="text"
                     value={searchQuery}
                     onChange={(e) => handleSearchChange(e.target.value, e)}
+                    onFocus={handleFocus}
+                    onBlur={handleBlur}
                     className="user-search-input"
                     placeholder={placeholder}
                     disabled={disabled || loading}
@@ -117,16 +137,32 @@ function UserSearch({
                             width: `${autocompletePosition.width}px`
                         }}
                     >
-                        {filteredUsers.map(user => (
-                            <div
-                                key={user.chatId}
-                                className="user-search-autocomplete-item"
-                                onClick={() => handleUserSelect(user)}
-                            >
-                                <div className="autocomplete-item-name">{user.fullName}</div>
-                                <div className="autocomplete-item-role">{getRoleDisplay(user.role)}</div>
-                            </div>
-                        ))}
+                        {filteredUsers.map(user => {
+                            const isSelected = selectedUsers.find(u => u.chatId === user.chatId)
+                            return (
+                                <div
+                                    key={user.chatId}
+                                    className={`user-search-autocomplete-item ${isSelected ? 'selected' : ''}`}
+                                    onMouseDown={(e) => {
+                                        e.preventDefault()
+                                        handleUserToggle(user, e)
+                                    }}
+                                >
+                                    <input
+                                        type="checkbox"
+                                        checked={!!isSelected}
+                                        onChange={() => handleUserToggle(user)}
+                                        onMouseDown={(e) => {
+                                            e.preventDefault()
+                                            e.stopPropagation()
+                                        }}
+                                        className="user-search-checkbox"
+                                    />
+                                    <div className="autocomplete-item-name">{user.fullName}</div>
+                                    <div className="autocomplete-item-role">{getRoleDisplay(user.role)}</div>
+                                </div>
+                            )
+                        })}
                     </div>
                 )}
             </div>
