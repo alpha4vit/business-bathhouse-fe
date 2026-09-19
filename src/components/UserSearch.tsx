@@ -81,6 +81,7 @@ function UserSearch({
     }
 
     const handleBlur = () => {
+        // Delay closing to allow clicking on dropdown items
         setTimeout(() => {
             setAutocompleteOpen(false)
             setAutocompletePosition(null)
@@ -88,6 +89,7 @@ function UserSearch({
     }
 
     const handleUserToggle = (user: UserSearchDto, event?: React.MouseEvent) => {
+        // Prevent default to avoid losing focus
         if (event) {
             event.preventDefault()
         }
@@ -97,6 +99,7 @@ function UserSearch({
         } else {
             onUsersChange([...selectedUsers, user])
         }
+        // Don't close dropdown or clear search - keep focus
     }
 
     const handleRemoveUser = (chatId: number) => {

@@ -9,6 +9,7 @@ import {authenticatedFetch} from '../utils/apiClient'
 import {useNotification} from '../hooks/useNotification'
 import arrowIcon from '../img/arrow.svg'
 import Loading from "./Loading.tsx";
+import PWAInstallModal from './PWAInstallModal'
 
 function PersonalCabinet() {
     const {user: authUser, refreshUser} = useAuthUser()
@@ -23,6 +24,7 @@ function PersonalCabinet() {
     const [showInstructions, setShowInstructions] = useState<boolean>(false)
     const [userPhotoUrl, setUserPhotoUrl] = useState<string | null>(null)
     const [photoLoading, setPhotoLoading] = useState<boolean>(false)
+    const [showPWAInstallModal, setShowPWAInstallModal] = useState<boolean>(false)
 
     // Используем кеш для рейтинга резидентов
     const {data: leaderboard, loading: leaderboardLoading, error: leaderboardError} = useCache(
@@ -34,6 +36,14 @@ function PersonalCabinet() {
     // Перезагружаем данные пользователя при монтировании компонента
     useEffect(() => {
         refreshUser()
+    }, [])
+
+    // Показываем модалку установки PWA при первом открытии личного кабинета
+    useEffect(() => {
+        const modalShown = localStorage.getItem('pwaInstallModalShown')
+        if (!modalShown) {
+            setShowPWAInstallModal(true)
+        }
     }, [])
 
     useEffect(() => {
@@ -167,6 +177,10 @@ function PersonalCabinet() {
                     {notification.message}
                 </div>
             )}
+            <PWAInstallModal 
+                isOpen={showPWAInstallModal} 
+                onClose={() => setShowPWAInstallModal(false)} 
+            />
             <div className="cabinet-content">
                 <div className="cabinet-header">
                     <h1>Мой личный кабинет</h1>
