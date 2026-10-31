@@ -1,10 +1,10 @@
 import React, {useEffect, useState} from 'react'
-import {UserSearchDto, userService} from '../services/userService'
+import {UserDto, userService} from '../services/userService'
 import './UserSearch.css'
 
 interface ReferrerSearchProps {
-    selectedUser: UserSearchDto | null
-    onUserChange: (user: UserSearchDto | null) => void
+    selectedUser: UserDto | null
+    onUserChange: (user: UserDto | null) => void
     placeholder?: string
     disabled?: boolean
 }
@@ -15,10 +15,10 @@ function ReferrerSearch({
     placeholder = 'Поиск по фамилии...',
     disabled = false
 }: ReferrerSearchProps) {
-    const [users, setUsers] = useState<UserSearchDto[]>([])
+    const [users, setUsers] = useState<UserDto[]>([])
     const [loading, setLoading] = useState(false)
     const [searchQuery, setSearchQuery] = useState('')
-    const [filteredUsers, setFilteredUsers] = useState<UserSearchDto[]>([])
+    const [filteredUsers, setFilteredUsers] = useState<UserDto[]>([])
     const [autocompleteOpen, setAutocompleteOpen] = useState(false)
     const [autocompletePosition, setAutocompletePosition] = useState<{
         top: number;
@@ -72,7 +72,7 @@ function ReferrerSearch({
         }
     }
 
-    const handleUserSelect = (user: UserSearchDto) => {
+    const handleUserSelect = (user: UserDto) => {
         onUserChange(user)
         setSearchQuery(user.fullName)
         setFilteredUsers([])

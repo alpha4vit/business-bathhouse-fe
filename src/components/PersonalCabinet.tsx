@@ -10,9 +10,12 @@ import {useNotification} from '../hooks/useNotification'
 import arrowIcon from '../img/arrow.svg'
 import Loading from "./Loading.tsx";
 import PWAInstallModal from './PWAInstallModal'
+import Modal from './Modal'
+import './Modal.css'
+import {LoyaltyReward, loyaltyService} from '../services/loyaltyService'
 
 function PersonalCabinet() {
-    const {user: authUser, refreshUser} = useAuthUser()
+    const {user: authUser} = useAuthUser()
     const userId = authUser?.company?.id?.toString() || null
     const {notification, showSuccess, showError} = useNotification()
 
@@ -25,6 +28,9 @@ function PersonalCabinet() {
     const [userPhotoUrl, setUserPhotoUrl] = useState<string | null>(null)
     const [photoLoading, setPhotoLoading] = useState<boolean>(false)
     const [showPWAInstallModal, setShowPWAInstallModal] = useState<boolean>(false)
+    const [showLoyaltyInfoModal, setShowLoyaltyInfoModal] = useState<boolean>(false)
+    const [loyaltyRewards, setLoyaltyRewards] = useState<LoyaltyReward[]>([])
+    const [loyaltyRewardsLoading, setLoyaltyRewardsLoading] = useState<boolean>(false)
 
     // Используем кеш для рейтинга резидентов
     const {data: leaderboard, loading: leaderboardLoading, error: leaderboardError} = useCache(
@@ -32,11 +38,6 @@ function PersonalCabinet() {
         () => userService.getLeaderboard(),
         [] // Пустые зависимости - кеш обновится только при перерендеринге компонента
     )
-
-    // Перезагружаем данные пользователя при монтировании компонента
-    useEffect(() => {
-        refreshUser()
-    }, [])
 
     // Показываем модалку установки PWA при первом открытии личного кабинета
     useEffect(() => {
@@ -65,7 +66,8 @@ function PersonalCabinet() {
                             points: 0,
                             pointsHistory: [],
                             company: undefined,
-                            gender: authUser.gender
+                            gender: authUser.gender,
+                            discount: authUser.discount
                         })
                     } else {
                         setError('Требуется авторизация')
@@ -112,7 +114,7 @@ function PersonalCabinet() {
         if (authUser) {
             fetchUserData()
         }
-    }, [userId, authUser])
+    }, [userId])
 
     // Очистка URL объекта при размонтировании
     useEffect(() => {
@@ -125,6 +127,22 @@ function PersonalCabinet() {
 
     const fetchLeaderboard = () => {
         setShowLeaderboard(!showLeaderboard)
+    }
+
+    const handleLoyaltyInfoClick = async () => {
+        if (!userId) return
+        
+        setLoyaltyRewardsLoading(true)
+        try {
+            const rewards = await loyaltyService.getUserRewards(Number(userId))
+            setLoyaltyRewards(rewards)
+            setShowLoyaltyInfoModal(true)
+        } catch (error) {
+            console.error('Failed to fetch loyalty rewards:', error)
+            showError('Не удалось загрузить информацию о персональных скидках')
+        } finally {
+            setLoyaltyRewardsLoading(false)
+        }
     }
 
     const getPointsWord = (count: number): string => {
@@ -181,6 +199,124 @@ function PersonalCabinet() {
                 isOpen={showPWAInstallModal} 
                 onClose={() => setShowPWAInstallModal(false)} 
             />
+            <Modal
+                isOpen={showLoyaltyInfoModal}
+                onClose={() => setShowLoyaltyInfoModal(false)}
+                title="Информация о персональных скидках"
+            >
+                {loyaltyRewardsLoading ? (
+                    <div className="cabinet-loading">
+                        <Loading message="Загрузка информации..."/>
+                    </div>
+                ) : loyaltyRewards.length > 0 ? (
+                    <div className="loyalty-info-modal-content">
+                        <div className="loyalty-info-section">
+                            <h3>Ваши персональные скидки</h3>
+                            {loyaltyRewards.map((reward, index) => (
+                                <div key={index} className="loyalty-info-item">
+                                    <div className="loyalty-info-item-header">
+                                        <span className="loyalty-info-item-name">{reward.rule.name}</span>
+                                        <span className="loyalty-info-item-discount">{reward.discount}%</span>
+                                    </div>
+                                    <p className="loyalty-info-item-description">{reward.rule.description}</p>
+                                </div>
+                            ))}
+                        </div>
+                        <div className="loyalty-info-section">
+                            <h3>Правила скидок на годовой членский взнос</h3>
+                            <div className="loyalty-info-points-list">
+                                <div className="loyalty-info-point-item">
+                                    <span className="loyalty-info-point-number">1</span>
+                                    <div className="loyalty-info-point-content">
+                                        <strong>Базовые скидки по году вступления</strong>
+                                        <div className="loyalty-info-years-list">
+                                            <div className="loyalty-info-year-item"><span className="loyalty-info-badge-green">10%</span> — Первый год в сообществе</div>
+                                            <div className="loyalty-info-year-item"><span className="loyalty-info-badge-green">20%</span> — Второй год</div>
+                                            <div className="loyalty-info-year-item"><span className="loyalty-info-badge-green">30%</span> — Третий год и более (максимальная базовая скидка)</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="loyalty-info-point-item">
+                                    <span className="loyalty-info-point-number">2</span>
+                                    <div className="loyalty-info-point-content">
+                                        <strong>Скидка за привлечение резидентов</strong>
+                                        <div className="loyalty-info-years-list">
+                                            <div className="loyalty-info-year-item"><span className="loyalty-info-badge-green">10%</span> — За каждого приведенного резидента, который оплатил годовой членский взнос</div>
+                                        </div>
+                                        <p className="loyalty-info-note">Скидки суммируются с базовой</p>
+                                    </div>
+                                </div>
+                                <div className="loyalty-info-point-item">
+                                    <span className="loyalty-info-point-number">3</span>
+                                    <div className="loyalty-info-point-content">
+                                        <strong>Скидки по рейтингу</strong>
+                                        <div className="loyalty-info-years-list">
+                                            <div className="loyalty-info-year-item"><span className="loyalty-info-badge-green">100%</span> — Топ-10 резидентов рейтинга</div>
+                                            <div className="loyalty-info-year-item"><span className="loyalty-info-badge-green">50%</span> — Места с 11 по 20 позицию рейтинга</div>
+                                        </div>
+                                        <p className="loyalty-info-note">Рейтинг формируется до конца года</p>
+                                    </div>
+                                </div>
+                                <div className="loyalty-info-point-item">
+                                    <span className="loyalty-info-point-number">4</span>
+                                    <div className="loyalty-info-point-content">
+                                        <strong>Персональные скидки</strong>
+                                        <p>Для иногородних резидентов, амбассадоров и других категорий предусмотрены специальные персональные скидки.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="loyalty-info-empty">
+                        <p>У вас пока нет персональных скидок.</p>
+                        <div className="loyalty-info-section">
+                            <h3>Правила скидок на годовой членский взнос</h3>
+                            <div className="loyalty-info-points-list">
+                                <div className="loyalty-info-point-item">
+                                    <span className="loyalty-info-point-number">1</span>
+                                    <div className="loyalty-info-point-content">
+                                        <strong>Базовые скидки по году вступления</strong>
+                                        <div className="loyalty-info-years-list">
+                                            <div className="loyalty-info-year-item"><span className="loyalty-info-badge-green">10%</span> — Первый год в сообществе</div>
+                                            <div className="loyalty-info-year-item"><span className="loyalty-info-badge-green">20%</span> — Второй год</div>
+                                            <div className="loyalty-info-year-item"><span className="loyalty-info-badge-green">30%</span> — Третий год и более (максимальная базовая скидка)</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="loyalty-info-point-item">
+                                    <span className="loyalty-info-point-number">2</span>
+                                    <div className="loyalty-info-point-content">
+                                        <strong>Скидка за привлечение резидентов</strong>
+                                        <div className="loyalty-info-years-list">
+                                            <div className="loyalty-info-year-item"><span className="loyalty-info-badge-green">10%</span> — За каждого приведенного резидента, который оплатил годовой членский взнос</div>
+                                        </div>
+                                        <p className="loyalty-info-note">Скидки суммируются с базовой</p>
+                                    </div>
+                                </div>
+                                <div className="loyalty-info-point-item">
+                                    <span className="loyalty-info-point-number">3</span>
+                                    <div className="loyalty-info-point-content">
+                                        <strong>Скидки по рейтингу</strong>
+                                        <div className="loyalty-info-years-list">
+                                            <div className="loyalty-info-year-item"><span className="loyalty-info-badge-green">100%</span> — Топ-10 резидентов рейтинга</div>
+                                            <div className="loyalty-info-year-item"><span className="loyalty-info-badge-green">50%</span> — Места с 11 по 20 позицию рейтинга</div>
+                                        </div>
+                                        <p className="loyalty-info-note">Рейтинг формируется до конца года</p>
+                                    </div>
+                                </div>
+                                <div className="loyalty-info-point-item">
+                                    <span className="loyalty-info-point-number">4</span>
+                                    <div className="loyalty-info-point-content">
+                                        <strong>Персональные скидки</strong>
+                                        <p>Для иногородних резидентов, амбассадоров и других категорий предусмотрены специальные персональные скидки.</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </Modal>
             <div className="cabinet-content">
                 <div className="cabinet-header">
                     <h1>Мой личный кабинет</h1>
@@ -292,6 +428,21 @@ function PersonalCabinet() {
                                 <div className="cabinet-points-emoji">⭐</div>
                                 <div className="cabinet-points-label">Всего баллов</div>
                             </div>
+                        </div>
+
+                        <div className="cabinet-discount-display">
+                            <button 
+                                className="cabinet-info-button"
+                                onClick={handleLoyaltyInfoClick}
+                                disabled={loyaltyRewardsLoading}
+                                title="Информация о персональных скидках"
+                            >
+                                i
+                            </button>
+                            <div className="cabinet-discount-amount">
+                                {userData.discount || 0}%
+                            </div>
+                            <div className="cabinet-discount-label">Скидка на годовой членский взнос</div>
                         </div>
 
                         <div className="cabinet-deposit-button-container">

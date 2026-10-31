@@ -82,7 +82,7 @@ function ReportsPage() {
 
             await reportService.generateReport(request)
 
-            showNotification('success', 'Отчет успешно сгенерирован и скачан')
+            showNotification('success', 'Отчет успешно сгенерирован и отправлен в личные сообщения!')
         } catch (error) {
             console.error('Error generating report:', error)
             const errorMessage = error instanceof Error ? error.message : 'Ошибка при генерации отчета'

@@ -1,21 +1,21 @@
 import {useEffect, useState} from 'react'
-import {UserSearchDto, userService} from '../services/userService'
+import {UserDto, userService} from '../services/userService'
 import './NewsletterSender.css'
 import {API_BASE_URL} from "../config/api.ts";
 import {authenticatedFetch} from "../utils/apiClient.ts";
 import Loading from "./Loading.tsx";
 
 export default function NewsletterSender() {
-    const [users, setUsers] = useState<UserSearchDto[]>([])
+    const [users, setUsers] = useState<UserDto[]>([])
     const [loading, setLoading] = useState(false)
     const [error, setError] = useState<string | null>(null)
 
     const [sendToResidents, setSendToResidents] = useState(false)
     const [sendToNonResidents, setSendToNonResidents] = useState(false)
-    const [selectedUsers, setSelectedUsers] = useState<UserSearchDto[]>([])
+    const [selectedUsers, setSelectedUsers] = useState<UserDto[]>([])
 
     const [searchQuery, setSearchQuery] = useState('')
-    const [filteredUsers, setFilteredUsers] = useState<UserSearchDto[]>([])
+    const [filteredUsers, setFilteredUsers] = useState<UserDto[]>([])
     const [autocompleteOpen, setAutocompleteOpen] = useState(false)
     const [autocompletePosition, setAutocompletePosition] = useState<{
         top: number;
@@ -28,7 +28,7 @@ export default function NewsletterSender() {
     const [fileError, setFileError] = useState<string | null>(null)
     const [isDragging, setIsDragging] = useState(false)
     const [notificationMode, setNotificationMode] = useState<'PERSONAL' | 'BUSINESS'>('PERSONAL')
-    const [parseMode, setParseMode] = useState<'NONE' | 'HTML'>('NONE')
+    const [parseMode, setParseMode] = useState<'MARKDOWN_V2' | 'HTML'>('MARKDOWN_V2')
     const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null)
 
     useEffect(() => {
@@ -71,7 +71,7 @@ export default function NewsletterSender() {
         }
     }
 
-    const handleUserSelect = (user: UserSearchDto) => {
+    const handleUserSelect = (user: UserDto) => {
         if (!selectedUsers.find(u => u.chatId === user.chatId)) {
             setSelectedUsers([...selectedUsers, user])
         }
@@ -524,8 +524,8 @@ export default function NewsletterSender() {
                             </div>
                             <div className="newsletter-notification-mode-toggle">
                                 <button
-                                    className={`toggle-option ${parseMode === 'NONE' ? 'active' : ''}`}
-                                    onClick={() => setParseMode('NONE')}
+                                    className={`toggle-option ${parseMode === 'MARKDOWN_V2' ? 'active' : ''}`}
+                                    onClick={() => setParseMode('MARKDOWN_V2')}
                                 >
                                     Обычный
                                 </button>

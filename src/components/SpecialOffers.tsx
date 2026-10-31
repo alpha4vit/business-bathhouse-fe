@@ -2,27 +2,31 @@ import './SpecialOffers.css'
 import {useEffect, useState} from 'react'
 import {SpecialOffer, specialOfferService} from '../services/specialOfferService'
 import Loading from "./Loading.tsx";
+import {useCache} from '../utils/cache'
 
 function SpecialOffers() {
+    const {data: offersData, loading: offersLoading, error: offersError} = useCache<SpecialOffer[]>(
+        'special-offers',
+        () => specialOfferService.getActiveOffers(),
+        []
+    )
     const [offers, setOffers] = useState<SpecialOffer[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
 
     useEffect(() => {
-        const loadOffers = async () => {
-            try {
-                const data = await specialOfferService.getActiveOffers()
-                setOffers(data)
-            } catch (err) {
-                console.error('Failed to load special offers:', err)
-                setError('Не удалось загрузить специальные предложения')
-            } finally {
-                setLoading(false)
-            }
+        if (offersData) {
+            setOffers(offersData)
         }
+    }, [offersData])
 
-        loadOffers()
-    }, [])
+    useEffect(() => {
+        setLoading(offersLoading)
+    }, [offersLoading])
+
+    useEffect(() => {
+        setError(offersError)
+    }, [offersError])
 
     if (loading) {
         return <div className="offers-container">

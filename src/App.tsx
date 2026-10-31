@@ -22,10 +22,12 @@ const EventsAdmin = lazy(() => import("./components/EventsAdmin.tsx"));
 const BalanceAdjustmentPage = lazy(() => import("./components/BalanceAdjustmentPage.tsx"));
 const UserDeactivationPage = lazy(() => import("./components/UserDeactivationPage.tsx"));
 const ChatsPage = lazy(() => import("./components/ChatsPage.tsx"));
+const LoyaltyAdmin = lazy(() => import("./components/LoyaltyAdmin.tsx"));
 const SupportPage = lazy(() => import("./components/SupportPage.tsx"));
 const RegistrationPage = lazy(() => import("./components/RegistrationPage.tsx"));
 const ReportsPage = lazy(() => import("./components/ReportsPage.tsx"));
 const OtpLoginPage = lazy(() => import("./components/OtpLoginPage.tsx"));
+const MembershipAdjustmentPage = lazy(() => import("./components/MembershipAdjustmentPage.tsx"));
 
 function AppContent() {
     const [searchParams] = useSearchParams();
@@ -103,8 +105,10 @@ function AppContent() {
                     <Route path="/admin/points/adjustments" element={<PointsAdjustmentsTable/>}/>
                     <Route path="/admin/balance/adjustment" element={<BalanceAdjustmentPage/>}/>
                     <Route path="/admin/users/deactivate" element={<UserDeactivationPage/>}/>
+                    <Route path="/admin/membership/adjustment" element={<MembershipAdjustmentPage/>}/>
                     <Route path="/admin/reports" element={<ReportsPage/>}/>
                     <Route path="/admin/special-offers" element={<SpecialOffersAdmin/>}/>
+                    <Route path="/admin/loyalty" element={<LoyaltyAdmin/>}/>
                     <Route path="/register" element={<RegistrationPage/>}/>
                     <Route path="/otp-login" element={<OtpLoginPage/>}/>
                 </Routes>
@@ -120,11 +124,11 @@ function AppContent() {
 
 function App() {
     return (
-        <UserProvider>
-            <Router>
+        <Router>
+            <UserProvider>
                 <AppContent/>
-            </Router>
-        </UserProvider>
+            </UserProvider>
+        </Router>
     )
 }
 

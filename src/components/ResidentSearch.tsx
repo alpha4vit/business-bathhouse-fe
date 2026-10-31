@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react'
+import {useState, useEffect, useRef} from 'react'
 import './ResidentSearch.css'
 import {userService, Resident} from '../services/userService'
 import SwipeCard from './SwipeCard'
@@ -11,6 +11,7 @@ function ResidentSearch() {
     const [failedAvatars, setFailedAvatars] = useState<Set<number>>(new Set())
     const [loadingAvatars, setLoadingAvatars] = useState<Set<number>>(new Set())
     const [loadedAvatars, setLoadedAvatars] = useState<Set<number>>(new Set())
+    const swipeCardRef = useRef<any>(null)
 
     const handleAvatarLoad = (resident: Resident) => {
         console.log(`[ResidentSearch] ✅ Аватар успешно загружен для ${resident.fullName} (chatId: ${resident.chatId})`)
@@ -89,6 +90,22 @@ function ResidentSearch() {
         }
     }, [currentIndex, results])
 
+    // Keyboard navigation
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (results.length === 0) return
+            
+            if (e.key === 'ArrowLeft' && currentIndex > 0) {
+                swipeCardRef.current?.handlePrevious()
+            } else if (e.key === 'ArrowRight' && currentIndex < results.length - 1) {
+                swipeCardRef.current?.handleNext()
+            }
+        }
+
+        window.addEventListener('keydown', handleKeyDown)
+        return () => window.removeEventListener('keydown', handleKeyDown)
+    }, [results.length, currentIndex])
+
     useEffect(() => {
         if (searchTerm.length < 2) {
             setResults([])
@@ -153,6 +170,7 @@ function ResidentSearch() {
                     </div>
                     
                     <SwipeCard
+                        ref={swipeCardRef}
                         items={results}
                         currentIndex={currentIndex}
                         onIndexChange={setCurrentIndex}
@@ -182,7 +200,7 @@ function ResidentSearch() {
 
                                 {resident.achievements && resident.achievements.length > 0 && (
                                     <div className="search-result-achievements">
-                                        {resident.achievements.map((achievement, index) => (
+                                        {resident.achievements.map((achievement: string, index: number) => (
                                             <span key={index} className="search-result-achievement">
                                                 {achievement}
                                             </span>

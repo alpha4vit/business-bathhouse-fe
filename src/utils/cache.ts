@@ -59,6 +59,9 @@ class SimpleCache {
 
 export const cache = new SimpleCache();
 
+// Глобальный кеш активных запросов для дедупликации
+const pendingRequests = new Map<string, Promise<any>>();
+
 // Хук для кеширования данных
 export function useCache<T>(
     key: string,
@@ -75,22 +78,38 @@ export function useCache<T>(
     const [error, setError] = useState<string | null>(null);
 
     const fetchData = async () => {
+        // Проверяем глобальный кеш активных запросов
+        if (pendingRequests.has(key)) {
+            const result = await pendingRequests.get(key);
+            setData(result);
+            return;
+        }
+
+        const requestPromise = (async () => {
+            try {
+                const result = await fetcher();
+                cache.set(key, result);
+                setData(result);
+                return result;
+            } catch (err) {
+                setError(err instanceof Error ? err.message : 'Произошла ошибка');
+                throw err;
+            } finally {
+                pendingRequests.delete(key);
+                setLoading(false);
+            }
+        })();
+
+        pendingRequests.set(key, requestPromise);
         setLoading(true);
         setError(null);
         
-        try {
-            const result = await fetcher();
-            cache.set(key, result);
-            setData(result);
-        } catch (err) {
-            setError(err instanceof Error ? err.message : 'Произошла ошибка');
-        } finally {
-            setLoading(false);
-        }
+        await requestPromise;
     };
 
     const refetch = () => {
         cache.delete(key);
+        pendingRequests.delete(key);
         fetchData();
     };
 

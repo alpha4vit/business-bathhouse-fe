@@ -8,6 +8,13 @@
   box-sizing: border-box;
 }
 
+.admin-events-content {
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
 .admin-events-loading {
   display: flex;
   flex-direction: column;
@@ -130,6 +137,10 @@
   font-weight: 600;
   transition: all 0.3s ease;
   font-family: inherit;
+}
+
+.admin-events-modal-actions .admin-events-button {
+  width: 100%;
 }
 
 .admin-events-button-contrast {
@@ -726,6 +737,20 @@
 
   .admin-events-button {
     flex: 1;
+  }
+
+  .admin-events-modal-actions {
+    flex-direction: column;
+  }
+}
+
+@media (min-width: 769px) {
+  .admin-events-item-actions .admin-events-button {
+    width: auto;
+  }
+
+  .admin-events-modal-actions {
+    flex-direction: row;
   }
 }
 

@@ -1,8 +1,7 @@
-import { useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { chatService, Chat } from '../services/chatService'
-import { userService } from '../services/userService'
-import { useAuthUser } from '../hooks/useAuthUser'
+import {useEffect, useState} from 'react'
+import {useNavigate} from 'react-router-dom'
+import {Chat, chatService} from '../services/chatService'
+import {userService} from '../services/userService'
 import './MandatoryChatsPage.css'
 
 interface ChatWithLink extends Chat {
@@ -12,7 +11,6 @@ interface ChatWithLink extends Chat {
 
 export default function MandatoryChatsPage() {
     const navigate = useNavigate()
-    const { refreshUser } = useAuthUser()
     const [chats, setChats] = useState<ChatWithLink[]>([])
     const [loading, setLoading] = useState(true)
     const [checking, setChecking] = useState(false)
@@ -62,17 +60,16 @@ export default function MandatoryChatsPage() {
             setChecking(true)
             setError(null)
 
-            // Call login endpoint to check subscription status
-            await userService.getCurrentUser()
+            const response = await userService.checkSubscription()
 
-            // Refresh user data to ensure cache is updated
-            await refreshUser()
-
-            // If we got here without 428 error, user has subscribed
-            // Navigate to personal cabinet
-            navigate('/cabinet')
+            if (response.isSubscribed) {
+                navigate('/cabinet')
+            } else {
+                setError('Вы всё ещё не подписаны на обязательные чаты')
+            }
         } catch (err) {
-            setError('Вы всё ещё не подписаны на обязательные чаты')
+            const errorMessage = err instanceof Error ? err.message : 'Вы всё ещё не подписаны на обязательные чаты'
+            setError(errorMessage)
             console.error('Subscription check failed:', err)
         } finally {
             setChecking(false)

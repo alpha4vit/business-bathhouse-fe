@@ -51,14 +51,15 @@
     align-items: center;
     justify-content: center;
     color: #6c757d;
-    transition: all 0.2s ease;
     z-index: 10;
+    padding-bottom: 5px;
+    padding-left: 7px;
 }
 
 .pwa-modal-close:hover {
     background: #e9ecef;
     color: #2D2D2D;
-    transform: rotate(90deg);
+    /*transform: rotate(90deg);*/
 }
 
 .pwa-modal-header {

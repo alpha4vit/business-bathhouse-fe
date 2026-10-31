@@ -1,0 +1,355 @@
+.loyalty-rewards-container {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  color: #2D2D2D;
+  line-height: 1.6;
+}
+
+.loyalty-rewards-error {
+  background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+  color: #c62828;
+  padding: 16px 20px;
+  border-radius: 15px;
+  margin-bottom: 20px;
+  border-left: 4px solid #c62828;
+  box-shadow: 0 4px 15px rgba(198, 40, 40, 0.2);
+}
+
+.loyalty-rewards-actions {
+  margin-bottom: 20px;
+}
+
+.loyalty-rewards-button {
+  padding: clamp(10px, 2.5vw, 14px) clamp(16px, 4vw, 20px);
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: clamp(14px, 3.5vw, 16px);
+  font-weight: 600;
+  transition: all 0.3s ease;
+  font-family: inherit;
+  width: 100%;
+}
+
+.loyalty-rewards-button-primary {
+  background: linear-gradient(135deg, #00A9E8 0%, #0080b8 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(0, 169, 232, 0.3);
+}
+
+.loyalty-rewards-button-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0, 169, 232, 0.4);
+}
+
+.loyalty-rewards-button-primary:active {
+  transform: translateY(0);
+}
+
+.loyalty-rewards-button-secondary {
+  background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+}
+
+.loyalty-rewards-button-secondary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(108, 117, 125, 0.4);
+}
+
+.loyalty-rewards-button-secondary:active {
+  transform: translateY(0);
+}
+
+.loyalty-rewards-button-danger {
+  background: linear-gradient(135deg, #e57373 0%, #ef5350 100%);
+  color: white;
+  box-shadow: 0 4px 15px rgba(229, 115, 115, 0.2);
+}
+
+.loyalty-rewards-button-danger:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(229, 115, 115, 0.3);
+}
+
+.loyalty-rewards-button-danger:active {
+  transform: translateY(0);
+}
+
+.loyalty-rewards-button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none !important;
+}
+
+.loyalty-rewards-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.loyalty-rewards-item {
+  background: white;
+  border-radius: 15px;
+  padding: clamp(16px, 4vw, 20px);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 16px;
+  box-shadow: 0 5px 20px rgba(45, 45, 45, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.loyalty-rewards-item:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(45, 45, 45, 0.15);
+}
+
+.loyalty-rewards-item-info {
+  flex: 1;
+}
+
+.loyalty-rewards-item-info h3 {
+  margin: 0 0 8px 0;
+  font-size: clamp(16px, 4vw, 18px);
+  font-weight: 600;
+  color: #00A9E8;
+}
+
+.loyalty-rewards-status {
+  display: inline-block;
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: clamp(12px, 3vw, 13px);
+  font-weight: 600;
+}
+
+.loyalty-rewards-status-active {
+  background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+  color: #2e7d32;
+  border: 1px solid #a5d6a7;
+}
+
+.loyalty-rewards-status-pending {
+  background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+  color: #e65100;
+  border: 1px solid #ffcc80;
+}
+
+.loyalty-rewards-status-applied {
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  color: #1565c0;
+  border: 1px solid #90caf9;
+}
+
+.loyalty-rewards-status-inactive {
+  background: linear-gradient(135deg, #f5f5f5 0%, #e0e0e0 100%);
+  color: #6c757d;
+  border: 1px solid #bdbdbd;
+}
+
+.loyalty-rewards-item-description {
+  margin: 0 0 8px 0;
+  color: #2D2D2D;
+  font-size: clamp(14px, 3.5vw, 15px);
+  line-height: 1.5;
+}
+
+.loyalty-rewards-item-discount {
+  margin: 0 0 8px 0;
+  color: #28a745;
+  font-size: clamp(14px, 3.5vw, 15px);
+  font-weight: 600;
+}
+
+.loyalty-rewards-item-users {
+  margin: 0;
+  color: #6c757d;
+  font-size: clamp(13px, 3.5vw, 14px);
+}
+
+.loyalty-rewards-item-actions {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
+}
+
+.loyalty-rewards-item-status-container {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+}
+
+.loyalty-rewards-empty {
+  text-align: center;
+  padding: clamp(30px, 6vw, 40px);
+  color: #6c757d;
+  font-size: clamp(16px, 4vw, 18px);
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 5px 20px rgba(45, 45, 45, 0.1);
+}
+
+/* Fix for UserSearch display inside LoyaltyRewards modal */
+.modal-form-group .user-search-container {
+  width: 100%;
+}
+
+.modal-form-group .user-search-container .user-search-input {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.modal-form-group .user-search-autocomplete {
+  z-index: 1001;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  overflow-x: hidden !important;
+}
+
+.modal-form-group .user-search-autocomplete-item {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  width: 100% !important;
+  overflow: hidden !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.modal-form-group .user-search-checkbox {
+  width: 18px !important;
+  height: 18px !important;
+  flex-shrink: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: none !important;
+}
+
+.modal-form-group .autocomplete-item-name {
+  color: #333 !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  flex: 1 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: none !important;
+}
+
+.modal-form-group .autocomplete-item-role {
+  color: #666 !important;
+  font-size: 12px !important;
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+  padding: 0 !important;
+  border: none !important;
+  background: none !important;
+}
+
+/* Fix for UserSearch display inside LoyaltyRewards modal */
+.loyalty-rewards-form-group .user-search-container {
+  width: 100%;
+}
+
+.loyalty-rewards-form-group .user-search-container .user-search-input {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 12px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.loyalty-rewards-form-group .user-search-autocomplete {
+  z-index: 1001;
+  max-width: 100% !important;
+  box-sizing: border-box !important;
+  overflow-x: hidden !important;
+}
+
+.loyalty-rewards-form-group .user-search-autocomplete-item {
+  display: flex !important;
+  align-items: center !important;
+  gap: 12px !important;
+  width: 100% !important;
+  overflow: hidden !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+}
+
+.loyalty-rewards-form-group .user-search-checkbox {
+  width: 18px !important;
+  height: 18px !important;
+  flex-shrink: 0 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: none !important;
+}
+
+.loyalty-rewards-form-group .autocomplete-item-name {
+  color: #333 !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  flex: 1 !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  min-width: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+  background: none !important;
+}
+
+.loyalty-rewards-form-group .autocomplete-item-role {
+  color: #666 !important;
+  font-size: 12px !important;
+  flex-shrink: 0 !important;
+  white-space: nowrap !important;
+  padding: 0 !important;
+  border: none !important;
+  background: none !important;
+}
+
+@media (min-width: 769px) {
+  .loyalty-rewards-item-actions {
+    flex-direction: row;
+    align-items: center;
+  }
+
+  .loyalty-rewards-item-status-container {
+    width: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .loyalty-rewards-item {
+    flex-direction: column;
+  }
+
+  .loyalty-rewards-item-actions {
+    width: 100%;
+    justify-content: stretch;
+  }
+
+  .loyalty-rewards-button {
+    flex: 1;
+  }
+}
+
+@media (max-width: 480px) {
+  .loyalty-rewards-button {
+    width: 100%;
+  }
+}

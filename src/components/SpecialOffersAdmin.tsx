@@ -7,7 +7,8 @@ import {
     CreateSpecialOfferRequest,
     UpdateSpecialOfferRequest
 } from '../services/specialOfferService'
-import Loading from "./Loading.tsx";
+import Loading from "./Loading.tsx"
+import Modal from './Modal'
 
 function SpecialOffersAdmin() {
     const [offers, setOffers] = useState<SpecialOffer[]>([])
@@ -144,190 +145,186 @@ function SpecialOffersAdmin() {
 
     return (
         <div className="admin-offers-container">
-            <div className="admin-offers-header">
-                <h1>Управление специальными предложениями</h1>
-                <button
-                    className="admin-offers-button admin-offers-button-contrast"
-                    onClick={() => setShowCreateModal(true)}
-                >
-                    + Создать предложение
-                </button>
-            </div>
-
-            {error && <div className="admin-offers-error">{error}</div>}
-
-            <div className="admin-offers-filters">
-                <button
-                    className={`admin-offers-filter ${filter === 'ALL' ? 'active' : ''}`}
-                    onClick={() => setFilter('ALL')}
-                >
-                    Все
-                </button>
-                <button
-                    className={`admin-offers-filter ${filter === SpecialOfferStatus.ACTIVE ? 'active' : ''}`}
-                    onClick={() => setFilter(SpecialOfferStatus.ACTIVE)}
-                >
-                    Активные
-                </button>
-                <button
-                    className={`admin-offers-filter ${filter === SpecialOfferStatus.DEACTIVATED ? 'active' : ''}`}
-                    onClick={() => setFilter(SpecialOfferStatus.DEACTIVATED)}
-                >
-                    Деактивированные
-                </button>
-            </div>
-
-            <div className="admin-offers-list">
-                {filteredOffers.map(offer => (
-                    <div key={offer.id} className="admin-offers-item">
-                        <div className="admin-offers-item-info">
-                            <h3>{offer.establishmentName}</h3>
-                            <p className="admin-offers-item-type">{offer.establishmentType}</p>
-                            <p className="admin-offers-item-offer">{offer.offer}</p>
-                            <span className={`admin-offers-status ${offer.status === SpecialOfferStatus.ACTIVE ? 'active' : 'deactivated'}`}>
-                                {offer.status === SpecialOfferStatus.ACTIVE ? 'Активно' : 'Деактивировано'}
-                            </span>
-                        </div>
-                        <div className="admin-offers-item-actions">
-                            <button
-                                className="admin-offers-button admin-offers-button-secondary"
-                                onClick={() => openEditModal(offer)}
-                            >
-                                Редактировать
-                            </button>
-                            <button
-                                className={`admin-offers-button ${offer.status === SpecialOfferStatus.ACTIVE ? 'admin-offers-button-danger' : 'admin-offers-button-secondary'}`}
-                                onClick={() => handleStatusToggle(offer)}
-                            >
-                                {offer.status === SpecialOfferStatus.ACTIVE ? 'Деактивировать' : 'Активировать'}
-                            </button>
-                        </div>
-                    </div>
-                ))}
-            </div>
-
-            {(showCreateModal || editingOffer) && (
-                <div
-                    className={`admin-offers-modal ${showCreateModal || editingOffer ? 'open' : ''}`}
-                    onClick={() => {
-                        setShowCreateModal(false)
-                        setEditingOffer(null)
-                        resetForm()
-                    }}
-                >
-                    <div
-                        className="admin-offers-modal-content"
-                        onClick={(e) => e.stopPropagation()}
+            <div className="admin-offers-content">
+                <div className="admin-offers-header">
+                    <h1>Управление специальными предложениями</h1>
+                    <button
+                        className="admin-offers-button admin-offers-button-contrast"
+                        onClick={() => setShowCreateModal(true)}
                     >
-                        <h2>{editingOffer ? 'Редактировать предложение' : 'Создать предложение'}</h2>
-                        <form onSubmit={(e) => { e.preventDefault(); editingOffer ? handleUpdate() : handleCreate(); }}>
-                            <div className="admin-offers-form-group">
-                                <label>Название заведения</label>
-                                <input
-                                    type="text"
-                                    value={formData.establishmentName}
-                                    onChange={(e) => setFormData({...formData, establishmentName: e.target.value})}
-                                    required
-                                />
-                            </div>
-                            <div className="admin-offers-form-group">
-                                <label>Тип заведения</label>
-                                <input
-                                    type="text"
-                                    value={formData.establishmentType}
-                                    onChange={(e) => setFormData({...formData, establishmentType: e.target.value})}
-                                    required
-                                />
-                            </div>
-                            <div className="admin-offers-form-group">
-                                <label>Специальное предложение</label>
-                                <textarea
-                                    value={formData.offer}
-                                    onChange={(e) => setFormData({...formData, offer: e.target.value})}
-                                    required
-                                />
-                            </div>
-                            <div className="admin-offers-form-group">
-                                <label>Адрес</label>
-                                <input
-                                    type="text"
-                                    value={formData.address}
-                                    onChange={(e) => setFormData({...formData, address: e.target.value})}
-                                />
-                            </div>
-                            <div className="admin-offers-form-group">
-                                <label>Ссылка на карту</label>
-                                <input
-                                    type="text"
-                                    value={formData.mapLink}
-                                    onChange={(e) => setFormData({...formData, mapLink: e.target.value})}
-                                />
-                            </div>
-                            <div className="admin-offers-form-group">
-                                <label>Режим работы</label>
-                                <input
-                                    type="text"
-                                    value={formData.workingHours}
-                                    onChange={(e) => setFormData({...formData, workingHours: e.target.value})}
-                                    required
-                                />
-                            </div>
-                            <div className="admin-offers-form-group">
-                                <label>Парковка</label>
-                                <input
-                                    type="text"
-                                    value={formData.parking}
-                                    onChange={(e) => setFormData({...formData, parking: e.target.value})}
-                                    required
-                                />
-                            </div>
-                            <div className="admin-offers-form-group">
-                                <label>Шаги (разделите знаком |)</label>
-                                <textarea
-                                    value={stepsRaw}
-                                    onChange={(e) => setStepsRaw(e.target.value)}
-                                />
-                            </div>
-                            <div className="admin-offers-form-group">
-                                <label>Совет</label>
-                                <textarea
-                                    value={formData.tip}
-                                    onChange={(e) => setFormData({...formData, tip: e.target.value})}
-                                />
-                            </div>
-                            <div className="admin-offers-form-group">
-                                <label>Статус</label>
-                                <select
-                                    value={formData.status}
-                                    onChange={(e) => setFormData({...formData, status: e.target.value as SpecialOfferStatus})}
-                                >
-                                    <option value={SpecialOfferStatus.ACTIVE}>Активно</option>
-                                    <option value={SpecialOfferStatus.DEACTIVATED}>Деактивировано</option>
-                                </select>
-                            </div>
-                            <div className="admin-offers-modal-actions">
-                                <button
-                                    type="button"
-                                    className="admin-offers-button admin-offers-button-secondary"
-                                    onClick={() => {
-                                        setShowCreateModal(false)
-                                        setEditingOffer(null)
-                                        resetForm()
-                                    }}
-                                >
-                                    Отмена
-                                </button>
-                                <button
-                                    type="submit"
-                                    className="admin-offers-button admin-offers-button-primary"
-                                >
-                                    {editingOffer ? 'Сохранить' : 'Создать'}
-                                </button>
-                            </div>
-                        </form>
-                    </div>
+                        + Создать предложение
+                    </button>
                 </div>
-            )}
+
+                {error && <div className="admin-offers-error">{error}</div>}
+
+                <div className="admin-offers-filters">
+                    <button
+                        className={`admin-offers-filter ${filter === 'ALL' ? 'active' : ''}`}
+                        onClick={() => setFilter('ALL')}
+                    >
+                        Все
+                    </button>
+                    <button
+                        className={`admin-offers-filter ${filter === SpecialOfferStatus.ACTIVE ? 'active' : ''}`}
+                        onClick={() => setFilter(SpecialOfferStatus.ACTIVE)}
+                    >
+                        Активные
+                    </button>
+                    <button
+                        className={`admin-offers-filter ${filter === SpecialOfferStatus.DEACTIVATED ? 'active' : ''}`}
+                        onClick={() => setFilter(SpecialOfferStatus.DEACTIVATED)}
+                    >
+                        Деактивированные
+                    </button>
+                </div>
+
+                <div className="admin-offers-list">
+                    {filteredOffers.map(offer => (
+                        <div key={offer.id} className="admin-offers-item">
+                            <div className="admin-offers-item-info">
+                                <h3>{offer.establishmentName}</h3>
+                                <p className="admin-offers-item-type">{offer.establishmentType}</p>
+                                <p className="admin-offers-item-offer">{offer.offer}</p>
+                                <span className={`admin-offers-status ${offer.status === SpecialOfferStatus.ACTIVE ? 'active' : 'deactivated'}`}>
+                                    {offer.status === SpecialOfferStatus.ACTIVE ? 'Активно' : 'Деактивировано'}
+                                </span>
+                            </div>
+                            <div className="admin-offers-item-actions">
+                                <button
+                                    className="admin-offers-button admin-offers-button-secondary"
+                                    onClick={() => openEditModal(offer)}
+                                >
+                                    Редактировать
+                                </button>
+                                <button
+                                    className={`admin-offers-button ${offer.status === SpecialOfferStatus.ACTIVE ? 'admin-offers-button-danger' : 'admin-offers-button-secondary'}`}
+                                    onClick={() => handleStatusToggle(offer)}
+                                >
+                                    {offer.status === SpecialOfferStatus.ACTIVE ? 'Деактивировать' : 'Активировать'}
+                                </button>
+                            </div>
+                        </div>
+                    ))}
+                </div>
+            </div>
+
+            <Modal
+                isOpen={showCreateModal || editingOffer !== null}
+                onClose={() => {
+                    setShowCreateModal(false)
+                    setEditingOffer(null)
+                    resetForm()
+                }}
+                title={editingOffer ? 'Редактировать предложение' : 'Создать предложение'}
+                actions={
+                    <>
+                        <button
+                            type="button"
+                            className="modal-button modal-button-secondary"
+                            onClick={() => {
+                                setShowCreateModal(false)
+                                setEditingOffer(null)
+                                resetForm()
+                            }}
+                        >
+                            Отмена
+                        </button>
+                        <button
+                            type="button"
+                            className="modal-button modal-button-primary"
+                            onClick={() => editingOffer ? handleUpdate() : handleCreate()}
+                        >
+                            {editingOffer ? 'Сохранить' : 'Создать'}
+                        </button>
+                    </>
+                }
+            >
+                <div className="modal-form-group">
+                    <label>Название заведения</label>
+                    <input
+                        type="text"
+                        value={formData.establishmentName}
+                        onChange={(e) => setFormData({...formData, establishmentName: e.target.value})}
+                        required
+                    />
+                </div>
+                <div className="modal-form-group">
+                    <label>Тип заведения</label>
+                    <input
+                        type="text"
+                        value={formData.establishmentType}
+                        onChange={(e) => setFormData({...formData, establishmentType: e.target.value})}
+                        required
+                    />
+                </div>
+                <div className="modal-form-group">
+                    <label>Специальное предложение</label>
+                    <textarea
+                        value={formData.offer}
+                        onChange={(e) => setFormData({...formData, offer: e.target.value})}
+                        required
+                    />
+                </div>
+                <div className="modal-form-group">
+                    <label>Адрес</label>
+                    <input
+                        type="text"
+                        value={formData.address}
+                        onChange={(e) => setFormData({...formData, address: e.target.value})}
+                    />
+                </div>
+                <div className="modal-form-group">
+                    <label>Ссылка на карту</label>
+                    <input
+                        type="text"
+                        value={formData.mapLink}
+                        onChange={(e) => setFormData({...formData, mapLink: e.target.value})}
+                    />
+                </div>
+                <div className="modal-form-group">
+                    <label>Режим работы</label>
+                    <input
+                        type="text"
+                        value={formData.workingHours}
+                        onChange={(e) => setFormData({...formData, workingHours: e.target.value})}
+                        required
+                    />
+                </div>
+                <div className="modal-form-group">
+                    <label>Парковка</label>
+                    <input
+                        type="text"
+                        value={formData.parking}
+                        onChange={(e) => setFormData({...formData, parking: e.target.value})}
+                        required
+                    />
+                </div>
+                <div className="modal-form-group">
+                    <label>Шаги (разделите знаком |)</label>
+                    <textarea
+                        value={stepsRaw}
+                        onChange={(e) => setStepsRaw(e.target.value)}
+                    />
+                </div>
+                <div className="modal-form-group">
+                    <label>Совет</label>
+                    <textarea
+                        value={formData.tip}
+                        onChange={(e) => setFormData({...formData, tip: e.target.value})}
+                    />
+                </div>
+                <div className="modal-form-group">
+                    <label>Статус</label>
+                    <select
+                        value={formData.status}
+                        onChange={(e) => setFormData({...formData, status: e.target.value as SpecialOfferStatus})}
+                    >
+                        <option value={SpecialOfferStatus.ACTIVE}>Активно</option>
+                        <option value={SpecialOfferStatus.DEACTIVATED}>Деактивировано</option>
+                    </select>
+                </div>
+            </Modal>
         </div>
     )
 }

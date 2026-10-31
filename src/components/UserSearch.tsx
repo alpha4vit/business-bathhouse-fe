@@ -1,5 +1,5 @@
-import React, {useEffect, useState} from 'react'
-import {UserSearchDto, userService} from '../services/userService'
+import React, {useEffect, useState, useRef} from 'react'
+import {UserDto, userService} from '../services/userService'
 import './UserSearch.css'
 
 export interface UserBalanceInfo {
@@ -8,34 +8,80 @@ export interface UserBalanceInfo {
 }
 
 interface UserSearchProps {
-    selectedUsers: UserSearchDto[]
-    onUsersChange: (users: UserSearchDto[]) => void
+    selectedUsers: UserDto[]
+    onUsersChange: (users: UserDto[]) => void
     placeholder?: string
     disabled?: boolean
     userBalances?: Record<number, UserBalanceInfo>
+    showExpirationDate?: boolean
+    showExpirationInSelected?: boolean
 }
 
 function UserSearch({
                         selectedUsers,
                         onUsersChange,
-                        placeholder = 'Поиск по фамилии...',
+                        placeholder = 'Поиск...',
                         disabled = false,
-                        userBalances
+                        userBalances,
+                        showExpirationDate = false,
+                        showExpirationInSelected = false
                     }: UserSearchProps) {
-    const [users, setUsers] = useState<UserSearchDto[]>([])
+    const [users, setUsers] = useState<UserDto[]>([])
     const [loading, setLoading] = useState(false)
     const [searchQuery, setSearchQuery] = useState('')
-    const [filteredUsers, setFilteredUsers] = useState<UserSearchDto[]>([])
+    const [filteredUsers, setFilteredUsers] = useState<UserDto[]>([])
     const [autocompleteOpen, setAutocompleteOpen] = useState(false)
     const [autocompletePosition, setAutocompletePosition] = useState<{
         top: number;
         left: number;
         width: number
     } | null>(null)
+    const [isKeyboardVisible, setIsKeyboardVisible] = useState(false)
+    const containerRef = useRef<HTMLDivElement>(null)
 
     useEffect(() => {
         loadUsers()
     }, [])
+
+    // Detect keyboard visibility on mobile
+    useEffect(() => {
+        const handleResize = () => {
+            const viewport = window.visualViewport
+            if (viewport) {
+                const keyboardVisible = viewport.height < window.innerHeight * 0.85
+                setIsKeyboardVisible(keyboardVisible)
+            }
+        }
+
+        if (window.visualViewport) {
+            window.visualViewport.addEventListener('resize', handleResize)
+            handleResize()
+        }
+
+        return () => {
+            if (window.visualViewport) {
+                window.visualViewport.removeEventListener('resize', handleResize)
+            }
+        }
+    }, [])
+
+    // Close autocomplete when clicking outside
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (containerRef.current && !containerRef.current.contains(event.target as Node)) {
+                setAutocompleteOpen(false)
+                setAutocompletePosition(null)
+            }
+        }
+
+        if (autocompleteOpen) {
+            document.addEventListener('mousedown', handleClickOutside)
+        }
+
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside)
+        }
+    }, [autocompleteOpen])
 
     const loadUsers = async () => {
         setLoading(true)
@@ -81,14 +127,17 @@ function UserSearch({
     }
 
     const handleBlur = () => {
-        // Delay closing to allow clicking on dropdown items
-        setTimeout(() => {
-            setAutocompleteOpen(false)
-            setAutocompletePosition(null)
-        }, 300)
+        // On mobile, don't close on blur when keyboard is hiding
+        // Let the click outside handler close it instead
+        if (!isKeyboardVisible) {
+            setTimeout(() => {
+                setAutocompleteOpen(false)
+                setAutocompletePosition(null)
+            }, 300)
+        }
     }
 
-    const handleUserToggle = (user: UserSearchDto, event?: React.MouseEvent) => {
+    const handleUserToggle = (user: UserDto, event?: React.MouseEvent) => {
         // Prevent default to avoid losing focus
         if (event) {
             event.preventDefault()
@@ -118,8 +167,22 @@ function UserSearch({
         return 'non-resident'
     }
 
+    const formatExpirationDate = (dateString: string | null) => {
+        if (!dateString) return 'Не указано'
+        try {
+            const date = new Date(dateString)
+            return date.toLocaleDateString('ru-RU', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric'
+            })
+        } catch {
+            return 'Не указано'
+        }
+    }
+
     return (
-        <div className="user-search-container">
+        <div className="user-search-container" ref={containerRef}>
             <div className="user-search-wrapper">
                 <input
                     type="text"
@@ -161,8 +224,13 @@ function UserSearch({
                                         }}
                                         className="user-search-checkbox"
                                     />
-                                    <div className="autocomplete-item-name">{user.fullName}</div>
-                                    <div className="autocomplete-item-role">{getRoleDisplay(user.role)}</div>
+                                    <div className="autocomplete-item-name">{user.fullName || 'Без имени'}</div>
+                                    <div className="autocomplete-item-role">{getRoleDisplay(user.role || 'UNKNOWN')}</div>
+                                    {showExpirationDate && (
+                                        <div className="autocomplete-item-expiration">
+                                            {formatExpirationDate(user.residentUntil)}
+                                        </div>
+                                    )}
                                 </div>
                             )
                         })}
@@ -188,7 +256,12 @@ function UserSearch({
                                                 : ''}
                                     </span>
                                 )}
-                                {(!userBalances || userBalances[user.chatId]?.loading || userBalances[user.chatId]?.amount == null) && (
+                                {showExpirationInSelected && (
+                                    <span className="selected-user-expiration">
+                                        {formatExpirationDate(user.residentUntil)}
+                                    </span>
+                                )}
+                                {(!userBalances || userBalances[user.chatId]?.loading || userBalances[user.chatId]?.amount == null) && !showExpirationInSelected && (
                                     <span className={`selected-user-role ${getRoleClass(user.role)}`}>
                                         {getRoleDisplay(user.role)}
                                     </span>

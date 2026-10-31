@@ -307,6 +307,68 @@
   color: #6c757d;
 }
 
+.cabinet-discount-display {
+  background: linear-gradient(120deg, rgba(40, 167, 69, 0.1) 0%, rgba(40, 167, 69, 0.2) 100%);
+  border-radius: 12px;
+  padding: clamp(25px, 5vw, 30px);
+  text-align: center;
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+}
+
+.cabinet-info-button {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  border: none;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(40, 167, 69, 0.3);
+  padding: 0;
+  line-height: 1;
+}
+
+.cabinet-info-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 4px 12px rgba(40, 167, 69, 0.4);
+}
+
+.cabinet-info-button:active {
+  transform: scale(1.05);
+}
+
+.cabinet-info-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.cabinet-discount-amount {
+  font-size: clamp(36px, 7vw, 48px);
+  font-weight: 700;
+  color: #28a745;
+  margin-bottom: 8px;
+}
+
+.cabinet-discount-label {
+  font-size: clamp(14px, 3.5vw, 16px);
+  color: #6c757d;
+}
+
 .cabinet-leaderboard-button {
   width: 100%;
   padding: clamp(12px, 3vw, 15px);
@@ -712,5 +774,247 @@
   
   .cabinet-no-photo-text {
     font-size: clamp(9px, 2vw, 10px);
+  }
+}
+
+/* Loyalty Info Modal Styles */
+.loyalty-info-modal-content {
+  max-height: 70vh;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
+.loyalty-info-section {
+  margin-bottom: 25px;
+}
+
+.loyalty-info-section h3 {
+  color: #00A9E8;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.loyalty-info-item {
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 12px;
+  border-left: 4px solid #28a745;
+}
+
+.loyalty-info-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.loyalty-info-item-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #2D2D2D;
+}
+
+.loyalty-info-item-discount {
+  font-size: 18px;
+  font-weight: 700;
+  color: #28a745;
+  background: rgba(40, 167, 69, 0.1);
+  padding: 4px 12px;
+  border-radius: 20px;
+}
+
+.loyalty-info-item-description {
+  font-size: 14px;
+  color: #495057;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.loyalty-info-points-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.loyalty-info-point-item {
+  background: #f8f9fa;
+  border-radius: 10px;
+  padding: 15px;
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  border-left: 4px solid #00A9E8;
+  transition: all 0.3s ease;
+}
+
+.loyalty-info-point-item:hover {
+  background: #e9ecef;
+  transform: translateX(5px);
+}
+
+.loyalty-info-point-number {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #00A9E8 0%, #0080b8 100%);
+  color: white;
+  font-size: 14px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 2px 8px rgba(0, 169, 232, 0.3);
+}
+
+.loyalty-info-point-content {
+  flex: 1;
+  text-align: left;
+}
+
+.loyalty-info-point-content strong {
+  display: block;
+  font-size: 15px;
+  color: #2D2D2D;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+.loyalty-info-point-content p {
+  font-size: 13px;
+  color: #495057;
+  margin: 0;
+  line-height: 1.5;
+}
+
+.loyalty-info-years-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.loyalty-info-year-item {
+  font-size: 14px;
+  color: #495057;
+  line-height: 1.4;
+}
+
+.loyalty-info-point-content p[style*="margin-top"] {
+  font-size: 13px;
+  color: #6c757d;
+  margin-top: 8px;
+}
+
+.loyalty-info-note {
+  font-size: 13px;
+  color: #6c757d;
+  margin-top: 8px;
+  margin-bottom: 0;
+  line-height: 1.4;
+}
+
+.loyalty-info-note strong {
+  color: #495057;
+}
+
+.cabinet-instructions-years-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.cabinet-instructions-year-item {
+  font-size: 14px;
+  color: #495057;
+  line-height: 1.4;
+}
+
+.cabinet-instructions-years-list:only-child .cabinet-instructions-year-item:only-child {
+  margin-bottom: 0;
+}
+
+.cabinet-instructions-note {
+  font-size: 13px;
+  color: #6c757d;
+  margin-top: 8px;
+  margin-bottom: 0;
+  line-height: 1.4;
+}
+
+.cabinet-instructions-note strong {
+  color: #495057;
+}
+
+.loyalty-info-badge {
+  background: linear-gradient(135deg, #00A9E8 0%, #0080b8 100%);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.loyalty-info-badge-green {
+  background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.loyalty-info-empty {
+  text-align: center;
+  padding: 20px;
+  color: #6c757d;
+}
+
+.loyalty-info-empty p {
+  font-size: 16px;
+  margin-bottom: 20px;
+}
+
+/* Mobile responsive for loyalty info modal */
+@media (max-width: 480px) {
+  .loyalty-info-point-item {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .loyalty-info-point-number {
+    width: 24px;
+    height: 24px;
+    font-size: 12px;
+  }
+
+  .loyalty-info-point-content strong {
+    font-size: 14px;
+  }
+
+  .loyalty-info-point-content p {
+    font-size: 12px;
+  }
+
+  .loyalty-info-item {
+    padding: 12px;
+  }
+
+  .loyalty-info-item-name {
+    font-size: 14px;
+  }
+
+  .loyalty-info-item-discount {
+    font-size: 16px;
+    padding: 3px 10px;
+  }
+
+  .loyalty-info-item-description {
+    font-size: 13px;
   }
 }

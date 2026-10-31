@@ -1,20 +1,30 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { userService, Gender } from '../services/userService'
-import { UserSearchDto } from '../services/userService'
+import { UserDto } from '../services/userService'
 import './RegistrationPage.css'
 import ReferrerSearch from './ReferrerSearch'
+import { telegramUtils } from '../utils/telegram'
 
 interface RegistrationFormData {
     fullName: string
     phoneNumber: string
     business: string
-    referrer: UserSearchDto | null
+    referrer: UserDto | null
     gender: Gender
 }
 
 function RegistrationPage() {
     const navigate = useNavigate()
+    
+    // Check if running in Telegram mini-app with initData
+    useEffect(() => {
+        const initData = telegramUtils.getInitData()
+        if (!initData) {
+            navigate('/otp-login')
+        }
+    }, [navigate])
+    
     const [formData, setFormData] = useState<RegistrationFormData>({
         fullName: '',
         phoneNumber: '',
@@ -88,7 +98,7 @@ function RegistrationPage() {
         }
     }
 
-    const handleReferrerChange = (user: UserSearchDto | null) => {
+    const handleReferrerChange = (user: UserDto | null) => {
         setFormData(prev => ({ ...prev, referrer: user }))
     }
 

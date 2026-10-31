@@ -6,7 +6,8 @@ export enum ReportType {
     USER_EVENT = 'USER_EVENT',
     GLOBAL = 'GLOBAL',
     POINTS = 'POINTS',
-    BALANCE = 'BALANCE'
+    BALANCE = 'BALANCE',
+    TRANSACTION = 'TRANSACTION'
 }
 
 export enum ReportMetadataType {
@@ -61,6 +62,12 @@ export const REPORT_TYPES: ReportTypeOption[] = [
         id: '15',
         label: 'Балансы пользователей',
         value: ReportType.BALANCE,
+        metadataType: ReportMetadataType.EMPTY
+    },
+    {
+        id: '16',
+        label: 'Финансовый отчет',
+        value: ReportType.TRANSACTION,
         metadataType: ReportMetadataType.EMPTY
     }
 ]

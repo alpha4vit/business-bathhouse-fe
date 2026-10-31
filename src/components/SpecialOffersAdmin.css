@@ -8,6 +8,13 @@
   box-sizing: border-box;
 }
 
+.admin-offers-content {
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
 .admin-offers-header {
   background: linear-gradient(135deg, #00A9E8 0%, #0080b8 100%);
   color: white;
@@ -38,6 +45,10 @@
   font-weight: 600;
   transition: all 0.3s ease;
   font-family: inherit;
+}
+
+.admin-offers-modal-actions .admin-offers-button {
+  width: 100%;
 }
 
 .admin-offers-button-primary {
@@ -225,111 +236,6 @@
   flex-wrap: wrap;
 }
 
-.admin-offers-modal {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.6);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-  backdrop-filter: blur(5px);
-  padding: 20px;
-  opacity: 0;
-  visibility: hidden;
-  transition: opacity 0.3s ease, visibility 0.3s ease;
-}
-
-.admin-offers-modal.open {
-  opacity: 1;
-  visibility: visible;
-  animation: fadeIn 0.3s ease;
-}
-
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
-}
-
-.admin-offers-modal-content {
-  background: white;
-  border-radius: 20px;
-  padding: clamp(20px, 5vw, 30px);
-  max-width: 500px;
-  width: 95%;
-  max-height: 85vh;
-  overflow-y: auto;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  animation: slideUp 0.3s ease;
-}
-
-@keyframes slideUp {
-  from {
-    transform: translateY(30px);
-    opacity: 0;
-  }
-  to {
-    transform: translateY(0);
-    opacity: 1;
-  }
-}
-
-.admin-offers-modal-content h2 {
-  margin: 0 0 24px 0;
-  font-size: clamp(20px, 5vw, 24px);
-  font-weight: 700;
-  color: #00A9E8;
-}
-
-.admin-offers-form-group {
-  margin-bottom: 18px;
-}
-
-.admin-offers-form-group label {
-  display: block;
-  margin-bottom: 8px;
-  font-weight: 600;
-  font-size: clamp(13px, 3.5vw, 14px);
-  color: #2D2D2D;
-}
-
-.admin-offers-form-group input,
-.admin-offers-form-group textarea,
-.admin-offers-form-group select {
-  width: 100%;
-  padding: 12px 16px;
-  border: 2px solid #e1e5e9;
-  border-radius: 12px;
-  font-size: clamp(14px, 3.5vw, 15px);
-  font-family: inherit;
-  box-sizing: border-box;
-  transition: border-color 0.3s ease, box-shadow 0.3s ease;
-  background: #f8f9fa;
-}
-
-.admin-offers-form-group textarea {
-  white-space: pre-wrap;
-  word-wrap: break-word;
-  min-height: 100px;
-  resize: vertical;
-}
-
-.admin-offers-modal-actions {
-  display: flex;
-  gap: 12px;
-  justify-content: flex-end;
-  margin-top: 28px;
-  padding-top: 20px;
-  border-top: 2px solid #e1e5e9;
-}
-
 @media (max-width: 768px) {
   .admin-offers-header {
     flex-direction: column;
@@ -358,6 +264,12 @@
     flex: 1;
     min-width: 80px;
     text-align: center;
+  }
+}
+
+@media (min-width: 769px) {
+  .admin-offers-item-actions .admin-offers-button {
+    width: auto;
   }
 }
 

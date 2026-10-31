@@ -306,7 +306,7 @@ function LegalInvoice() {
                             <option value={PaymentPurpose.DEPOSIT}>Пополнение лицевого счета резидента для оплаты
                                 мероприятий (Бизнес Бани, бизнес завтраков / ужинов и т д)
                             </option>
-                            <option value={PaymentPurpose.CHARITY}>Благотворительный взнос</option>
+                            {/*<option value={PaymentPurpose.CHARITY}>Благотворительный взнос</option>*/}
                             <option value={PaymentPurpose.SUBSCRIPTION_RENEWAL}>Оплата годового членского взноса
                             </option>
                         </select>

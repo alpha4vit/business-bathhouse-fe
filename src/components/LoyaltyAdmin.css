@@ -1,0 +1,113 @@
+.loyalty-admin-container {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+  color: #2D2D2D;
+  line-height: 1.6;
+  min-height: 100vh;
+  padding: clamp(15px, 4vw, 20px) clamp(10px, 3vw, 15px);
+  box-sizing: border-box;
+}
+
+.loyalty-admin-content {
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.loyalty-admin-header {
+  background: linear-gradient(135deg, #00A9E8 0%, #0080b8 100%);
+  color: white;
+  padding: clamp(20px, 5vw, 30px) clamp(15px, 4vw, 20px);
+  border-radius: 20px;
+  margin-bottom: 25px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 169, 232, 0.3);
+  position: relative;
+  overflow: hidden;
+  box-sizing: border-box;
+}
+
+.loyalty-admin-header h1 {
+  font-size: clamp(20px, 5vw, 24px);
+  font-weight: 700;
+  margin-bottom: 10px;
+  position: relative;
+  z-index: 1;
+}
+
+.loyalty-admin-nav {
+  margin-bottom: 25px;
+}
+
+.loyalty-nav-tabs {
+  display: flex;
+  background: white;
+  border-radius: 12px;
+  padding: 4px;
+  box-shadow: 0 2px 10px rgba(45, 45, 45, 0.1);
+  position: relative;
+}
+
+.loyalty-nav-tab {
+  flex: 1;
+  padding: 12px 20px;
+  border: none;
+  background: transparent;
+  border-radius: 8px;
+  font-size: clamp(14px, 4vw, 16px);
+  font-weight: 500;
+  color: #6c757d;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  z-index: 2;
+  white-space: nowrap;
+}
+
+.loyalty-nav-tab:hover {
+  color: #00A9E8;
+}
+
+.loyalty-nav-tab.active {
+  color: white;
+  background: linear-gradient(135deg, #00A9E8 0%, #0080b8 100%);
+  box-shadow: 0 2px 8px rgba(0, 169, 232, 0.3);
+  transform: translateY(-1px);
+}
+
+.loyalty-admin-content-area {
+  background: transparent;
+}
+
+@media (max-width: 768px) {
+  .loyalty-nav-tab {
+    padding: 10px 16px;
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 480px) {
+  .loyalty-nav-tab {
+    padding: 8px 12px;
+    font-size: 13px;
+  }
+
+  .loyalty-nav-tabs {
+    padding: 3px;
+  }
+}
+
+@media (max-width: 390px) {
+  .loyalty-nav-tabs {
+    flex-direction: column;
+  }
+
+  .loyalty-nav-tab {
+    margin-bottom: 4px;
+  }
+
+  .loyalty-nav-tab:last-child {
+    margin-bottom: 0;
+  }
+}

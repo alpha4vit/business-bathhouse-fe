@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { authService } from '../services/authService'
 import { userStorage } from '../utils/userStorage'
 import { useNotification } from '../hooks/useNotification'
+import { telegramUtils } from '../utils/telegram'
 import './OtpLoginPage.css'
 import './Notification.css'
 
@@ -15,6 +16,13 @@ function OtpLoginPage() {
     const [errors, setErrors] = useState<{ phone?: string; otp?: string }>({})
     const [isSubmitting, setIsSubmitting] = useState(false)
     const inputRefs = useRef<(HTMLInputElement | null)[]>([])
+    const [isTelegramMiniApp, setIsTelegramMiniApp] = useState(false)
+
+    // Check if running in Telegram mini-app
+    useEffect(() => {
+        const initData = telegramUtils.getInitData()
+        setIsTelegramMiniApp(!!initData)
+    }, [])
 
     // Auto-submit when all 6 digits are entered
     useEffect(() => {
@@ -192,14 +200,16 @@ function OtpLoginPage() {
                             {isSubmitting ? 'Отправка...' : 'Получить код в Telegram'}
                         </button>
 
-                        <div className="text-link-container">
-                            <span
-                                className="text-link"
-                                onClick={() => navigate('/register')}
-                            >
-                                Зарегистрироваться
-                            </span>
-                        </div>
+                        {isTelegramMiniApp && (
+                            <div className="text-link-container">
+                                <span
+                                    className="text-link"
+                                    onClick={() => navigate('/register')}
+                                >
+                                    Зарегистрироваться
+                                </span>
+                            </div>
+                        )}
                     </form>
                 ) : (
                     <form className="otp-login-form">

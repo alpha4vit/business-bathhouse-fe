@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react'
 import './BalanceAdjustmentPage.css'
-import { UserSearchDto, userService } from '../services/userService'
+import { UserDto, userService } from '../services/userService'
 import { Event } from '../services/eventService'
 import {
     balanceAdjustmentService,
@@ -11,7 +11,7 @@ import UserSearch, { UserBalanceInfo } from './UserSearch'
 import EventSearch from './EventSearch'
 
 function BalanceAdjustmentPage() {
-    const [selectedUsers, setSelectedUsers] = useState<UserSearchDto[]>([])
+    const [selectedUsers, setSelectedUsers] = useState<UserDto[]>([])
     const [amount, setAmount] = useState<string>('')
     const [direction, setDirection] = useState<TransactionDirection>(TransactionDirection.CREDIT)
     const [title, setTitle] = useState<string>('')
@@ -150,7 +150,7 @@ function BalanceAdjustmentPage() {
                         <UserSearch
                             selectedUsers={selectedUsers}
                             onUsersChange={setSelectedUsers}
-                            placeholder="Поиск по фамилии..."
+                            placeholder="Поиск..."
                             disabled={isSubmitting}
                             userBalances={userBalances}
                         />

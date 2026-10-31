@@ -1,4 +1,4 @@
-import {useState, ReactNode} from 'react'
+import {forwardRef, ReactNode, useImperativeHandle, useState} from 'react'
 import './SwipeCard.css'
 
 export interface SwipeCardProps<T> {
@@ -10,14 +10,19 @@ export interface SwipeCardProps<T> {
     cardClassName?: string
 }
 
-function SwipeCard<T>({
-    items,
-    currentIndex,
-    onIndexChange,
-    renderCard,
-    className = '',
-    cardClassName = ''
-}: SwipeCardProps<T>) {
+export interface SwipeCardRef {
+    handlePrevious: () => void
+    handleNext: () => void
+}
+
+const SwipeCard = forwardRef<SwipeCardRef, SwipeCardProps<any>>(function SwipeCard<T>({
+                                                                                          items,
+                                                                                          currentIndex,
+                                                                                          onIndexChange,
+                                                                                          renderCard,
+                                                                                          className = '',
+                                                                                          cardClassName = ''
+                                                                                      }: SwipeCardProps<T>, ref: any) {
     const [swipeOffset, setSwipeOffset] = useState(0)
     const [isDragging, setIsDragging] = useState(false)
     const [isAnimating, setIsAnimating] = useState(false)
@@ -27,6 +32,11 @@ function SwipeCard<T>({
     const [animationDir, setAnimationDir] = useState<'left' | 'right' | null>(null)
     const [touchStart, setTouchStart] = useState(0)
     const [touchStartY, setTouchStartY] = useState(0)
+
+    useImperativeHandle(ref, () => ({
+        handlePrevious,
+        handleNext
+    }))
 
     const handleTouchStart = (e: React.TouchEvent) => {
         setTouchStart(e.touches[0].clientX)
@@ -133,11 +143,12 @@ function SwipeCard<T>({
                     disabled={currentIndex === 0 || isAnimating}
                     aria-label="Previous"
                 >
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                         strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="15 18 9 12 15 6"></polyline>
                     </svg>
                 </button>
-                
+
                 <div
                     className={`swipe-card-container ${isSwiping ? 'swiping' : ''}`}
                     onTouchStart={handleTouchStart}
@@ -172,20 +183,23 @@ function SwipeCard<T>({
                         )
                     })}
                 </div>
-                
+
                 <button
                     className="swipe-card-nav-button swipe-card-nav-next"
                     onClick={handleNext}
                     disabled={currentIndex === items.length - 1 || isAnimating}
                     aria-label="Next"
                 >
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+                         strokeLinecap="round" strokeLinejoin="round">
                         <polyline points="9 18 15 12 9 6"></polyline>
                     </svg>
                 </button>
             </div>
         </div>
     )
-}
+})
+
+SwipeCard.displayName = 'SwipeCard'
 
 export default SwipeCard

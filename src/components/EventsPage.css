@@ -10,6 +10,13 @@
   min-height: 100vh;
 }
 
+.events-content {
+  max-width: 800px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+}
+
 .notification {
   position: fixed;
   top: 20px;
@@ -223,6 +230,12 @@
 
 .events-result-description-content p {
   margin: 10px 0;
+}
+
+.events-result-description-content br {
+  display: block;
+  margin: 10px 0;
+  content: "";
 }
 
 .events-result-description-content ul,

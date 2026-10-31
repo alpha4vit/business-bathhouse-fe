@@ -1,15 +1,15 @@
 import {useState} from 'react'
 import './UserDeactivationPage.css'
-import {UserSearchDto, userService} from '../services/userService'
+import {UserDto, userService} from '../services/userService'
 import UserSearch from './UserSearch'
 
 interface DeactivationResult {
-    success: UserSearchDto[]
-    failed: UserSearchDto[]
+    success: UserDto[]
+    failed: UserDto[]
 }
 
 function UserDeactivationPage() {
-    const [selectedUsers, setSelectedUsers] = useState<UserSearchDto[]>([])
+    const [selectedUsers, setSelectedUsers] = useState<UserDto[]>([])
     const [isSubmitting, setIsSubmitting] = useState(false)
     const [result, setResult] = useState<DeactivationResult | null>(null)
     const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(null)

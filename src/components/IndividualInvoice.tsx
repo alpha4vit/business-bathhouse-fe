@@ -15,7 +15,7 @@ enum PaymentPurpose {
 }
 
 function IndividualInvoice() {
-    const {user: authUser, loading: authLoading, error: authError} = useAuthUser()
+    const {user: authUser, loading: authLoading, error: authError, role} = useAuthUser()
     const userId = authUser?.company?.id?.toString() || null
     const {notification, showError} = useNotification()
     const [paymentPurpose, setPaymentPurpose] = useState<PaymentPurpose | ''>('')
@@ -126,6 +126,16 @@ function IndividualInvoice() {
         setCreatedTransaction(null)
         setInvoiceAmount('')
         setCopiedUrl(false)
+    }
+
+    const getAvailablePaymentPurposes = () => {
+        if (role === 'NON_RESIDENT' || role === 'UNREGISTERED') {
+            return [PaymentPurpose.DOWN_PAYMENT]
+        }
+        if (role === 'RESIDENT' || role === 'ADMIN') {
+            return [PaymentPurpose.DEPOSIT]
+        }
+        return [PaymentPurpose.DEPOSIT, PaymentPurpose.DOWN_PAYMENT]
     }
 
     if (authLoading) {
@@ -254,10 +264,14 @@ function IndividualInvoice() {
                             className="legal-invoice-select"
                         >
                             <option value="">Выберите назначение...</option>
-                            <option value={PaymentPurpose.DEPOSIT}>Пополнение лицевого счета резидента для оплаты
-                                мероприятий (Бизнес Бани, бизнес завтраков / ужинов и т д)
-                            </option>
-                            <option value={PaymentPurpose.DOWN_PAYMENT}>Первоначальный взнос</option>
+                            {getAvailablePaymentPurposes().includes(PaymentPurpose.DEPOSIT) && (
+                                <option value={PaymentPurpose.DEPOSIT}>Пополнение лицевого счета резидента для оплаты
+                                    мероприятий (Бизнес Бани, бизнес завтраков / ужинов и т д)
+                                </option>
+                            )}
+                            {getAvailablePaymentPurposes().includes(PaymentPurpose.DOWN_PAYMENT) && (
+                                <option value={PaymentPurpose.DOWN_PAYMENT}>Первоначальный взнос</option>
+                            )}
                         </select>
 
                         <label style={{ marginTop: 20 }}>Сумма начисления</label>

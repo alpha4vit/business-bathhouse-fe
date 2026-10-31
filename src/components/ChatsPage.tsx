@@ -1,15 +1,22 @@
-import {useEffect, useState} from 'react'
-import SwipeCard from './SwipeCard'
+import {useEffect, useState, useRef} from 'react'
+import SwipeCard, {SwipeCardRef} from './SwipeCard'
 import {Chat, chatService} from '../services/chatService'
 import './ChatsPage.css'
 import {useUser} from "../contexts/UserContext.tsx";
 import {isNonResident} from "../services/userService.ts";
 import {useNotification} from "../hooks/useNotification.ts";
 import Loading from "./Loading.tsx";
+import {useCache} from '../utils/cache'
 
 function ChatsPage() {
     const {user} = useUser()
     const {showSuccess, showError} = useNotification()
+    const swipeCardRef = useRef<SwipeCardRef>(null)
+    const {data: chatsData, loading: chatsLoading, error: chatsError} = useCache<Chat[]>(
+        'chats',
+        () => chatService.getChats(),
+        []
+    )
     const [chats, setChats] = useState<Chat[]>([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState<string | null>(null)
@@ -20,8 +27,36 @@ function ChatsPage() {
     const [requestingChatId, setRequestingChatId] = useState<number | null>(null)
 
     useEffect(() => {
-        loadChats()
-    }, [])
+        if (chatsData) {
+            setChats(chatsData)
+        }
+    }, [chatsData])
+
+    useEffect(() => {
+        setLoading(chatsLoading)
+    }, [chatsLoading])
+
+    useEffect(() => {
+        setError(chatsError)
+    }, [chatsError])
+
+    // Handle keyboard navigation for desktop
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (chats.length === 0) return
+
+            if (e.key === 'ArrowLeft') {
+                e.preventDefault()
+                swipeCardRef.current?.handlePrevious()
+            } else if (e.key === 'ArrowRight') {
+                e.preventDefault()
+                swipeCardRef.current?.handleNext()
+            }
+        }
+
+        window.addEventListener('keydown', handleKeyDown)
+        return () => window.removeEventListener('keydown', handleKeyDown)
+    }, [chats.length])
 
     useEffect(() => {
         chats.forEach(chat => {
@@ -34,19 +69,6 @@ function ChatsPage() {
             }
         })
     }, [chats, user])
-
-    const loadChats = async () => {
-        try {
-            setLoading(true)
-            const data = await chatService.getChats()
-            setChats(data)
-        } catch (err) {
-            setError('Не удалось загрузить чаты')
-            console.error(err)
-        } finally {
-            setLoading(false)
-        }
-    }
 
     const loadChatImage = async (chatId: number) => {
         try {
@@ -140,6 +162,7 @@ function ChatsPage() {
                     </div>
                 ) : (
                     <SwipeCard
+                        ref={swipeCardRef}
                         items={chats}
                         currentIndex={currentIndex}
                         onIndexChange={setCurrentIndex}

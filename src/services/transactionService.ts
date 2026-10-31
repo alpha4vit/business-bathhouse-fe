@@ -2,8 +2,8 @@ import {API_BASE_URL} from '../config/api'
 import {authenticatedFetch} from '../utils/apiClient'
 
 export enum TransactionDirection {
-    DEBIT = '1',
-    CREDIT = '2'
+    DEBIT = 'DEBIT',
+    CREDIT = 'CREDIT'
 }
 
 export enum TransactionType {

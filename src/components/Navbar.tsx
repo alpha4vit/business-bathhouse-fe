@@ -114,6 +114,12 @@ function Navbar({hideMenuButton = false}: { hideMenuButton?: boolean }) {
                                         <Link to="/admin/users/deactivate" className="navbar-dropdown-item">
                                             <span>Деактивация пользователей</span>
                                         </Link>
+                                        <Link to="/admin/membership/adjustment" className="navbar-dropdown-item">
+                                            <span>Корректировка членства</span>
+                                        </Link>
+                                        <Link to="/admin/loyalty" className="navbar-dropdown-item">
+                                            <span>Управление скидками</span>
+                                        </Link>
                                     </div>
                                 </div>
                             )}
@@ -263,6 +269,20 @@ function Navbar({hideMenuButton = false}: { hideMenuButton?: boolean }) {
                                                 setIsAdminSubmenuOpen(false);
                                             }}>
                                                 <span>Управление мероприятиями</span>
+                                            </Link>
+                                            <Link to="/admin/loyalty"
+                                                  className="navbar-drawer-link navbar-drawer-sublink" onClick={() => {
+                                                setIsMenuOpen(false);
+                                                setIsAdminSubmenuOpen(false);
+                                            }}>
+                                                <span>Управление скидками</span>
+                                            </Link>
+                                            <Link to="/admin/membership/adjustment"
+                                                  className="navbar-drawer-link navbar-drawer-sublink" onClick={() => {
+                                                setIsMenuOpen(false);
+                                                setIsAdminSubmenuOpen(false);
+                                            }}>
+                                                <span>Корректировка членства</span>
                                             </Link>
                                         </div>
                                     </div>

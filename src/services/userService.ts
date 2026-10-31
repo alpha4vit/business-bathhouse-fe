@@ -1,6 +1,10 @@
 import {API_BASE_URL} from '../config/api'
 import {authenticatedFetch, handleApiError} from '../utils/apiClient'
 
+export interface SubscriptionCheckError extends Error {
+    isSubscriptionError?: boolean
+}
+
 export enum Gender {
     MALE = '273098',
     FEMALE = '273100'
@@ -28,6 +32,7 @@ export interface UserDataDto {
     points: number,
     gender?: string,
     pointsHistory: PointsHistoryItem[]
+    discount?: number
     company?: {
         id: string
         title?: string
@@ -64,7 +69,7 @@ export interface Resident {
     photoSource?: string // Источник фото для загрузки по требованию
 }
 
-export interface UserSearchDto {
+export interface UserDto {
     chatId: number
     companyId: string | null
     fullName: string
@@ -74,6 +79,7 @@ export interface UserSearchDto {
     achievements: string[]
     avatarUrl: string | null
     role: string
+    residentUntil: string | null
 }
 
 export interface TelegramUserResponse {
@@ -87,6 +93,7 @@ export interface TelegramUserResponse {
     role?: string
     status?: string
     gender?: string
+    discount?: number
     company?: {
         id: string
         title?: string
@@ -131,6 +138,26 @@ export const userService = {
             return await response.json();
         } catch (error) {
             console.error('Error getting current user:', error);
+            throw error;
+        }
+    },
+
+    async checkSubscription(): Promise<{ isSubscribed: boolean }> {
+        try {
+            const response = await authenticatedFetch(`${API_BASE_URL}/api/auth/subscription/refresh`, {
+                method: 'POST'
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                const error = new Error(errorData.message || 'Failed to check subscription') as SubscriptionCheckError;
+                error.isSubscriptionError = true;
+                throw error;
+            }
+
+            return await response.json();
+        } catch (error) {
+            console.error('Error checking subscription:', error);
             throw error;
         }
     },
@@ -196,6 +223,7 @@ export const userService = {
                 points: user.company?.points || 0,
                 gender: user.gender as Gender || Gender.MALE,
                 pointsHistory,
+                discount: user.discount,
                 company: user.company ? {
                     ...user.company,
                     photo: user.company.photo
@@ -335,7 +363,7 @@ export const userService = {
         }
     },
 
-    async getAllUsers(): Promise<UserSearchDto[]> {
+    async getAllUsers(): Promise<UserDto[]> {
         try {
             const response = await authenticatedFetch(`${API_BASE_URL}/api/users`)
 
@@ -380,6 +408,23 @@ export const userService = {
         if (!response.ok) {
             await handleApiError(response, 'Failed to register')
         }
+    },
+
+    async updateMembershipExpiration(data: {
+        userIds: string[]
+        residentUntil: string
+    }): Promise<Array<{ externalId: string; residentUntil: string }>> {
+        const response = await authenticatedFetch(`${API_BASE_URL}/api/users/membership/update`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(data)
+        })
+
+        if (!response.ok) {
+            await handleApiError(response, 'Failed to update membership expiration')
+        }
+
+        return await response.json()
     }
 }
 

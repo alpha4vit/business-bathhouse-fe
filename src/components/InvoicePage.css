@@ -99,8 +99,22 @@
     padding: 8px 12px;
     font-size: 13px;
   }
-  
+
   .invoice-nav-tabs {
     padding: 3px;
+  }
+}
+
+@media (max-width: 390px) {
+  .invoice-nav-tabs {
+    flex-direction: column;
+  }
+
+  .invoice-nav-tab {
+    margin-bottom: 4px;
+  }
+
+  .invoice-nav-tab:last-child {
+    margin-bottom: 0;
   }
 }
