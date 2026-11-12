@@ -87,6 +87,8 @@ function LegalInvoice() {
     useEffect(() => {
         if (paymentPurpose === PaymentPurpose.BATHHOUSE_EVENT) {
             setInvoiceAmount('14000')
+        } else if (paymentPurpose === PaymentPurpose.NEW_YEAR_BATHHOUSE) {
+            setInvoiceAmount('39900')
         }
     }, [paymentPurpose])
 
@@ -309,6 +311,7 @@ function LegalInvoice() {
                             {/*<option value={PaymentPurpose.CHARITY}>Благотворительный взнос</option>*/}
                             <option value={PaymentPurpose.SUBSCRIPTION_RENEWAL}>Оплата годового членского взноса
                             </option>
+                            <option value={PaymentPurpose.NEW_YEAR_BATHHOUSE}>Новогодняя баня</option>
                         </select>
                     </div>
                 </div>
@@ -332,6 +335,19 @@ function LegalInvoice() {
                                     <option value="28000">28 000 ₽</option>
                                 </select>
                             </div>
+                        ) : paymentPurpose === PaymentPurpose.NEW_YEAR_BATHHOUSE ? (
+                            <div className="legal-invoice-input-wrapper">
+                                <input
+                                    type="text"
+                                    value={invoiceAmount}
+                                    readOnly
+                                    className="legal-invoice-input"
+                                    disabled
+                                />
+                                <div className="legal-invoice-ruble-symbol">
+                                    ₽
+                                </div>
+                            </div>
                         ) : (
                             <div className="legal-invoice-input-wrapper">
                                 <input
@@ -348,27 +364,31 @@ function LegalInvoice() {
                         )}
                     </div>
 
-                    <div className="legal-invoice-input-group">
-                        <label>
-                            Сумма к зачислению на счет
-                        </label>
-                        <div className="legal-invoice-input-wrapper">
-                            <input
-                                type="text"
-                                value={calculatedAmount}
-                                readOnly
-                                className="legal-invoice-input"
-                                disabled
-                            />
-                            <div className="legal-invoice-ruble-symbol">
-                                ₽
+                    {paymentPurpose !== PaymentPurpose.NEW_YEAR_BATHHOUSE && (
+                        <>
+                            <div className="legal-invoice-input-group">
+                                <label>
+                                    Сумма к зачислению на счет
+                                </label>
+                                <div className="legal-invoice-input-wrapper">
+                                    <input
+                                        type="text"
+                                        value={calculatedAmount}
+                                        readOnly
+                                        className="legal-invoice-input"
+                                        disabled
+                                    />
+                                    <div className="legal-invoice-ruble-symbol">
+                                        ₽
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
 
-                    <div className="legal-invoice-note">
-                        <strong>Примечание:</strong> На баланс зачисляется 92% от суммы (8% — налог по АУСН)
-                    </div>
+                            <div className="legal-invoice-note">
+                                <strong>Примечание:</strong> На баланс зачисляется 92% от суммы (8% — налог по АУСН)
+                            </div>
+                        </>
+                    )}
                 </div>
 
                 <div className="legal-invoice-button-container">
