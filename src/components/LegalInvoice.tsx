@@ -304,13 +304,10 @@ function LegalInvoice() {
                             className="legal-invoice-select"
                         >
                             <option value="">Выберите назначение...</option>
-                            <option value={PaymentPurpose.BATHHOUSE_EVENT}>Банное мероприятие</option>
                             <option value={PaymentPurpose.DEPOSIT}>Пополнение лицевого счета резидента для оплаты
                                 мероприятий (Бизнес Бани, бизнес завтраков / ужинов и т д)
                             </option>
                             {/*<option value={PaymentPurpose.CHARITY}>Благотворительный взнос</option>*/}
-                            <option value={PaymentPurpose.SUBSCRIPTION_RENEWAL}>Оплата годового членского взноса
-                            </option>
                             <option value={PaymentPurpose.NEW_YEAR_BATHHOUSE}>Новогодняя баня</option>
                         </select>
                     </div>
